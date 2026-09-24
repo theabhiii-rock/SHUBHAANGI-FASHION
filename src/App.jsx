@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   FiX as X, FiInstagram, FiYoutube, FiMessageCircle,
   FiClock, FiDollarSign, FiCalendar, FiShield, FiArrowDown,
-  FiHeart, FiStar
+  FiHeart, FiStar, FiChevronRight, FiCheckCircle, FiPackage, FiTag, FiPhoneCall
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import Lenis from '@studio-freight/lenis';
@@ -77,10 +77,11 @@ export default function App() {
     });
   };
 
-  // Check URL Hash on initial load & hash changes for #/admin
+  // Check URL Hash on initial load & hash changes for #admin or #owner
   useEffect(() => {
     const handleHashCheck = () => {
-      if (window.location.hash === '#/admin') {
+      const h = window.location.hash.toLowerCase();
+      if (h === '#/admin' || h === '#admin' || h === '#owner') {
         if (isAuthenticated) {
           setCurrentView('admin');
         } else {
@@ -93,7 +94,20 @@ export default function App() {
 
     handleHashCheck();
     window.addEventListener('hashchange', handleHashCheck);
-    return () => window.removeEventListener('hashchange', handleHashCheck);
+
+    // Discreet shortcut for studio owners (Ctrl + Shift + A)
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        setIsAuthModalOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashCheck);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isAuthenticated]);
 
   // Track visitors once on mount
@@ -323,63 +337,184 @@ export default function App() {
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
-            transition={{ type: 'tween', duration: 0.5, ease: [0.25, 0.4, 0.25, 1] }}
-            className="fixed top-0 left-0 w-80 max-w-[80vw] h-full bg-luxury-light z-50 flex flex-col shadow-2xl"
+            transition={{ type: 'tween', duration: 0.35, ease: [0.25, 0.4, 0.25, 1] }}
+            className="fixed top-0 left-0 w-84 max-w-[85vw] h-full bg-[#faf9f6] z-50 flex flex-col shadow-2xl overflow-y-auto"
           >
-            <div className="p-6 flex justify-between items-center border-b border-gray-200">
-              <div className="flex items-center gap-3">
+            {/* Luxury Header Banner */}
+            <div className="bg-[#121212] text-white p-6 border-b border-luxury-gold/30 relative">
+              <button 
+                onClick={() => setSidebarOpen(false)} 
+                className="absolute top-4 right-4 text-gray-400 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                aria-label="Close menu"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="flex items-center gap-3 mb-3">
                 <img 
                   src="/images/shubhaangi-official-logo.jpg" 
-                  alt="SHUBHAANGI Logo" 
-                  className="w-10 h-10 rounded-full object-cover border border-luxury-gold/60 shadow-sm shrink-0" 
+                  alt="SHUBHAANGI Official Crest" 
+                  className="w-12 h-12 rounded-full object-cover border border-luxury-gold/70 shadow-md ring-1 ring-luxury-gold/30 shrink-0" 
                 />
-                <span className="font-serif text-xl font-bold tracking-[0.15em] uppercase">Shubhaangi</span>
+                <div>
+                  <h2 className="font-serif text-lg tracking-[0.18em] uppercase font-bold text-white">
+                    Shubhaangi
+                  </h2>
+                  <p className="text-[9px] tracking-[0.3em] uppercase text-luxury-gold font-medium">
+                    The Ultimate Bride
+                  </p>
+                </div>
               </div>
-              <button onClick={() => setSidebarOpen(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><X size={22} /></button>
-            </div>
-            <nav className="flex-1 p-8 flex flex-col gap-6 text-lg font-serif">
-              {[
-                { name: 'Bridal Lehengas', tab: 'DRESS' },
-                { name: 'Bridal Jewellery', tab: 'JEWELLERY' },
-                { name: 'Makeup Packages', tab: 'MAKEUP' },
-                { name: 'All Collections', tab: 'ALL' }
-              ].map((item) => (
-                <a 
-                  key={item.name}
-                  href="#catalog" 
-                  onClick={() => {
-                    setActiveTab(item.tab);
-                    setSidebarOpen(false);
-                  }}
-                  className="transition-colors tracking-wide text-gray-800 hover:text-luxury-gold"
-                >
-                  {item.name}
-                </a>
-              ))}
-              <a 
-                href="https://wa.me/916397799514?text=Hello%20SHUBHAANGI%20Studio,%20I%20would%20like%20to%20book%20a%20bridal%20trial%20session."
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm font-sans tracking-widest uppercase text-luxury-gold mt-4 font-semibold"
-              >
-                + Book Studio Fitting
-              </a>
 
-              <button
-                onClick={() => {
-                  setSidebarOpen(false);
-                  setIsAuthModalOpen(true);
-                }}
-                className="text-xs font-mono tracking-wider uppercase text-gray-500 hover:text-black border-t border-gray-200 pt-4 text-left flex items-center gap-1.5"
-              >
-                <FiShield size={14} className="text-luxury-gold" />
-                <span>Studio Owner OS (PIN: 2026)</span>
-              </button>
-            </nav>
-            <div className="p-8 border-t border-gray-200 bg-gray-50">
-              <p className="text-xs tracking-widest text-gray-500 mb-1 uppercase">Direct Atelier WhatsApp</p>
-              <p className="font-medium text-base text-gray-900">+91 6397 799 514</p>
-              <p className="text-[10px] text-gray-400 mt-1">B-125, First Floor, Laxmi Nagar, Delhi</p>
+              <div className="bg-white/5 border border-white/10 rounded px-3 py-1.5 text-[11px] text-gray-300 flex items-center justify-between">
+                <span>✨ Bespoke Couture Atelier</span>
+                <span className="text-[9px] bg-luxury-gold/20 text-luxury-gold font-bold px-1.5 py-0.5 rounded uppercase">
+                  Delhi Flagship
+                </span>
+              </div>
+            </div>
+
+            {/* Main E-Commerce Content */}
+            <div className="p-5 flex-1 space-y-6">
+              {/* Category Links */}
+              <div>
+                <h3 className="text-[10px] uppercase tracking-[0.25em] text-gray-400 font-bold mb-3 px-1">
+                  Couture Categories
+                </h3>
+                <div className="space-y-1">
+                  {[
+                    { name: 'Bridal Lehengas', tab: 'DRESS', desc: 'Handcrafted Heritage Zardozi', badge: 'Popular' },
+                    { name: 'Bridal Jewellery', tab: 'JEWELLERY', desc: 'Kundan, Polki & Emerald Chokers', badge: 'Trending' },
+                    { name: 'Makeup Packages', tab: 'MAKEUP', desc: 'HD Bridal & Reception Glam', badge: null },
+                    { name: 'All Collections', tab: 'ALL', desc: 'Complete 2026 Bridal Vault', badge: null }
+                  ].map((item) => (
+                    <button 
+                      key={item.name}
+                      onClick={() => {
+                        setActiveTab(item.tab);
+                        setSidebarOpen(false);
+                        const el = document.getElementById('catalog');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-black/5 transition-all text-left group"
+                    >
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-serif text-base font-semibold text-gray-900 group-hover:text-luxury-gold transition-colors">
+                            {item.name}
+                          </span>
+                          {item.badge && (
+                            <span className="text-[8px] tracking-wider uppercase font-bold bg-luxury-gold/15 text-luxury-gold px-1.5 py-0.2 rounded">
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-gray-500 font-light mt-0.5">{item.desc}</p>
+                      </div>
+                      <FiChevronRight size={16} className="text-gray-400 group-hover:text-luxury-gold group-hover:translate-x-1 transition-all" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* VIP Customer Services (Pro E-Commerce Concierge) */}
+              <div>
+                <h3 className="text-[10px] uppercase tracking-[0.25em] text-gray-400 font-bold mb-3 px-1">
+                  Client Concierge
+                </h3>
+                <div className="space-y-1.5">
+                  <button
+                    onClick={() => {
+                      setSidebarOpen(false);
+                      setIsAppointmentOpen(true);
+                    }}
+                    className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-black/5 text-gray-800 text-xs font-medium transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-luxury-gold/10 text-luxury-gold flex items-center justify-center shrink-0">
+                      <FiCalendar size={14} />
+                    </div>
+                    <div className="text-left flex-1">
+                      <span className="font-semibold block">Book Studio Trial</span>
+                      <span className="text-[10px] text-gray-500 font-light">Visit VIP Fitting Suite in Delhi</span>
+                    </div>
+                    <span className="text-[10px] text-luxury-gold font-bold">Book →</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setSidebarOpen(false);
+                      setIsOrderTrackerOpen(true);
+                    }}
+                    className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-black/5 text-gray-800 text-xs font-medium transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-black/5 text-gray-700 flex items-center justify-center shrink-0">
+                      <FiPackage size={14} />
+                    </div>
+                    <div className="text-left flex-1">
+                      <span className="font-semibold block">Track Order & Rentals</span>
+                      <span className="text-[10px] text-gray-500 font-light">Live bridal delivery status</span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setSidebarOpen(false);
+                      setIsWishlistOpen(true);
+                    }}
+                    className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-black/5 text-gray-800 text-xs font-medium transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center shrink-0">
+                      <FiHeart size={14} />
+                    </div>
+                    <div className="text-left flex-1">
+                      <span className="font-semibold block">My Bridal Wishlist</span>
+                      <span className="text-[10px] text-gray-500 font-light">{wishlistIds.length} saved creations</span>
+                    </div>
+                  </button>
+
+                  <a
+                    href="https://wa.me/916397799514?text=Hello%20Deepak%20Sir,%20I%20need%20custom%20fitting%20assistance%20for%20a%20SHUBHAANGI%20dress."
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-[#25D366]/10 text-gray-800 text-xs font-medium transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-[#25D366]/15 text-[#25D366] flex items-center justify-center shrink-0">
+                      <FiMessageCircle size={15} />
+                    </div>
+                    <div className="text-left flex-1">
+                      <span className="font-semibold block text-[#1e7e34]">Designer Fitting WhatsApp</span>
+                      <span className="text-[10px] text-gray-500 font-light">Free size alterations with Deepak Kumar</span>
+                    </div>
+                  </a>
+                </div>
+              </div>
+
+              {/* E-Commerce Trust Badges */}
+              <div className="bg-gray-100/70 p-3.5 rounded-lg space-y-2 border border-gray-200/50">
+                <div className="flex items-center gap-2 text-[11px] text-gray-700">
+                  <FiCheckCircle size={13} className="text-emerald-600 shrink-0" />
+                  <span>Free Custom Fitting by Designer Deepak</span>
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-gray-700">
+                  <FiCheckCircle size={13} className="text-emerald-600 shrink-0" />
+                  <span>100% Refundable Security Deposit</span>
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-gray-700">
+                  <FiCheckCircle size={13} className="text-emerald-600 shrink-0" />
+                  <span>Dry-Cleaned & Sanitized Assurance</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Drawer Footer Contact */}
+            <div className="p-5 border-t border-gray-200 bg-white">
+              <div className="flex items-center justify-between text-xs mb-2">
+                <span className="text-gray-500 font-medium">Customer Support:</span>
+                <a href="tel:+916397799514" className="font-bold text-gray-900 hover:text-luxury-gold">+91 6397 799 514</a>
+              </div>
+              <p className="text-[10px] text-gray-400 font-light leading-relaxed">
+                B-125, First Floor, Laxmi Nagar (Near V3S Mall), Delhi - 110092
+              </p>
             </div>
           </motion.div>
         )}
