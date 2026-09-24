@@ -1,0 +1,52 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400&family=Poppins:wght@300;400;500;600&display=swap');
+
+@theme {
+  --color-luxury-dark: #1a1a1a;
+  --color-luxury-light: #faf9f6;
+  --color-luxury-gold: #c8a951;
+  --color-luxury-gray: #888888;
+  
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Poppins", sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-luxury-light);
+    color: var(--color-luxury-dark);
+    font-family: var(--font-sans);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Mobile Safe Area & Utilities */
+.safe-area-bottom {
+  padding-bottom: max(0.625rem, env(safe-area-inset-bottom));
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
