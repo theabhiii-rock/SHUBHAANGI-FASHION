@@ -521,7 +521,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* 6. CINEMATIC HERO SECTION */}
-      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black">
+      <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-black pt-20 sm:pt-28">
         <motion.div 
           initial={{ scale: 1.15 }}
           animate={{ scale: 1 }}
@@ -533,27 +533,27 @@ export default function App() {
             alt="Bridal Couture" 
             className="w-full h-full object-cover opacity-80" 
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/70" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/80" />
         </motion.div>
         
         <motion.div 
           initial="hidden"
           animate="visible"
           variants={staggerContainer}
-          className="relative z-10 text-center text-white px-4 mt-16 max-w-4xl"
+          className="relative z-10 text-center text-white px-4 mt-8 sm:mt-12 max-w-4xl"
         >
           <motion.div variants={fadeUp} className="mb-4">
-             <span className="text-[10px] md:text-xs tracking-[0.5em] uppercase text-luxury-gold border-b border-luxury-gold/50 pb-2 font-semibold">
+             <span className="text-[10px] md:text-xs tracking-[0.45em] uppercase text-luxury-gold border-b border-luxury-gold/50 pb-2 font-medium">
                Haute Couture • Jewellery • Atelier Services
              </span>
           </motion.div>
 
-          <motion.h1 variants={fadeUp} className="text-5xl md:text-8xl lg:text-9xl mb-4 font-light tracking-[0.05em] drop-shadow-2xl font-serif">
+          <motion.h1 variants={fadeUp} className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl mb-4 font-sans font-medium tracking-[0.06em] uppercase drop-shadow-2xl text-white">
             Bridal Couture '26
           </motion.h1>
 
-          <motion.p variants={fadeUp} className="text-sm md:text-lg tracking-[0.2em] mb-10 text-gray-200 font-light max-w-2xl mx-auto">
-            Experience handcrafted Indian luxury. Available for <strong>3-Day & 7-Day Rental</strong> or bespoke commissioning.
+          <motion.p variants={fadeUp} className="text-xs sm:text-sm md:text-base tracking-[0.16em] uppercase mb-10 text-gray-200 font-light max-w-2xl mx-auto leading-relaxed">
+            Experience handcrafted Indian luxury. Available for <strong className="text-luxury-gold font-normal">3-Day & 7-Day Rental</strong> or bespoke commissioning.
           </motion.p>
           
           <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
