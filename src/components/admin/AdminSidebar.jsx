@@ -86,6 +86,19 @@ export default function AdminSidebar({ activeTab, onSelectTab, onBackToStore, on
         >
           <FiLogOut size={14} /> Exit Studio Hub
         </button>
+
+        {/* Tech Partner Branding & Link */}
+        <div className="pt-3 text-center text-[10px] text-gray-500 border-t border-white/5">
+          <p className="tracking-wider uppercase text-[9px] text-gray-400">Engineering & AI Partner</p>
+          <a 
+            href="https://rockautomations.in" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-luxury-gold hover:text-white font-semibold tracking-widest uppercase block mt-0.5 transition-colors"
+          >
+            Rock Automations ↗
+          </a>
+        </div>
       </div>
     </aside>
   );

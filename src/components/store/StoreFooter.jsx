@@ -97,8 +97,23 @@ export default function StoreFooter({ onOpenAuthModal }) {
       </div>
 
       {/* Bottom Legal & Staff Link */}
-      <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-center text-[10px] text-gray-500 tracking-[0.2em] uppercase relative z-10">
+      <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-center text-[10px] text-gray-500 tracking-[0.2em] uppercase relative z-10">
         <p>© 2026 SHUBHAANGI. ALL RIGHTS RESERVED.</p>
+
+        {/* Agency Signature & Backlink */}
+        <div className="flex items-center gap-1.5 normal-case tracking-normal text-xs text-gray-400">
+          <span>Architected & Crafted by</span>
+          <a 
+            href="https://rockautomations.in" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-luxury-gold hover:text-white font-semibold tracking-wide uppercase text-[11px] underline decoration-luxury-gold/50 hover:decoration-white transition-colors inline-flex items-center gap-1"
+            title="Rock Automations — Luxury Web & Automation Solutions"
+          >
+            <span>Rock Automations</span>
+            <span className="text-[10px]">↗</span>
+          </a>
+        </div>
         
         <div className="flex items-center gap-6">
           <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
@@ -107,10 +122,10 @@ export default function StoreFooter({ onOpenAuthModal }) {
           {/* Subtle Discreet Staff Login (Only accessible to studio owners) */}
           <button
             onClick={onOpenAuthModal}
-            className="text-gray-600 hover:text-luxury-gold transition-colors flex items-center gap-1 font-mono tracking-wider ml-4"
+            className="text-gray-600 hover:text-luxury-gold transition-colors flex items-center gap-1 font-mono tracking-wider ml-2"
             title="Studio Owner & Staff Login"
           >
-            <FiLock size={10} /> Staff Atelier Access
+            <FiLock size={10} /> Staff Access
           </button>
         </div>
       </div>
