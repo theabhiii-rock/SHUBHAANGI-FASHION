@@ -143,19 +143,6 @@ export default function StoreHeader({
             )}
           </button>
 
-          {/* Studio OS button for Owner */}
-          <button
-            onClick={onOpenAdmin}
-            className={`hidden md:inline-flex items-center gap-1.5 px-3 py-1 text-[10px] tracking-widest uppercase border rounded-full transition-all ${
-              scrolled 
-                ? 'border-gray-300 text-gray-700 hover:border-black hover:text-black' 
-                : 'border-white/30 text-white/90 hover:border-white hover:text-white'
-            }`}
-            title="Studio Owner OS (Passcode: 2026)"
-          >
-            <Lock size={10} />
-            <span>Studio OS</span>
-          </button>
 
           {/* Shopping Bag with dynamic item count */}
           <button 
