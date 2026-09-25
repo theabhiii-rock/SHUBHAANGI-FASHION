@@ -20,7 +20,7 @@ Please visit our atelier for inspection & deposit handover. If you need a return
 
   return (
     <div
-      className={`p-5 rounded-sm border flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all shadow-sm ${
+      className={`p-4 sm:p-5 rounded-lg border flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all shadow-sm ${
         isPendingReturn
           ? 'border-rose-300 bg-rose-50/70'
           : isActiveRental
@@ -28,16 +28,16 @@ Please visit our atelier for inspection & deposit handover. If you need a return
           : 'border-gray-200 bg-white'
       }`}
     >
-      <div className="space-y-1.5 flex-1 min-w-0">
-        <div className="flex flex-wrap items-center gap-2 mb-1">
-          <span className="font-mono text-xs font-bold text-gray-500 bg-black/5 px-2 py-0.5 rounded">
+      <div className="space-y-2 flex-1 min-w-0 w-full">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-mono text-xs font-bold text-gray-600 bg-black/5 px-2 py-0.5 rounded shrink-0">
             {rental.id}
           </span>
-          <h4 className="text-base font-serif font-bold text-gray-900 truncate">
+          <h4 className="text-base sm:text-lg font-serif font-bold text-gray-900 break-words">
             {rental.item}
           </h4>
           <span
-            className={`text-[9px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1 ${
+            className={`text-[9px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1 shrink-0 ${
               isPendingReturn
                 ? 'bg-rose-600 text-white animate-pulse'
                 : isActiveRental
@@ -50,42 +50,42 @@ Please visit our atelier for inspection & deposit handover. If you need a return
           </span>
         </div>
 
-        <div className="text-xs text-gray-600 flex flex-wrap gap-x-6 gap-y-1">
-          <span>Client: <strong className="text-gray-900">{rental.customerName}</strong> ({rental.phone})</span>
-          <span>Duration: <strong>{rental.duration}</strong></span>
+        <div className="text-xs text-gray-600 flex flex-wrap gap-x-5 gap-y-1 pt-0.5">
+          <span>Client: <strong className="text-gray-900 font-semibold">{rental.customerName}</strong> ({rental.phone})</span>
+          <span>Duration: <strong className="text-gray-900 font-semibold">{rental.duration}</strong></span>
           <span>
-            Return Due Date: <strong className={isPendingReturn ? 'text-rose-700 underline' : 'text-gray-900'}>
+            Return Due Date: <strong className={isPendingReturn ? 'text-rose-700 underline font-bold' : 'text-gray-900 font-semibold'}>
               {rental.rentalDueDate || 'N/A'}
             </strong>
           </span>
         </div>
 
-        <div className="text-xs text-gray-500 flex items-center gap-1.5 pt-1">
+        <div className="text-xs text-gray-500 flex items-center gap-1.5 pt-1 border-t border-black/5">
           <FiShield className="text-luxury-gold flex-shrink-0" size={13} />
           <span>
-            Security Deposit Held: <strong className="text-gray-900">₹{rental.deposit?.toLocaleString('en-IN')}</strong>
+            Security Deposit Held: <strong className="text-gray-900 font-semibold">₹{rental.deposit?.toLocaleString('en-IN')}</strong>
             <span className="text-gray-400 ml-1.5">({rental.paymentStatus})</span>
           </span>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 self-end md:self-auto flex-shrink-0">
+      <div className="w-full md:w-auto flex flex-wrap items-center justify-end sm:justify-start gap-2 pt-3 md:pt-0 border-t md:border-t-0 border-black/5 shrink-0">
         {!isReturned ? (
           <button
             onClick={() => onMarkReturned(rental.id)}
-            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold uppercase tracking-wider rounded transition-colors flex items-center gap-1.5 shadow-sm"
+            className="flex-1 sm:flex-initial px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold uppercase tracking-wider rounded-md transition-colors flex items-center justify-center gap-1.5 shadow-sm"
           >
             <FiCheckCircle size={14} /> Mark Returned & Release Deposit
           </button>
         ) : (
-          <span className="text-xs text-emerald-700 font-bold bg-emerald-50 px-3.5 py-2 rounded border border-emerald-200 flex items-center gap-1.5">
-            <FiCheckCircle /> Outfit Returned & Deposit Released
+          <span className="text-xs text-emerald-800 font-bold bg-emerald-50 px-3.5 py-2 rounded-md border border-emerald-200 flex items-center gap-1.5">
+            <FiCheckCircle className="text-emerald-600" /> Outfit Returned & Deposit Released
           </span>
         )}
 
         <button
           onClick={handleWhatsAppReminder}
-          className="p-2.5 bg-[#25D366] hover:bg-[#1eb855] text-white rounded transition-colors flex items-center justify-center shadow-sm"
+          className="p-2.5 bg-[#25D366] hover:bg-[#1eb855] text-white rounded-md transition-colors flex items-center justify-center shadow-sm shrink-0"
           title="Send WhatsApp return reminder to bride"
         >
           <FiMessageCircle size={16} />

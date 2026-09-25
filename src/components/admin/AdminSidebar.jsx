@@ -19,30 +19,30 @@ export default function AdminSidebar({ activeTab, onSelectTab, onBackToStore, on
   ];
 
   return (
-    <aside className="w-64 bg-[#0d0d0d] text-white flex flex-col justify-between border-r border-white/10 flex-shrink-0 min-h-screen">
+    <aside className="w-64 max-w-full bg-[#0d0d0d] text-white flex flex-col justify-between border-r border-white/10 flex-shrink-0 min-h-screen md:h-screen md:sticky md:top-0 overflow-y-auto">
       <div>
         {/* Brand Header with Official Logo */}
-        <div className="p-6 border-b border-white/10 flex items-center gap-3">
+        <div className="p-5 sm:p-6 border-b border-white/10 flex items-center gap-3">
           <img 
             src="/images/shubhaangi-official-logo.jpg" 
             alt="SHUBHAANGI Logo" 
             className="w-11 h-11 rounded-full object-cover border border-luxury-gold/60 shadow-md ring-1 ring-luxury-gold/30 shrink-0"
           />
-          <div>
-            <span className="text-[9px] text-luxury-gold tracking-[0.25em] uppercase block font-semibold">
+          <div className="min-w-0">
+            <span className="text-[9px] text-luxury-gold tracking-[0.22em] uppercase block font-semibold truncate">
               Studio Operating System
             </span>
-            <h2 className="text-base font-serif tracking-widest text-white">
+            <h2 className="text-base font-serif tracking-widest text-white truncate">
               SHUBHAANGI
             </h2>
-            <p className="text-[10px] text-gray-400">
+            <p className="text-[10px] text-gray-400 truncate">
               Ekta Jain & Deepak Kumar
             </p>
           </div>
         </div>
 
         {/* Navigation Items */}
-        <nav className="p-4 space-y-1.5">
+        <nav className="p-3 sm:p-4 space-y-1.5">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -50,18 +50,18 @@ export default function AdminSidebar({ activeTab, onSelectTab, onBackToStore, on
               <button
                 key={item.id}
                 onClick={() => onSelectTab(item.id)}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded text-xs tracking-wider uppercase font-medium transition-all ${
+                className={`w-full flex items-center justify-between px-3.5 py-3 rounded-md text-xs tracking-wider uppercase font-medium transition-all ${
                   isActive
                     ? 'bg-luxury-gold text-black font-bold shadow-md'
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <Icon size={16} />
-                  <span>{item.label}</span>
+                <div className="flex items-center gap-3 min-w-0">
+                  <Icon size={16} className="shrink-0" />
+                  <span className="truncate">{item.label}</span>
                 </div>
                 {item.badge && (
-                  <span className="bg-rose-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">
+                  <span className="bg-rose-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shrink-0 ml-1">
                     {item.badge}
                   </span>
                 )}
@@ -72,10 +72,10 @@ export default function AdminSidebar({ activeTab, onSelectTab, onBackToStore, on
       </div>
 
       {/* Bottom Actions */}
-      <div className="p-4 border-t border-white/10 space-y-2 bg-black/40">
+      <div className="p-4 border-t border-white/10 space-y-2 bg-black/40 mt-auto">
         <button
           onClick={onBackToStore}
-          className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-white/10 hover:bg-white hover:text-black text-white text-xs tracking-wider uppercase rounded transition-all"
+          className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-white/10 hover:bg-white hover:text-black text-white text-xs tracking-wider uppercase rounded-md transition-all font-medium"
         >
           <FiEye size={15} /> View Storefront
         </button>
