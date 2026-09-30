@@ -4,7 +4,7 @@ import {
   FiClock, FiAlertCircle, FiPhone, FiMessageCircle, 
   FiEdit2, FiSearch, FiMenu, FiX, FiPlus, FiCheck,
   FiTag, FiPercent, FiCopy, FiTrash2, FiVolume2,
-  FiImage
+  FiImage, FiUploadCloud, FiCamera, FiCheckCircle, FiLoader
 } from 'react-icons/fi';
 import { 
   getStoredOrders, saveOrders, getStoredProducts, saveProducts, getVisitorCount, 
@@ -15,6 +15,7 @@ import {
   broadcastOfferAlert,
   getStoredSubscribers
 } from '../utils/notifications';
+import { compressImageFile } from '../utils/imageUpload';
 import AdminSidebar from './admin/AdminSidebar';
 import RentalTimelineCard from './admin/RentalTimelineCard';
 
@@ -30,6 +31,13 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
   const [notification, setNotification] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Photo upload states for Add Product & Gallery Manager
+  const [coverPhotoTab, setCoverPhotoTab] = useState('FILE'); // 'FILE' | 'URL'
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [extraPhotosList, setExtraPhotosList] = useState([]);
+  const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+  const [isUploadingManagerPhoto, setIsUploadingManagerPhoto] = useState(false);
 
   // Newsletter subscribers
   const [subscribers, setSubscribers] = useState(() => getStoredSubscribers());
@@ -141,6 +149,60 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
     showToast(`✅ Pricing updated and synchronized live with storefront!`);
   };
 
+  const handleCoverFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setIsUploadingCover(true);
+      const compressedDataUrl = await compressImageFile(file, 1200, 0.84);
+      setNewProd(prev => ({ ...prev, img: compressedDataUrl }));
+      showToast('✅ Cover photo loaded from your device!');
+    } catch (err) {
+      alert('Could not process image: ' + err.message);
+    } finally {
+      setIsUploadingCover(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleExtraFilesChange = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    try {
+      setIsUploadingGallery(true);
+      const compressedList = await Promise.all(
+        files.map(f => compressImageFile(f, 1200, 0.84))
+      );
+      setExtraPhotosList(prev => [...prev, ...compressedList]);
+      showToast(`✅ Added ${compressedList.length} angle photo(s) from your device!`);
+    } catch (err) {
+      alert('Could not process images: ' + err.message);
+    } finally {
+      setIsUploadingGallery(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveExtraPhoto = (indexToRemove) => {
+    setExtraPhotosList(prev => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const handleManagerFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !photoManagerProduct) return;
+    try {
+      setIsUploadingManagerPhoto(true);
+      const compressedDataUrl = await compressImageFile(file, 1200, 0.84);
+      handleAddPhotoToProduct(photoManagerProduct.id, compressedDataUrl);
+      showToast('✅ New photo uploaded to gallery!');
+    } catch (err) {
+      alert('Could not upload image: ' + err.message);
+    } finally {
+      setIsUploadingManagerPhoto(false);
+      e.target.value = '';
+    }
+  };
+
   const handleAddNewProduct = (e) => {
     e.preventDefault();
     if (!newProd.name || !newProd.buyPrice) {
@@ -148,14 +210,15 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       return;
     }
 
-    const additionalImages = newProd.galleryUrls
+    const additionalFromTextarea = newProd.galleryUrls
       ? newProd.galleryUrls
           .split(/[\n,]/)
           .map(url => url.trim())
           .filter(url => url.length > 0)
       : [];
-    const primaryImg = newProd.img.trim() || additionalImages[0] || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=1000';
-    const allImages = [primaryImg, ...additionalImages.filter(url => url !== primaryImg)];
+    const allExtra = [...extraPhotosList, ...additionalFromTextarea];
+    const primaryImg = newProd.img.trim() || allExtra[0] || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=1000';
+    const allImages = [primaryImg, ...allExtra.filter(url => url !== primaryImg)];
 
     const created = {
       id: Date.now(),
@@ -189,6 +252,8 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       galleryUrls: '',
       isRentalAvailable: true
     });
+    setExtraPhotosList([]);
+    setCoverPhotoTab('FILE');
     broadcastNewDressAlert(created);
     const subCount = getStoredSubscribers().length;
     showToast(`🔔 Added "${created.name}" & sent instant Push Notification to ${subCount} VIP Subscribers!`);
@@ -1442,35 +1507,189 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                   </div>
                 </div>
 
-                <div>
-                  <label className="font-semibold block mb-1 text-gray-800">Primary Cover Photo URL *</label>
-                  <input
-                    type="url"
-                    placeholder="https://images.unsplash.com/... or image link"
-                    value={newProd.img}
-                    onChange={(e) => setNewProd({ ...newProd, img: e.target.value })}
-                    className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-mono text-xs"
-                  />
-                  <p className="text-[10px] text-gray-400 mt-0.5">Primary thumbnail shown on the storefront catalog</p>
+                {/* ── 1. PRIMARY COVER PHOTO (DEVICE UPLOAD OR URL) ── */}
+                <div className="bg-gray-50/90 p-3.5 rounded-lg border border-gray-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="font-bold text-gray-800 flex items-center gap-1.5">
+                      <span>Primary Cover Photo *</span>
+                      {newProd.img && (
+                        <span className="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1">
+                          <FiCheckCircle size={11} /> Photo Loaded
+                        </span>
+                      )}
+                    </label>
+
+                    {/* Switch between Device File and Web URL */}
+                    <div className="flex bg-white rounded-md p-0.5 border border-gray-300 text-[10px] font-bold">
+                      <button
+                        type="button"
+                        onClick={() => setCoverPhotoTab('FILE')}
+                        className={`px-2.5 py-1 rounded transition-colors ${
+                          coverPhotoTab === 'FILE'
+                            ? 'bg-black text-white shadow-xs'
+                            : 'text-gray-600 hover:text-black'
+                        }`}
+                      >
+                        📱 Phone / PC File
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCoverPhotoTab('URL')}
+                        className={`px-2.5 py-1 rounded transition-colors ${
+                          coverPhotoTab === 'URL'
+                            ? 'bg-black text-white shadow-xs'
+                            : 'text-gray-600 hover:text-black'
+                        }`}
+                      >
+                        🔗 Image Link
+                      </button>
+                    </div>
+                  </div>
+
+                  {coverPhotoTab === 'FILE' ? (
+                    <div>
+                      {newProd.img ? (
+                        <div className="flex items-center gap-3 bg-white p-2.5 rounded-md border border-gray-200">
+                          <div className="w-16 h-20 rounded bg-zinc-950 overflow-hidden relative border border-gray-200 shrink-0">
+                            <img
+                              src={newProd.img}
+                              alt="Cover Preview"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold text-gray-900 truncate">Cover Image Selected</p>
+                            <p className="text-[10px] text-emerald-600 font-medium">✓ Compressed & ready for storefront</p>
+                            <div className="flex items-center gap-2 mt-2">
+                              <label className="cursor-pointer text-[10px] px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded font-bold border border-gray-300 transition-colors">
+                                Change Photo
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={handleCoverFileChange}
+                                />
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => setNewProd(prev => ({ ...prev, img: '' }))}
+                                className="text-[10px] text-rose-600 hover:underline font-bold"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center p-5 border-2 border-dashed border-gray-300 hover:border-black rounded-lg bg-white cursor-pointer transition-colors group">
+                          {isUploadingCover ? (
+                            <div className="flex items-center gap-2 text-gray-600 py-3">
+                              <FiLoader size={20} className="animate-spin text-luxury-gold" />
+                              <span className="text-xs font-semibold">Optimizing & processing photo...</span>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="w-10 h-10 rounded-full bg-luxury-gold/15 text-luxury-gold flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                                <FiCamera size={20} />
+                              </div>
+                              <span className="text-xs font-bold text-gray-900 text-center">
+                                Tap to Choose Photo from Phone Gallery / PC
+                              </span>
+                              <span className="text-[10px] text-gray-500 text-center mt-0.5">
+                                JPG, PNG, WEBP — automatically optimized for ultra-fast loading
+                              </span>
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            disabled={isUploadingCover}
+                            onChange={handleCoverFileChange}
+                          />
+                        </label>
+                      )}
+                    </div>
+                  ) : (
+                    <div>
+                      <input
+                        type="url"
+                        placeholder="https://images.unsplash.com/... or paste image link"
+                        value={newProd.img}
+                        onChange={(e) => setNewProd({ ...newProd, img: e.target.value })}
+                        className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-mono text-xs"
+                      />
+                      <p className="text-[10px] text-gray-400 mt-1">Direct URL to the image file</p>
+                    </div>
+                  )}
                 </div>
 
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="font-semibold text-gray-800">Additional Model & Angle Photo URLs</label>
-                    <span className="text-[10px] text-amber-800 font-semibold">
-                      {newProd.galleryUrls ? `${newProd.galleryUrls.split(/[\n,]/).filter(s => s.trim()).length} extra photos` : 'Optional'}
-                    </span>
+                {/* ── 2. ADDITIONAL MODEL & ANGLE PHOTOS (MULTI-UPLOAD & URL) ── */}
+                <div className="bg-gray-50/90 p-3.5 rounded-lg border border-gray-200 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="font-bold text-gray-800 block">
+                        Additional Model & Angle Photos
+                      </label>
+                      <span className="text-[10px] text-gray-500">
+                        Back view, close-up embroidery, dupatta drape (Optional)
+                      </span>
+                    </div>
+                    <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-black hover:bg-luxury-gold text-white text-[11px] font-bold rounded-md transition-colors shadow-xs">
+                      {isUploadingGallery ? (
+                        <>
+                          <FiLoader size={12} className="animate-spin" />
+                          <span>Uploading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <FiUploadCloud size={13} />
+                          <span>+ Add from Device</span>
+                        </>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="hidden"
+                        disabled={isUploadingGallery}
+                        onChange={handleExtraFilesChange}
+                      />
+                    </label>
                   </div>
-                  <textarea
-                    rows={3}
-                    placeholder="Enter additional photo URLs (one per line or comma separated)&#10;e.g.&#10;https://images.unsplash.com/...&#10;https://images.unsplash.com/..."
-                    value={newProd.galleryUrls}
-                    onChange={(e) => setNewProd({ ...newProd, galleryUrls: e.target.value })}
-                    className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none font-mono text-[11px] bg-white"
-                  />
-                  <p className="text-[10px] text-gray-400 mt-0.5">
-                    Customers can browse all these angles in the interactive dress popup modal!
-                  </p>
+
+                  {/* Preview of extra photos added from device */}
+                  {extraPhotosList.length > 0 && (
+                    <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 pt-1">
+                      {extraPhotosList.map((photo, pIdx) => (
+                        <div key={pIdx} className="relative aspect-[3/4] rounded-md overflow-hidden bg-zinc-950 border border-gray-300 group shadow-xs">
+                          <img src={photo} alt="" className="w-full h-full object-contain" />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveExtraPhoto(pIdx)}
+                            className="absolute top-1 right-1 w-5 h-5 bg-black/80 hover:bg-rose-600 text-white rounded-full flex items-center justify-center text-[10px] transition-colors"
+                            title="Remove"
+                          >
+                            <FiX size={11} />
+                          </button>
+                          <span className="absolute bottom-1 left-1 bg-black/70 text-white text-[8px] px-1 py-0.2 rounded font-mono">
+                            #{pIdx + 1}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Or enter URLs */}
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Or paste extra image URLs (comma-separated)..."
+                      value={newProd.galleryUrls}
+                      onChange={(e) => setNewProd({ ...newProd, galleryUrls: e.target.value })}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:border-black outline-none font-mono text-[11px] bg-white"
+                    />
+                  </div>
                 </div>
 
                 <div className="pt-3 flex flex-col sm:flex-row gap-2.5">
@@ -1595,18 +1814,44 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                 </div>
               </div>
 
-              {/* Add New Photo URL Form */}
-              <div className="bg-gray-50 p-3.5 border border-gray-200 rounded-md mb-4 shrink-0">
-                <label className="text-xs font-bold text-gray-800 block mb-1">
-                  Add New Photo URL to this Dress
-                </label>
-                <p className="text-[11px] text-gray-500 mb-2">
-                  Paste high-resolution image URL (e.g. from Google Drive direct image URL, Unsplash, Cloudinary, etc.)
-                </p>
-                <div className="flex flex-col sm:flex-row gap-2">
+              {/* Add New Photo Form (Direct Phone/PC Upload or URL) */}
+              <div className="bg-gray-50 p-3.5 border border-gray-200 rounded-md mb-4 shrink-0 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label className="text-xs font-bold text-gray-800 block">
+                      Add New Photo to this Dress
+                    </label>
+                    <p className="text-[11px] text-gray-500">
+                      Upload directly from your phone/PC gallery, or paste an image URL below:
+                    </p>
+                  </div>
+
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-2 bg-black hover:bg-luxury-gold text-white text-xs font-bold rounded-md transition-colors shadow-xs shrink-0">
+                    {isUploadingManagerPhoto ? (
+                      <>
+                        <FiLoader size={13} className="animate-spin text-luxury-gold" />
+                        <span>Optimizing & Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <FiCamera size={14} />
+                        <span>📱 Choose Photo from Device</span>
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={isUploadingManagerPhoto}
+                      onChange={handleManagerFileChange}
+                    />
+                  </label>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-2 pt-1 border-t border-gray-200">
                   <input
                     type="url"
-                    placeholder="https://images.unsplash.com/... or image URL"
+                    placeholder="Or paste high-resolution image URL (https://...)"
                     value={newPhotoUrlInput}
                     onChange={(e) => setNewPhotoUrlInput(e.target.value)}
                     className="flex-1 p-2 text-xs border border-gray-300 rounded-md focus:border-black outline-none bg-white font-mono"
@@ -1620,10 +1865,10 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                   <button
                     type="button"
                     onClick={() => handleAddPhotoToProduct(photoManagerProduct.id, newPhotoUrlInput)}
-                    className="px-4 py-2 bg-black text-white hover:bg-luxury-gold text-xs font-semibold rounded-md shrink-0 transition-colors flex items-center justify-center gap-1.5"
+                    className="px-4 py-2 bg-gray-900 text-white hover:bg-luxury-gold text-xs font-semibold rounded-md shrink-0 transition-colors flex items-center justify-center gap-1.5"
                   >
                     <FiPlus size={14} />
-                    <span>Add Photo</span>
+                    <span>Add URL</span>
                   </button>
                 </div>
               </div>
