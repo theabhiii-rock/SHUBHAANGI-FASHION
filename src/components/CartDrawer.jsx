@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FiX, FiTrash2, FiShoppingBag, FiMessageCircle, 
-  FiShield, FiTag, FiTruck, FiMapPin, FiCheckCircle 
+  FiShield, FiTag, FiTruck, FiMapPin, FiCheckCircle,
+  FiCreditCard, FiAlertCircle
 } from 'react-icons/fi';
 import { saveOrders, getStoredOrders, validateCouponCode, getStoredCoupons } from '../data/store';
+import { initiateRazorpayPayment } from '../utils/razorpay';
 
 export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, onClearCart }) {
   const [customerName, setCustomerName] = useState('');
@@ -16,6 +18,11 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponError, setCouponError] = useState('');
+
+  // Razorpay payment state
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
+  const [paymentNotice, setPaymentNotice] = useState('');
 
   const [confirmedBooking, setConfirmedBooking] = useState(null);
 
@@ -46,7 +53,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
     setCouponError('');
   };
 
-  const processOrderCreation = React.useCallback(() => {
+  const processOrderCreation = React.useCallback((paymentDetails = {}) => {
     const orderNumber = `SHB-${Date.now().toString().slice(-4)}`;
     const currentOrders = getStoredOrders();
     const newOrders = cartItems.map((item) => ({
@@ -63,12 +70,57 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
       deliveryType,
       discountApplied: discountAmount > 0 ? appliedCoupon?.coupon?.code : null,
       status: item.orderMode === 'RENT' ? 'ACTIVE_RENTAL' : 'COMPLETED',
-      paymentStatus: 'PAID'
+      paymentStatus: paymentDetails.paymentStatus || 'PAID',
+      razorpayPaymentId: paymentDetails.paymentId || null,
+      razorpayOrderId: paymentDetails.orderId || null
     }));
 
     saveOrders([...newOrders, ...currentOrders]);
     return { orderNumber, newOrders };
   }, [cartItems, customerName, customerPhone, eventDate, deliveryType, discountAmount, appliedCoupon]);
+
+  const handleRazorpayCheckout = async () => {
+    if (cartItems.length === 0 || isProcessingPayment) return;
+    setPaymentError('');
+    setPaymentNotice('');
+    setIsProcessingPayment(true);
+
+    const receiptId = `SHB_RCPT_${Date.now()}`;
+    await initiateRazorpayPayment({
+      amountInRupees: grandTotal,
+      receipt: receiptId,
+      customerName: customerName.trim(),
+      customerPhone: customerPhone.trim(),
+      description: `${cartItems.length} Bridal Piece(s) — SHUBHAANGI Couture`,
+      onSuccess: ({ paymentId, orderId }) => {
+        setIsProcessingPayment(false);
+        const { orderNumber } = processOrderCreation({
+          paymentStatus: 'RAZORPAY_VERIFIED',
+          paymentId,
+          orderId
+        });
+        setConfirmedBooking({
+          orderNumber,
+          clientName: customerName || 'Valued Client',
+          itemsCount: cartItems.length,
+          total: grandTotal,
+          deposit: totalSecurityDeposit,
+          discount: discountAmount,
+          deliveryType,
+          razorpayPaymentId: paymentId,
+          razorpayOrderId: orderId
+        });
+      },
+      onDismiss: (noticeMsg) => {
+        setIsProcessingPayment(false);
+        setPaymentNotice(noticeMsg);
+      },
+      onError: (errMsg) => {
+        setIsProcessingPayment(false);
+        setPaymentError(errMsg);
+      }
+    });
+  };
 
   const handleWhatsAppCheckout = () => {
     if (cartItems.length === 0) return;
@@ -441,11 +493,37 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
                     </p>
                   )}
 
-                  {/* Dual Checkout Buttons */}
+                  {/* Razorpay Error / Dismiss Alerts */}
+                  {paymentError && (
+                    <div className="p-2.5 bg-rose-50 border border-rose-200 rounded text-xs text-rose-700 flex items-start gap-2">
+                      <FiAlertCircle className="shrink-0 mt-0.5 text-rose-600" size={14} />
+                      <span>{paymentError}</span>
+                    </div>
+                  )}
+
+                  {paymentNotice && !paymentError && (
+                    <div className="p-2.5 bg-amber-50 border border-amber-200 rounded text-xs text-amber-800 flex items-start gap-2">
+                      <FiAlertCircle className="shrink-0 mt-0.5 text-amber-600" size={14} />
+                      <span>{paymentNotice}</span>
+                    </div>
+                  )}
+
+                  {/* Checkout Action Buttons */}
                   <div className="space-y-2">
                     <button
+                      onClick={handleRazorpayCheckout}
+                      disabled={isProcessingPayment}
+                      className="w-full bg-[#072654] hover:bg-[#0a3678] disabled:opacity-60 text-white py-3.5 px-6 text-xs tracking-[0.15em] uppercase font-semibold transition-all shadow-md flex items-center justify-center gap-2 rounded-sm cursor-pointer"
+                    >
+                      <FiCreditCard size={17} className="text-luxury-gold" />
+                      {isProcessingPayment
+                        ? 'Initializing Razorpay...'
+                        : `Pay ₹${grandTotal.toLocaleString('en-IN')} with Razorpay`}
+                    </button>
+
+                    <button
                       onClick={handleWhatsAppCheckout}
-                      className="w-full bg-[#25D366] hover:bg-[#1eb855] text-white py-3.5 px-6 text-xs tracking-[0.18em] uppercase font-semibold transition-all shadow-md flex items-center justify-center gap-2 rounded-sm"
+                      className="w-full bg-[#25D366] hover:bg-[#1eb855] text-white py-3 px-6 text-xs tracking-[0.18em] uppercase font-semibold transition-all shadow-md flex items-center justify-center gap-2 rounded-sm"
                     >
                       <FiMessageCircle size={17} />
                       Confirm & Send via WhatsApp
@@ -453,9 +531,9 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
 
                     <button
                       onClick={handleInstantConfirm}
-                      className="w-full bg-black hover:bg-luxury-gold hover:text-black text-white py-3 px-6 text-xs tracking-[0.18em] uppercase font-semibold transition-all shadow-sm flex items-center justify-center gap-2 rounded-sm"
+                      className="w-full bg-black hover:bg-luxury-gold hover:text-black text-white py-2.5 px-6 text-xs tracking-[0.18em] uppercase font-semibold transition-all shadow-sm flex items-center justify-center gap-2 rounded-sm"
                     >
-                      Instant Order & Get Receipt
+                      Book for Studio Payment
                     </button>
                   </div>
                 </div>
@@ -469,7 +547,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
                       <FiCheckCircle size={28} />
                     </div>
                     <span className="text-[10px] tracking-[0.3em] uppercase text-gray-400 font-bold block mb-1">
-                      Order Booked & Confirmed
+                      {confirmedBooking.razorpayPaymentId ? 'Payment Verified & Order Confirmed' : 'Order Booked & Confirmed'}
                     </span>
                     <h3 className="font-serif text-2xl text-gray-900 font-bold mb-2">
                       Thank You, {confirmedBooking.clientName}!
@@ -482,6 +560,18 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
                     </p>
 
                     <div className="bg-gray-50 border border-gray-200 p-4 rounded text-xs text-left space-y-2 mb-6">
+                      {confirmedBooking.razorpayPaymentId && (
+                        <>
+                          <div className="flex justify-between text-emerald-800">
+                            <span>Razorpay Payment ID:</span>
+                            <span className="font-mono font-bold">{confirmedBooking.razorpayPaymentId}</span>
+                          </div>
+                          <div className="flex justify-between text-gray-500">
+                            <span>Razorpay Order ID:</span>
+                            <span className="font-mono">{confirmedBooking.razorpayOrderId}</span>
+                          </div>
+                        </>
+                      )}
                       <div className="flex justify-between">
                         <span className="text-gray-500">Selected Garments:</span>
                         <span className="font-bold">{confirmedBooking.itemsCount} piece(s)</span>
@@ -505,7 +595,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
 
                   <div className="space-y-2 pb-4">
                     <a
-                      href={`https://wa.me/916397799514?text=${encodeURIComponent(`Hello SHUBHAANGI Studio, I just booked Order #${confirmedBooking.orderNumber}. Kindly share fitting time slot.`)}`}
+                      href={`https://wa.me/916397799514?text=${encodeURIComponent(`Hello SHUBHAANGI Studio, I just booked Order #${confirmedBooking.orderNumber}${confirmedBooking.razorpayPaymentId ? ` (Razorpay Paid: ${confirmedBooking.razorpayPaymentId})` : ''}. Kindly share fitting time slot.`)}`}
                       target="_blank"
                       rel="noreferrer"
                       className="w-full bg-[#25D366] text-white py-3 px-4 text-xs tracking-wider uppercase font-semibold flex items-center justify-center gap-2 rounded"
