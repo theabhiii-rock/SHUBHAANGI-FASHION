@@ -694,6 +694,12 @@ export default function App() {
           totalCount={products.filter(p => activeTab === 'ALL' || p.category === activeTab).length}
           sortBy={sortBy}
           onSortChange={setSortBy}
+          categoryCounts={{
+            DRESS: products.filter(p => p.category === 'DRESS').length,
+            JEWELLERY: products.filter(p => p.category === 'JEWELLERY').length,
+            MAKEUP: products.filter(p => p.category === 'MAKEUP').length,
+            ALL: products.length,
+          }}
         />
 
         {/* Product Grid */}
