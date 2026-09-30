@@ -15,7 +15,7 @@ export default function WishlistDrawer({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
+        <div className="fixed inset-0 z-[100] overflow-hidden" data-lenis-prevent>
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -25,16 +25,16 @@ export default function WishlistDrawer({
             className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
           />
 
-          <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-4 sm:pl-10">
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.4, ease: [0.25, 0.4, 0.25, 1] }}
-              className="w-screen max-w-md bg-white shadow-2xl flex flex-col"
+              className="w-screen max-w-md bg-white shadow-2xl flex flex-col h-full"
             >
               {/* Header */}
-              <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-luxury-light">
+              <div className="p-5 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-luxury-light shrink-0">
                 <div className="flex items-center gap-2">
                   <FiHeart className="text-rose-500 fill-rose-500" size={20} />
                   <h3 className="font-serif text-xl tracking-wider text-black uppercase">
@@ -53,7 +53,7 @@ export default function WishlistDrawer({
               </div>
 
               {/* Content */}
-              <div className="flex-1 overflow-y-auto p-6">
+              <div className="flex-1 overflow-y-auto overscroll-contain p-5 sm:p-6" data-lenis-prevent>
                 {wishlistedProducts.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 py-16">
                     <FiHeart size={48} strokeWidth={1} className="mb-4 text-gray-300" />
@@ -73,17 +73,27 @@ export default function WishlistDrawer({
                     {wishlistedProducts.map((item) => (
                       <div
                         key={item.id}
-                        className="flex gap-4 p-3 bg-gray-50 border border-gray-100 rounded-sm relative group"
+                        className="flex gap-4 p-3 bg-gray-50 border border-gray-100 rounded-sm relative group items-center"
                       >
-                        <img
-                          src={item.img}
-                          alt={item.name}
-                          className="w-20 h-24 object-cover rounded-sm flex-shrink-0 bg-gray-200 cursor-pointer"
+                        <div
                           onClick={() => {
                             onSelectProduct(item);
                             onClose();
                           }}
-                        />
+                          className="relative w-24 h-32 rounded-sm overflow-hidden flex-shrink-0 bg-zinc-950 border border-gray-200 cursor-pointer"
+                        >
+                          <img
+                            src={item.img}
+                            alt=""
+                            aria-hidden="true"
+                            className="absolute inset-0 w-full h-full object-cover blur-md opacity-40 scale-110 pointer-events-none"
+                          />
+                          <img
+                            src={item.img}
+                            alt={item.name}
+                            className="relative z-10 w-full h-full object-contain"
+                          />
+                        </div>
                         <div className="flex-1 min-w-0 pr-6">
                           <span className="text-[9px] uppercase tracking-wider text-luxury-gold font-bold block mb-1">
                             {item.subCategory || item.category}

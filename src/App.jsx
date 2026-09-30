@@ -147,6 +147,18 @@ export default function App() {
   };
 
   // Smooth Scroll with Lenis (Active on client storefront only)
+  const lenisRef = React.useRef(null);
+  const isAnyModalOpen = Boolean(
+    selectedProductForModal ||
+    isCartOpen ||
+    isSidebarOpen ||
+    isSearchOpen ||
+    isWishlistOpen ||
+    isAppointmentOpen ||
+    isOrderTrackerOpen ||
+    isAuthModalOpen
+  );
+
   useEffect(() => {
     if (currentView === 'admin') return;
 
@@ -155,6 +167,7 @@ export default function App() {
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
+    lenisRef.current = lenis;
 
     function raf(time) {
       lenis.raf(time);
@@ -164,8 +177,23 @@ export default function App() {
 
     return () => {
       lenis.destroy();
+      lenisRef.current = null;
     };
   }, [currentView]);
+
+  // Stop background website scroll whenever any popup/drawer is open
+  useEffect(() => {
+    if (isAnyModalOpen) {
+      lenisRef.current?.stop();
+      document.body.style.overflow = 'hidden';
+    } else {
+      lenisRef.current?.start();
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isAnyModalOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -325,7 +353,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/60 z-[85] backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)} 
           />
         )}
@@ -338,7 +366,8 @@ export default function App() {
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'tween', duration: 0.35, ease: [0.25, 0.4, 0.25, 1] }}
-            className="fixed top-0 left-0 w-84 max-w-[85vw] h-full bg-[#faf9f6] z-50 flex flex-col shadow-2xl overflow-y-auto"
+            data-lenis-prevent
+            className="fixed top-0 left-0 w-84 max-w-[85vw] h-full bg-[#faf9f6] z-[90] flex flex-col shadow-2xl overflow-y-auto overscroll-contain"
           >
             {/* Luxury Header Banner */}
             <div className="bg-[#121212] text-white p-6 border-b border-luxury-gold/30 relative">

@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiX, FiClock } from 'react-icons/fi';
 
@@ -24,7 +24,7 @@ export default function SearchModal({ isOpen, onClose, products, onSelectProduct
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4 md:px-6">
+      <div className="fixed inset-0 z-[100] flex items-start justify-center pt-16 px-4 md:px-6" data-lenis-prevent>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -84,7 +84,7 @@ export default function SearchModal({ isOpen, onClose, products, onSelectProduct
           </div>
 
           {/* Results List */}
-          <div className="max-h-[60vh] overflow-y-auto p-4 md:p-6 divide-y divide-gray-100">
+          <div className="max-h-[60vh] overflow-y-auto overscroll-contain p-4 md:p-6 divide-y divide-gray-100" data-lenis-prevent>
             {filteredProducts.length === 0 ? (
               <div className="py-12 text-center text-gray-400">
                 <p className="font-serif text-base text-gray-600 mb-1">No bridal creations match your search.</p>
@@ -106,7 +106,7 @@ export default function SearchModal({ isOpen, onClose, products, onSelectProduct
                       <img
                         src={p.img}
                         alt={p.name}
-                        className="w-14 h-16 object-cover rounded-sm bg-gray-100 shrink-0"
+                        className="w-16 h-20 object-contain rounded-sm bg-zinc-950 shrink-0"
                       />
                       <div>
                         <span className="text-[9px] uppercase tracking-widest text-luxury-gold font-semibold block">

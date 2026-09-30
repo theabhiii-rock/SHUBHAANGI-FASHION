@@ -19,32 +19,48 @@ export default function StoreHeader({
 }) {
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/10 shadow-xl text-white transition-all duration-300">
-      {/* Top Promotional Announcement Bar */}
+      {/* Top Promotional Announcement Bar — Highlighted Left-to-Right Running Ticker */}
       {offerBanner?.enabled && (
-        <div className="bg-[#141414] text-luxury-gold text-[10.5px] py-1.5 px-4 text-center tracking-widest uppercase font-medium flex items-center justify-center gap-2 border-b border-luxury-gold/20">
-          <span className="px-1.5 py-0.2 bg-luxury-gold/20 text-luxury-gold text-[9px] font-bold rounded uppercase tracking-wider shrink-0">
-            {offerBanner.badge || 'OFFER'}
-          </span>
-          <span className="truncate max-w-xl text-gray-200 hidden sm:inline">
-            {offerBanner.text}
-          </span>
-          <span className="truncate max-w-xs text-gray-200 sm:hidden">
-            {offerBanner.text}
-          </span>
-          {offerBanner.couponCode && (
-            <button
-              onClick={() => {
-                if (navigator.clipboard) {
-                  navigator.clipboard.writeText(offerBanner.couponCode);
-                }
-                alert(`Voucher Code "${offerBanner.couponCode}" copied! Apply it in your shopping bag for discount.`);
-              }}
-              className="underline font-bold text-luxury-gold hover:text-white ml-1 cursor-pointer transition-colors shrink-0"
-              title="Click to copy voucher code"
-            >
-              Use Code: {offerBanner.couponCode}
-            </button>
-          )}
+        <div className="relative overflow-hidden bg-gradient-to-r from-[#171104] via-[#2b1f07] to-[#171104] text-luxury-gold text-[10.5px] sm:text-[11px] py-2 border-b border-luxury-gold/40 shadow-[0_2px_12px_rgba(200,169,81,0.18)] select-none">
+          <div className="animate-marquee-ltr items-center">
+            {[0, 1].map((halfIdx) => (
+              <div key={halfIdx} className="flex items-center shrink-0">
+                {[0, 1, 2].map((repeatIdx) => (
+                  <div
+                    key={`${halfIdx}-${repeatIdx}`}
+                    className="flex items-center gap-3 px-6 tracking-[0.18em] uppercase font-medium whitespace-nowrap"
+                  >
+                    <span className="px-2 py-0.5 bg-luxury-gold text-black text-[9px] font-extrabold rounded-sm uppercase tracking-widest shadow-[0_0_10px_rgba(200,169,81,0.55)] shrink-0">
+                      {offerBanner.badge || 'LIMITED PERIOD'}
+                    </span>
+                    <span className="text-amber-100 font-semibold drop-shadow-sm">
+                      {offerBanner.text}
+                    </span>
+                    {offerBanner.couponCode && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (navigator.clipboard) {
+                            navigator.clipboard.writeText(offerBanner.couponCode);
+                          }
+                          alert(`Voucher Code "${offerBanner.couponCode}" copied! Apply it in your shopping bag for discount.`);
+                        }}
+                        className="px-2.5 py-0.5 bg-luxury-gold/20 hover:bg-luxury-gold text-luxury-gold hover:text-black border border-luxury-gold/70 rounded-sm font-extrabold tracking-widest cursor-pointer transition-all shrink-0 shadow-sm"
+                        title="Click to copy voucher code"
+                      >
+                        USE CODE: {offerBanner.couponCode}
+                      </button>
+                    )}
+                    <span className="text-luxury-gold/80 font-bold mx-1">✦</span>
+                    <span className="text-emerald-300 font-semibold tracking-wider">
+                      EXTRA ₹500 INSTANT DISCOUNT ON ONLINE PREPAID ORDERS
+                    </span>
+                    <span className="text-luxury-gold/80 font-bold mx-1">✦</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

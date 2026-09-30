@@ -253,14 +253,14 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
+        <div className="fixed inset-0 z-[100] overflow-hidden" data-lenis-prevent>
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-black/65 backdrop-blur-sm transition-opacity"
           />
 
           <div className="fixed inset-y-0 right-0 max-w-full flex pl-4 sm:pl-10">
@@ -269,10 +269,10 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.35, ease: [0.25, 0.4, 0.25, 1] }}
-              className="w-screen max-w-md bg-white shadow-2xl flex flex-col"
+              className="w-screen max-w-md bg-white shadow-2xl flex flex-col h-full"
             >
               {/* Drawer Header */}
-              <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-luxury-light">
+              <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between bg-luxury-light shrink-0">
                 <div className="flex items-center gap-2">
                   <FiShoppingBag className="text-luxury-gold" size={20} />
                   <h3 className="font-serif text-lg tracking-wider text-black uppercase font-bold">
@@ -291,7 +291,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
               </div>
 
               {/* Drawer Content */}
-              <div className="flex-1 overflow-y-auto p-5 space-y-5">
+              <div className="flex-1 overflow-y-auto overscroll-contain p-5 space-y-5" data-lenis-prevent>
                 {cartItems.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 py-16">
                     <FiShoppingBag size={48} strokeWidth={1} className="mb-4 text-gray-300" />
@@ -313,15 +313,23 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
                       {cartItems.map((item) => (
                         <div
                           key={item.cartItemId}
-                          className="flex gap-3.5 p-3 bg-gray-50 border border-gray-100 rounded-md relative group"
+                          className="flex gap-3.5 p-3 bg-gray-50 border border-gray-200/80 rounded-md relative group items-center"
                         >
-                          <img
-                            src={item.img}
-                            alt={item.name}
-                            className="w-18 h-22 object-cover rounded-sm flex-shrink-0 bg-gray-200"
-                          />
+                          <div className="relative w-28 h-36 rounded-md overflow-hidden flex-shrink-0 bg-zinc-950 border border-gray-200 shadow-sm">
+                            <img
+                              src={item.img}
+                              alt=""
+                              aria-hidden="true"
+                              className="absolute inset-0 w-full h-full object-cover blur-md opacity-40 scale-110 pointer-events-none"
+                            />
+                            <img
+                              src={item.img}
+                              alt={item.name}
+                              className="relative z-10 w-full h-full object-contain"
+                            />
+                          </div>
                           <div className="flex-1 min-w-0 pr-6">
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <span
                                 className={`text-[9px] tracking-wider uppercase font-semibold px-2 py-0.5 rounded-sm ${
                                   item.orderMode === 'RENT'
@@ -333,7 +341,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
                               </span>
                               <span className="text-[10px] text-gray-500">Fit: {item.selectedSize}</span>
                             </div>
-                            <h4 className="text-xs font-serif font-semibold text-gray-900 truncate">
+                            <h4 className="text-xs font-serif font-bold text-gray-900 line-clamp-2 leading-snug">
                               {item.name}
                             </h4>
                             <div className="mt-1.5 text-xs">

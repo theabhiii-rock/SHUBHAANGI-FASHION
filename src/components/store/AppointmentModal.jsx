@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiCalendar, FiClock, FiMapPin, FiCheckCircle, FiMessageCircle } from 'react-icons/fi';
 
@@ -39,7 +39,7 @@ Kindly confirm my private bridal trial slot with designer Deepak Kumar.`;
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" data-lenis-prevent>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -52,7 +52,8 @@ Kindly confirm my private bridal trial slot with designer Deepak Kumar.`;
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-lg bg-white rounded-sm shadow-2xl overflow-hidden z-10 border border-gray-200"
+          data-lenis-prevent
+          className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto overscroll-contain bg-white rounded-sm shadow-2xl z-10 border border-gray-200"
         >
           <button
             onClick={onClose}

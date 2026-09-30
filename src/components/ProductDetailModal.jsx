@@ -144,7 +144,10 @@ export default function ProductDetailModal({ product, isOpen, onClose, onAddToCa
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6">
+      <div
+        data-lenis-prevent
+        className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 md:p-6"
+      >
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -156,11 +159,12 @@ export default function ProductDetailModal({ product, isOpen, onClose, onAddToCa
 
         {/* Modal Window: Fixed height on desktop with internal scrolling only on the right panel */}
         <motion.div
+          data-lenis-prevent
           initial={{ opacity: 0, scale: 0.96, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 20 }}
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className="relative w-full max-w-5xl bg-white max-h-[92vh] md:h-[88vh] overflow-hidden shadow-2xl z-10 flex flex-col md:flex-row rounded-sm"
+          className="relative w-full max-w-5xl bg-white max-h-[92vh] md:h-[88vh] overflow-y-auto md:overflow-hidden overscroll-contain shadow-2xl z-10 flex flex-col md:flex-row rounded-sm"
         >
           {/* Top Actions: Wishlist & Close buttons */}
           <div className="absolute top-4 right-4 z-30 flex items-center gap-2">
@@ -182,20 +186,32 @@ export default function ProductDetailModal({ product, isOpen, onClose, onAddToCa
           </div>
 
           {/* Left Column: Fixed / Sticky Multi-Photo Model Gallery */}
-          <div className="w-full md:w-1/2 h-[380px] sm:h-[450px] md:h-full relative bg-zinc-950 flex flex-col justify-between shrink-0 overflow-hidden select-none">
-            {/* Main Active Image Viewport */}
-            <div className="relative w-full flex-1 flex items-center justify-center overflow-hidden bg-zinc-900 group">
+          <div className="w-full md:w-1/2 h-[420px] sm:h-[480px] md:h-full relative bg-zinc-950 flex flex-col justify-between shrink-0 overflow-hidden select-none">
+            {/* Main Active Image Viewport — Full Head-to-Toe Model View */}
+            <div className="relative w-full flex-1 flex items-center justify-center overflow-hidden bg-zinc-950 group">
               <AnimatePresence mode="wait">
-                <motion.img
+                <motion.div
                   key={currentImage}
-                  src={currentImage}
-                  alt={`${product.name} - View ${activeImgIndex + 1}`}
                   initial={{ opacity: 0, scale: 1.02 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.25, ease: 'easeOut' }}
-                  className="w-full h-full object-cover object-top"
-                />
+                  className="relative w-full h-full flex items-center justify-center"
+                >
+                  {/* Ambient blurred background fill so vertical portraits look rich without cropping */}
+                  <img
+                    src={currentImage}
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-35 scale-110 pointer-events-none"
+                  />
+                  {/* Full uncropped model view */}
+                  <img
+                    src={currentImage}
+                    alt={`${product.name} - View ${activeImgIndex + 1}`}
+                    className="relative z-10 w-full h-full object-contain"
+                  />
+                </motion.div>
               </AnimatePresence>
 
               {/* Top Left Badges */}
@@ -279,7 +295,10 @@ export default function ProductDetailModal({ product, isOpen, onClose, onAddToCa
           </div>
 
           {/* Right Column: Independent Scrolling Customizer & Cart Actions */}
-          <div className="w-full md:w-1/2 h-auto md:h-full p-6 md:p-8 flex flex-col justify-between overflow-y-auto overscroll-contain">
+          <div
+            data-lenis-prevent
+            className="w-full md:w-1/2 h-auto md:h-full p-6 md:p-8 flex flex-col justify-between md:overflow-y-auto overscroll-contain"
+          >
             <div>
               {/* Header */}
               <div className="border-b border-gray-100 pb-4 mb-5">
