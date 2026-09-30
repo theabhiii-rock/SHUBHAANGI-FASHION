@@ -5,12 +5,14 @@ import {
   FiEdit2, FiSearch, FiMenu, FiX, FiPlus, FiCheck,
   FiTag, FiPercent, FiCopy, FiTrash2, FiVolume2,
   FiImage, FiUploadCloud, FiCamera, FiCheckCircle, FiLoader,
-  FiBookOpen, FiClipboard, FiCreditCard, FiSend, FiScissors
+  FiBookOpen, FiClipboard, FiCreditCard, FiSend, FiScissors,
+  FiCalendar, FiMapPin, FiStar
 } from 'react-icons/fi';
 import { 
   getStoredOrders, saveOrders, getStoredProducts, saveProducts, getVisitorCount, 
   getStoredCoupons, saveCoupons, getStoredOfferBanner, saveOfferBanner,
-  getStoredOfflineOrders, saveOfflineOrders
+  getStoredOfflineOrders, saveOfflineOrders,
+  getStoredStudioServices, saveStudioServices
 } from '../data/store';
 import {
   broadcastNewDressAlert,
@@ -21,11 +23,21 @@ import { compressImageFile } from '../utils/imageUpload';
 import AdminSidebar from './admin/AdminSidebar';
 import RentalTimelineCard from './admin/RentalTimelineCard';
 
+export const STUDIO_SERVICE_TYPES = [
+  { id: 'PREWEDDING', label: 'Pre-Wedding Shoots', icon: '📸', desc: 'Cinematic destination and heritage palace sessions' },
+  { id: 'EVENTS', label: 'Upcoming Events', icon: '🎪', desc: 'Exhibitions, trunk show previews & masterclasses' },
+  { id: 'PHOTOSHOOT', label: 'Photoshoots', icon: '📷', desc: 'Studio bridal & glamour portrait photography' },
+  { id: 'PORTFOLIO', label: 'Portfolio Shoots', icon: '🌟', desc: 'Agency model books & couple bridal portfolios' },
+  { id: 'BTS_VIDEOS', label: 'BTS Videos', icon: '🎬', desc: 'Behind the scenes karigar reels & trial suite stories' },
+  { id: 'MAKEUP', label: 'Makeup Packages', icon: '💄', desc: 'Signature HD & Airbrush bridal makeover packages' },
+  { id: 'PRE_BRIDAL', label: 'Pre-Bridals', icon: '👰', desc: 'Holistic skin prep, glow rituals & hair spa sessions' },
+];
+
 export default function AdminDashboard({ onBackToStore, onLogout }) {
   const [orders, setOrders] = useState(() => getStoredOrders());
   const [products, setProducts] = useState(() => getStoredProducts());
   const [visitors] = useState(() => getVisitorCount());
-  const [activeTab, setActiveTab] = useState('OVERVIEW'); // 'OVERVIEW' | 'OFFLINE_ORDERS' | 'RENTALS' | 'ORDERS' | 'INVENTORY' | 'COUPONS' | 'NEWSLETTER'
+  const [activeTab, setActiveTab] = useState('OVERVIEW'); // 'OVERVIEW' | 'OFFLINE_ORDERS' | 'STUDIO_SERVICES' | 'RENTALS' | 'ORDERS' | 'INVENTORY' | 'COUPONS' | 'NEWSLETTER'
   const [editingProduct, setEditingProduct] = useState(null);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [photoManagerProduct, setPhotoManagerProduct] = useState(null);
@@ -33,6 +45,29 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
   const [notification, setNotification] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Shoots, Events & Studio Experiences State
+  const [studioServices, setStudioServices] = useState(() => getStoredStudioServices());
+  const [isAddServiceOpen, setIsAddServiceOpen] = useState(false);
+  const [editingService, setEditingService] = useState(null);
+  const [serviceCategoryFilter, setServiceCategoryFilter] = useState('ALL');
+  const [serviceSearch, setServiceSearch] = useState('');
+  const [servicePhotoTab, setServicePhotoTab] = useState('FILE'); // 'FILE' | 'URL'
+  const [isUploadingServicePhoto, setIsUploadingServicePhoto] = useState(false);
+  const [serviceForm, setServiceForm] = useState({
+    type: 'PREWEDDING',
+    categoryLabel: 'Pre-Wedding Shoots',
+    title: '',
+    subtitle: '',
+    price: '',
+    date: '',
+    location: 'Delhi Atelier & Destination',
+    badge: 'Popular',
+    image: '',
+    description: '',
+    features: '',
+    isActive: true
+  });
 
   // Offline Studio Orders (Walk-In Desk Register)
   const [offlineOrders, setOfflineOrders] = useState(() => getStoredOfflineOrders());
@@ -225,6 +260,139 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
     const text = `*SHUBHAANGI — THE ULTIMATE BRIDE*\n_Official Studio Booking Slip_\n\nNamaste ${order.customerName} ji! ✨\nThank you for choosing SHUBHAANGI Bridal Studio (Laxmi Nagar, Delhi).\n\n*Booking Details:*\n• Slip ID: #${order.id}\n• Outfit / Set: ${order.item}\n• Category: ${order.category === 'DRESS' ? 'Bridal Lehenga / Saree' : (order.category === 'JEWELLERY' ? 'Royal Jewellery' : 'Bridal Makeup')}\n• Order Type: ${order.mode === 'RENT' ? 'Bridal Rental' : 'Bespoke Purchase'}\n• Function Date: ${order.eventDate || 'As scheduled'}${rentalText}\n\n*Payment Summary:*\n• Total Agreed: ₹${order.amount.toLocaleString('en-IN')}\n• Advance Received: ₹${order.advancePaid.toLocaleString('en-IN')} (${order.paymentMethod})\n• ${balanceText}\n\n${order.notes ? `*Alteration / Fitting Notes:* ${order.notes}\n\n` : ''}📍 *Studio Address:* B-125, First Floor, Laxmi Nagar, Delhi (Near V3S Mall)\n📞 *Contact:* +91 6397799514\n\n_We look forward to crafting your bridal royalty!_ 👑`;
 
     const url = `https://wa.me/${cleanPhone || '916397799514'}?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
+  // ── Studio Services Handlers ──
+  const handleToggleServiceActive = (serviceId) => {
+    const updated = studioServices.map(s => {
+      if (s.id === serviceId) {
+        return { ...s, isActive: !s.isActive };
+      }
+      return s;
+    });
+    setStudioServices(updated);
+    saveStudioServices(updated);
+    const item = updated.find(s => s.id === serviceId);
+    showToast(`${item.isActive ? '👁️ Activated' : '🔒 Hidden'}: "${item.title}"`);
+  };
+
+  const handleDeleteService = (serviceId) => {
+    const item = studioServices.find(s => s.id === serviceId);
+    if (!window.confirm(`Are you sure you want to delete "${item?.title || 'this entry'}"? This cannot be undone.`)) return;
+    const updated = studioServices.filter(s => s.id !== serviceId);
+    setStudioServices(updated);
+    saveStudioServices(updated);
+    showToast(`🗑️ Deleted: "${item?.title || 'Service entry'}"`);
+  };
+
+  const handleOpenAddService = (type = 'PREWEDDING') => {
+    const matched = STUDIO_SERVICE_TYPES.find(t => t.id === type) || STUDIO_SERVICE_TYPES[0];
+    setEditingService(null);
+    setServicePhotoTab('FILE');
+    setServiceForm({
+      type: matched.id,
+      categoryLabel: matched.label,
+      title: '',
+      subtitle: '',
+      price: '',
+      date: '',
+      location: 'Delhi Atelier & Destination',
+      badge: 'Popular',
+      image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=1000',
+      description: '',
+      features: 'Destination Palace Sets\nFull Stylist & Makeup Artist on Set\nCinematic Wedding Teaser Reel',
+      isActive: true
+    });
+    setIsAddServiceOpen(true);
+  };
+
+  const handleOpenEditService = (service) => {
+    setEditingService(service);
+    setServicePhotoTab('FILE');
+    setServiceForm({
+      type: service.type,
+      categoryLabel: service.categoryLabel || service.type,
+      title: service.title,
+      subtitle: service.subtitle || '',
+      price: service.price || '',
+      date: service.date || '',
+      location: service.location || 'Delhi Atelier',
+      badge: service.badge || '',
+      image: service.image || '',
+      description: service.description || '',
+      features: Array.isArray(service.features) ? service.features.join('\n') : (service.features || ''),
+      isActive: service.isActive !== false
+    });
+    setIsAddServiceOpen(true);
+  };
+
+  const handleSaveService = (e) => {
+    e.preventDefault();
+    if (!serviceForm.title.trim()) {
+      alert('Please provide a title for the service or event.');
+      return;
+    }
+
+    const featureList = (serviceForm.features || '')
+      .split(/[\n,]/)
+      .map(f => f.trim())
+      .filter(Boolean);
+
+    const matchedType = STUDIO_SERVICE_TYPES.find(t => t.id === serviceForm.type);
+    const categoryLabel = matchedType ? matchedType.label : serviceForm.categoryLabel;
+
+    if (editingService) {
+      const updated = studioServices.map(s => {
+        if (s.id === editingService.id) {
+          return {
+            ...s,
+            ...serviceForm,
+            categoryLabel,
+            features: featureList
+          };
+        }
+        return s;
+      });
+      setStudioServices(updated);
+      saveStudioServices(updated);
+      showToast(`✨ Updated: "${serviceForm.title}"`);
+    } else {
+      const newEntry = {
+        id: `srv-${Date.now()}`,
+        ...serviceForm,
+        categoryLabel,
+        features: featureList
+      };
+      const updated = [newEntry, ...studioServices];
+      setStudioServices(updated);
+      saveStudioServices(updated);
+      showToast(`🎉 Added new studio experience: "${serviceForm.title}"`);
+    }
+
+    setIsAddServiceOpen(false);
+    setEditingService(null);
+  };
+
+  const handleServicePhotoFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingServicePhoto(true);
+    try {
+      const compressedDataUrl = await compressImageFile(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.82 });
+      setServiceForm(prev => ({ ...prev, image: compressedDataUrl }));
+      showToast('📸 Photo compressed and uploaded successfully!');
+    } catch (err) {
+      console.error(err);
+      showToast('⚠️ Failed to process image file.');
+    } finally {
+      setIsUploadingServicePhoto(false);
+    }
+  };
+
+  const handleSendServiceWhatsApp = (service) => {
+    const text = `*SHUBHAANGI — Luxury Bridal Atelier*\n\nNamaste! Inquiring regarding:\n👑 *${service.title}*\n• Category: ${service.categoryLabel || service.type}\n• Price / Details: ${service.price || service.date || 'Consultation'}\n• Location: ${service.location || 'Delhi Atelier'}\n\nPlease share booking availability. Thank you!`;
+    const url = `https://wa.me/916397799514?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
 
@@ -628,6 +796,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
             pendingReturnsCount={pendingReturns.length}
             subscriberCount={subscribers.length}
             offlineOrdersCount={offlineOrders.length}
+            studioServicesCount={studioServices.length}
           />
         </div>
       </div>
@@ -640,6 +809,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
             <h1 className="text-lg sm:text-xl md:text-2xl font-serif font-bold text-gray-900 tracking-tight">
               {activeTab === 'OVERVIEW' && 'Executive Business Intelligence'}
               {activeTab === 'OFFLINE_ORDERS' && 'Studio Walk-In Bookings & Offline Register'}
+              {activeTab === 'STUDIO_SERVICES' && 'Shoots, Events & Studio Experiences Manager'}
               {activeTab === 'RENTALS' && 'Rental Returns & Escrow Tracker'}
               {activeTab === 'ORDERS' && 'Online Client Bookings CRM'}
               {activeTab === 'INVENTORY' && 'Inventory & Live Pricing Studio'}
@@ -2950,6 +3120,560 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
             </div>
           );
         })()}
+
+        {/* ── SHOOTS, EVENTS & STUDIO SERVICES TAB ────────────────── */}
+        {activeTab === 'STUDIO_SERVICES' && (() => {
+          const filteredServices = studioServices.filter(service => {
+            const matchesCategory = serviceCategoryFilter === 'ALL' || service.type === serviceCategoryFilter;
+            const q = serviceSearch.toLowerCase().trim();
+            const matchesSearch = !q ||
+              service.title?.toLowerCase().includes(q) ||
+              service.subtitle?.toLowerCase().includes(q) ||
+              service.location?.toLowerCase().includes(q) ||
+              service.price?.toLowerCase().includes(q) ||
+              service.description?.toLowerCase().includes(q);
+            return matchesCategory && matchesSearch;
+          });
+
+          const activeCount = studioServices.filter(s => s.isActive !== false).length;
+          const inactiveCount = studioServices.length - activeCount;
+
+          return (
+            <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+              {/* Studio Services Overview Banner */}
+              <div className="bg-gradient-to-r from-zinc-950 via-[#181818] to-zinc-950 text-white p-5 rounded-xl border border-luxury-gold/40 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="p-3 bg-luxury-gold/20 text-luxury-gold rounded-xl border border-luxury-gold/40 text-2xl shrink-0">
+                    <FiCamera size={26} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-luxury-gold block">
+                      Client Menu & Studio Manager
+                    </span>
+                    <h2 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight">
+                      Shoots, Events & Bridal Services
+                    </h2>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      Directly controls the 7 studio experience options visible in the website's slide-out menu drawer.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => handleOpenAddService(serviceCategoryFilter === 'ALL' ? 'PREWEDDING' : serviceCategoryFilter)}
+                  className="px-4 py-2.5 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-md flex items-center gap-2 cursor-pointer shrink-0"
+                >
+                  <FiPlus size={16} />
+                  <span>+ Add Service / Event</span>
+                </button>
+              </div>
+
+              {/* Stat Counters */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
+                  <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Total Studio Offerings</p>
+                  <h3 className="text-2xl font-serif font-bold text-gray-900 mt-1">{studioServices.length}</h3>
+                  <p className="text-[10px] text-gray-400 mt-1">Across 7 distinct categories</p>
+                </div>
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
+                  <p className="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold">Active On Website</p>
+                  <h3 className="text-2xl font-serif font-bold text-emerald-700 mt-1">{activeCount}</h3>
+                  <p className="text-[10px] text-emerald-600 mt-1">Visible to brides & clients</p>
+                </div>
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
+                  <p className="text-[11px] uppercase tracking-wider text-amber-700 font-semibold">Hidden / Draft</p>
+                  <h3 className="text-2xl font-serif font-bold text-amber-700 mt-1">{inactiveCount}</h3>
+                  <p className="text-[10px] text-gray-400 mt-1">Temporarily offline</p>
+                </div>
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
+                  <p className="text-[11px] uppercase tracking-wider text-indigo-700 font-semibold">WhatsApp Concierge</p>
+                  <h3 className="text-2xl font-serif font-bold text-indigo-700 mt-1">+91 6397799514</h3>
+                  <p className="text-[10px] text-gray-400 mt-1">Direct booking link</p>
+                </div>
+              </div>
+
+              {/* Category Filter Tabs & Search Bar */}
+              <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs space-y-3">
+                <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3">
+                  {/* Search input */}
+                  <div className="relative flex-1 max-w-md">
+                    <FiSearch className="absolute left-3 top-2.5 text-gray-400" size={15} />
+                    <input
+                      type="text"
+                      placeholder="Search title, price, location or features..."
+                      value={serviceSearch}
+                      onChange={(e) => setServiceSearch(e.target.value)}
+                      className="w-full pl-9 pr-3 py-2 text-xs border border-gray-300 rounded-md focus:border-black outline-none bg-gray-50 focus:bg-white"
+                    />
+                  </div>
+
+                  <span className="text-xs text-gray-500 font-medium">
+                    Showing <strong className="text-gray-900">{filteredServices.length}</strong> of {studioServices.length} experiences
+                  </span>
+                </div>
+
+                {/* 7 Category Pills */}
+                <div className="flex gap-1.5 overflow-x-auto no-scrollbar pt-1">
+                  <button
+                    onClick={() => setServiceCategoryFilter('ALL')}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                      serviceCategoryFilter === 'ALL'
+                        ? 'bg-black text-white shadow-xs font-bold'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    🌟 All Services ({studioServices.length})
+                  </button>
+                  {STUDIO_SERVICE_TYPES.map((cat) => {
+                    const count = studioServices.filter(s => s.type === cat.id).length;
+                    const isSelected = serviceCategoryFilter === cat.id;
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => setServiceCategoryFilter(cat.id)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
+                          isSelected
+                            ? 'bg-luxury-gold text-black shadow-xs font-bold'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        <span>{cat.icon}</span>
+                        <span>{cat.label} ({count})</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Service Cards Grid */}
+              {filteredServices.length === 0 ? (
+                <div className="bg-white rounded-lg border border-dashed border-gray-300 p-12 text-center">
+                  <p className="text-gray-400 text-sm mb-3">No services found for this filter or search query.</p>
+                  <button
+                    onClick={() => handleOpenAddService(serviceCategoryFilter === 'ALL' ? 'PREWEDDING' : serviceCategoryFilter)}
+                    className="px-4 py-2 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-luxury-gold transition-colors cursor-pointer"
+                  >
+                    + Add New Entry
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {filteredServices.map((service) => {
+                    const typeMeta = STUDIO_SERVICE_TYPES.find(t => t.id === service.type) || { icon: '✨', label: service.categoryLabel || service.type };
+                    const isServiceActive = service.isActive !== false;
+
+                    return (
+                      <div
+                        key={service.id}
+                        className={`bg-white rounded-xl border overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between ${
+                          isServiceActive ? 'border-gray-200' : 'border-gray-300 bg-gray-50/70 opacity-75'
+                        }`}
+                      >
+                        <div>
+                          {/* Image Banner */}
+                          <div className="h-44 w-full bg-gray-900 relative overflow-hidden group">
+                            {service.image ? (
+                              <img
+                                src={service.image}
+                                alt={service.title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-4xl bg-gradient-to-br from-zinc-800 to-zinc-950 text-luxury-gold">
+                                {typeMeta.icon}
+                              </div>
+                            )}
+
+                            {/* Gradient Overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                            {/* Top Badges */}
+                            <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+                              <span className="px-2.5 py-1 bg-black/80 backdrop-blur-xs text-white text-[10px] font-bold uppercase tracking-wider rounded-md flex items-center gap-1 border border-white/10">
+                                <span>{typeMeta.icon}</span>
+                                <span>{typeMeta.label}</span>
+                              </span>
+
+                              {service.badge && (
+                                <span className="px-2 py-0.5 bg-luxury-gold text-black text-[9px] font-bold uppercase tracking-wider rounded shadow-xs">
+                                  {service.badge}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Bottom Title inside Image */}
+                            <div className="absolute bottom-2.5 left-3 right-3 text-white">
+                              {service.price && (
+                                <span className="text-xs font-mono font-bold text-luxury-gold bg-black/70 px-2 py-0.5 rounded inline-block mb-1">
+                                  {service.price}
+                                </span>
+                              )}
+                              {service.date && !service.price && (
+                                <span className="text-xs font-semibold text-luxury-gold bg-black/70 px-2 py-0.5 rounded inline-block mb-1">
+                                  📅 {service.date}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Content Body */}
+                          <div className="p-4 space-y-3">
+                            <div>
+                              <h4 className="text-base font-serif font-bold text-gray-900 leading-snug">
+                                {service.title}
+                              </h4>
+                              {service.subtitle && (
+                                <p className="text-xs text-gray-500 font-medium mt-0.5">
+                                  {service.subtitle}
+                                </p>
+                              )}
+                            </div>
+
+                            {service.description && (
+                              <p className="text-xs text-gray-600 line-clamp-2">
+                                {service.description}
+                              </p>
+                            )}
+
+                            {/* Features list */}
+                            {Array.isArray(service.features) && service.features.length > 0 && (
+                              <div className="flex flex-wrap gap-1 pt-1">
+                                {service.features.map((feat, fIdx) => (
+                                  <span
+                                    key={fIdx}
+                                    className="px-2 py-0.5 bg-gray-100 text-gray-700 text-[10px] rounded-md font-medium"
+                                  >
+                                    ✓ {feat}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Location */}
+                            {service.location && (
+                              <div className="text-[11px] text-gray-500 flex items-center gap-1.5 pt-1 border-t border-gray-100">
+                                <FiMapPin size={12} className="text-luxury-gold shrink-0" />
+                                <span className="truncate">{service.location}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Card Actions Footer */}
+                        <div className="p-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between gap-2 text-xs">
+                          {/* Active Toggle Switch */}
+                          <button
+                            onClick={() => handleToggleServiceActive(service.id)}
+                            className={`px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer ${
+                              isServiceActive
+                                ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            }`}
+                            title="Toggle visibility on website"
+                          >
+                            <span className={`w-2 h-2 rounded-full ${isServiceActive ? 'bg-emerald-600' : 'bg-gray-400'}`}></span>
+                            <span>{isServiceActive ? 'Active' : 'Hidden'}</span>
+                          </button>
+
+                          <div className="flex items-center gap-1.5">
+                            {/* WhatsApp Direct Test */}
+                            <button
+                              onClick={() => handleSendServiceWhatsApp(service)}
+                              className="p-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded transition-colors cursor-pointer"
+                              title="Test WhatsApp Inquiry"
+                            >
+                              <FiMessageCircle size={14} />
+                            </button>
+
+                            {/* Edit Button */}
+                            <button
+                              onClick={() => handleOpenEditService(service)}
+                              className="px-2.5 py-1 bg-gray-900 hover:bg-luxury-gold hover:text-black text-white rounded text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center gap-1 cursor-pointer"
+                            >
+                              <FiEdit2 size={12} />
+                              <span>Edit</span>
+                            </button>
+
+                            {/* Delete Button */}
+                            <button
+                              onClick={() => handleDeleteService(service.id)}
+                              className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                              title="Delete service entry"
+                            >
+                              <FiTrash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* ── ADD / EDIT STUDIO SERVICE MODAL ───────────────────────── */}
+        {isAddServiceOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xs overflow-y-auto">
+            <div className="bg-white max-w-xl w-full p-5 sm:p-6 rounded-xl shadow-2xl relative border border-gray-200 my-auto max-h-[92vh] overflow-y-auto">
+              <button
+                onClick={() => setIsAddServiceOpen(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-black p-1.5 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+                aria-label="Close"
+              >
+                <FiX size={20} />
+              </button>
+
+              <div className="flex items-center gap-3 mb-3">
+                <span className="p-2.5 bg-luxury-gold/20 text-luxury-gold rounded-lg border border-luxury-gold/40 text-xl shrink-0">
+                  <FiCamera size={20} />
+                </span>
+                <div>
+                  <h3 className="text-base sm:text-lg font-serif font-bold text-gray-900 leading-tight">
+                    {editingService ? 'Edit Studio Experience' : 'Add New Studio Service / Event'}
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    Controls client menu options & showcase details at Shubhaangi Delhi Atelier
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={handleSaveService} className="space-y-3.5 text-xs">
+                {/* Category Type Selector */}
+                <div>
+                  <label className="font-semibold block mb-1 text-gray-800">
+                    Service Category * (7 Menu Options)
+                  </label>
+                  <select
+                    value={serviceForm.type}
+                    onChange={(e) => {
+                      const selected = STUDIO_SERVICE_TYPES.find(t => t.id === e.target.value);
+                      setServiceForm({
+                        ...serviceForm,
+                        type: e.target.value,
+                        categoryLabel: selected ? selected.label : e.target.value
+                      });
+                    }}
+                    className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-semibold text-xs"
+                  >
+                    {STUDIO_SERVICE_TYPES.map(cat => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.icon} {cat.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Title and Subtitle */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">Title / Package Name *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Royal Heritage Pre-Wedding Shoot"
+                      value={serviceForm.title}
+                      onChange={(e) => setServiceForm({ ...serviceForm, title: e.target.value })}
+                      required
+                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">Subtitle / Tagline</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 2 Days Cinematic Palace Shoot"
+                      value={serviceForm.subtitle}
+                      onChange={(e) => setServiceForm({ ...serviceForm, subtitle: e.target.value })}
+                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white"
+                    />
+                  </div>
+                </div>
+
+                {/* Price, Date, Badge */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">Price / Charges</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. ₹25,000 or Watch Reel"
+                      value={serviceForm.price}
+                      onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
+                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">Event Date (if event)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 24–26 Oct 2026"
+                      value={serviceForm.date}
+                      onChange={(e) => setServiceForm({ ...serviceForm, date: e.target.value })}
+                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">Badge Tag</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Popular / 30-Day / Oct 2026"
+                      value={serviceForm.badge}
+                      onChange={(e) => setServiceForm({ ...serviceForm, badge: e.target.value })}
+                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white"
+                    />
+                  </div>
+                </div>
+
+                {/* Location */}
+                <div>
+                  <label className="font-semibold block mb-1 text-gray-800">Studio / Shoot Location</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Delhi Flagship Atelier • Laxmi Nagar (Near V3S Mall)"
+                    value={serviceForm.location}
+                    onChange={(e) => setServiceForm({ ...serviceForm, location: e.target.value })}
+                    className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white"
+                  />
+                </div>
+
+                {/* Photo Upload: File or URL */}
+                <div className="bg-gray-50 p-3.5 rounded-lg border border-gray-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="font-semibold text-gray-800">Cover Photo / Showcase Visual</label>
+                    <div className="flex gap-1 bg-white p-0.5 rounded border border-gray-200">
+                      <button
+                        type="button"
+                        onClick={() => setServicePhotoTab('FILE')}
+                        className={`px-2.5 py-1 text-[10px] font-bold rounded uppercase transition-colors cursor-pointer ${
+                          servicePhotoTab === 'FILE' ? 'bg-black text-white' : 'text-gray-500 hover:text-black'
+                        }`}
+                      >
+                        Upload File
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setServicePhotoTab('URL')}
+                        className={`px-2.5 py-1 text-[10px] font-bold rounded uppercase transition-colors cursor-pointer ${
+                          servicePhotoTab === 'URL' ? 'bg-black text-white' : 'text-gray-500 hover:text-black'
+                        }`}
+                      >
+                        Image URL
+                      </button>
+                    </div>
+                  </div>
+
+                  {servicePhotoTab === 'FILE' ? (
+                    <div>
+                      <label className="border-2 border-dashed border-gray-300 hover:border-black rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer bg-white transition-colors">
+                        {isUploadingServicePhoto ? (
+                          <div className="flex items-center gap-2 text-gray-500">
+                            <FiLoader className="animate-spin text-luxury-gold" size={18} />
+                            <span>Optimizing & compressing photo...</span>
+                          </div>
+                        ) : (
+                          <>
+                            <FiUploadCloud size={24} className="text-gray-400 mb-1" />
+                            <span className="font-semibold text-gray-700">Click to choose image file</span>
+                            <span className="text-[10px] text-gray-400 mt-0.5">JPG, PNG, WEBP automatically compressed</span>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          disabled={isUploadingServicePhoto}
+                          onChange={handleServicePhotoFileChange}
+                        />
+                      </label>
+                    </div>
+                  ) : (
+                    <div>
+                      <input
+                        type="url"
+                        placeholder="https://images.unsplash.com/... or paste image link"
+                        value={serviceForm.image}
+                        onChange={(e) => setServiceForm({ ...serviceForm, image: e.target.value })}
+                        className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-mono text-xs"
+                      />
+                    </div>
+                  )}
+
+                  {/* Photo Preview */}
+                  {serviceForm.image && (
+                    <div className="flex items-center gap-3 pt-2">
+                      <img
+                        src={serviceForm.image}
+                        alt="Preview"
+                        className="w-16 h-16 object-cover rounded border border-gray-300 shadow-xs"
+                      />
+                      <div className="flex-1 min-w-0 text-[11px] text-gray-500">
+                        <span className="text-emerald-700 font-semibold block">✓ Image ready</span>
+                        <span className="truncate block font-mono text-[10px]">{serviceForm.image.slice(0, 50)}...</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="font-semibold block mb-1 text-gray-800">Description</label>
+                  <textarea
+                    rows={2}
+                    placeholder="Details about this shoot package, event schedule, or service experience..."
+                    value={serviceForm.description}
+                    onChange={(e) => setServiceForm({ ...serviceForm, description: e.target.value })}
+                    className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white text-xs"
+                  />
+                </div>
+
+                {/* Inclusions / Highlights */}
+                <div>
+                  <label className="font-semibold block mb-1 text-gray-800">
+                    Inclusions / Key Highlights (One per line or comma-separated)
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Destination Palace Sets&#10;Full Stylist & Makeup Artist on Set&#10;Cinematic Wedding Teaser Reel&#10;Designer Outfits on Loan"
+                    value={serviceForm.features}
+                    onChange={(e) => setServiceForm({ ...serviceForm, features: e.target.value })}
+                    className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white text-xs font-mono"
+                  />
+                </div>
+
+                {/* Active Switch */}
+                <div className="flex items-center gap-2 pt-1">
+                  <input
+                    type="checkbox"
+                    id="isActiveCheckbox"
+                    checked={serviceForm.isActive}
+                    onChange={(e) => setServiceForm({ ...serviceForm, isActive: e.target.checked })}
+                    className="w-4 h-4 accent-luxury-gold cursor-pointer"
+                  />
+                  <label htmlFor="isActiveCheckbox" className="font-semibold text-gray-800 cursor-pointer">
+                    Active & visible on client website menu drawer
+                  </label>
+                </div>
+
+                {/* Submit Buttons */}
+                <div className="pt-3 flex flex-col sm:flex-row gap-2.5 border-t border-gray-200">
+                  <button
+                    type="submit"
+                    className="flex-1 py-3 bg-black hover:bg-luxury-gold hover:text-black text-white font-bold uppercase tracking-wider rounded-md transition-colors shadow-xs cursor-pointer text-xs"
+                  >
+                    {editingService ? 'Save Changes' : 'Publish Service to Studio'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddServiceOpen(false)}
+                    className="px-5 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 font-medium cursor-pointer text-xs"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

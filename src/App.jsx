@@ -10,7 +10,7 @@ import Lenis from '@studio-freight/lenis';
 import { 
   getStoredProducts, getVisitorCount, 
   getStoredWishlist, saveWishlist, getStoredOrders,
-  getStoredOfferBanner 
+  getStoredOfferBanner, getStoredStudioServices
 } from './data/store';
 import { openProductWhatsAppChat } from './utils/whatsapp';
 import ProductDetailModal from './components/ProductDetailModal';
@@ -37,6 +37,7 @@ import OrderTrackerModal from './components/store/OrderTrackerModal';
 import CustomerReviewsSection from './components/store/CustomerReviewsSection';
 import MobileBottomBar from './components/store/MobileBottomBar';
 import NewsletterPopupModal from './components/store/NewsletterPopupModal';
+import StudioServiceModal from './components/store/StudioServiceModal';
 
 export default function App() {
   const [currentView, setCurrentView] = useState('store'); // 'store' | 'admin'
@@ -57,6 +58,9 @@ export default function App() {
   const [isOrderTrackerOpen, setIsOrderTrackerOpen] = useState(false);
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [offerBanner, setOfferBanner] = useState(() => getStoredOfferBanner());
+  const [studioServices, setStudioServices] = useState(() => getStoredStudioServices());
+  const [isStudioServiceModalOpen, setIsStudioServiceModalOpen] = useState(false);
+  const [selectedStudioServiceCategory, setSelectedStudioServiceCategory] = useState('PREWEDDING');
 
   const [cartItems, setCartItems] = useState(() => {
     try {
@@ -178,6 +182,7 @@ export default function App() {
     isAppointmentOpen ||
     isOrderTrackerOpen ||
     isNewsletterOpen ||
+    isStudioServiceModalOpen ||
     isAuthModalOpen
   );
 
@@ -255,6 +260,7 @@ export default function App() {
         onBackToStore={() => {
           setProducts(getStoredProducts());
           setOfferBanner(getStoredOfferBanner());
+          setStudioServices(getStoredStudioServices());
           setCurrentView('store');
           window.location.hash = '';
         }}
@@ -351,6 +357,14 @@ export default function App() {
         }}
       />
 
+      {/* 7C. BESPOKE STUDIO SHOOTS & EXPERIENCES MODAL */}
+      <StudioServiceModal
+        isOpen={isStudioServiceModalOpen}
+        onClose={() => setIsStudioServiceModalOpen(false)}
+        initialCategory={selectedStudioServiceCategory}
+        services={studioServices}
+      />
+
       {/* 8. PURE CLIENT LUXURY HEADER */}
       <StoreHeader
         scrolled={scrolled}
@@ -426,42 +440,54 @@ export default function App() {
 
             {/* Main E-Commerce Content */}
             <div className="p-5 flex-1 space-y-6">
-              {/* Category Links */}
+              {/* Studio Services & Experiences (User Dashboard Menu) */}
               <div>
-                <h3 className="text-[10px] uppercase tracking-[0.25em] text-gray-400 font-bold mb-3 px-1">
-                  Couture Categories
-                </h3>
+                <div className="flex items-center justify-between mb-3 px-1">
+                  <h3 className="text-[10px] uppercase tracking-[0.25em] text-gray-500 font-bold">
+                    Studio Shoots & Services
+                  </h3>
+                  <span className="text-[9px] bg-luxury-gold/15 text-luxury-gold px-1.5 py-0.5 rounded font-semibold uppercase">
+                    Delhi Atelier
+                  </span>
+                </div>
                 <div className="space-y-1">
                   {[
-                    { name: 'Bridal Lehengas', tab: 'DRESS', desc: 'Handcrafted Heritage Zardozi', badge: 'Popular' },
-                    { name: 'Bridal Jewellery', tab: 'JEWELLERY', desc: 'Kundan, Polki & Emerald Chokers', badge: 'Trending' },
-                    { name: 'Makeup Packages', tab: 'MAKEUP', desc: 'HD Bridal & Reception Glam', badge: null },
-                    { name: 'All Collections', tab: 'ALL', desc: 'Complete 2026 Bridal Vault', badge: null }
+                    { id: 'PREWEDDING', name: 'Pre-Wedding Shoots', icon: '📸', desc: 'Cinematic Heritage & Destination Shoots', badge: 'Popular' },
+                    { id: 'EVENTS', name: 'Upcoming Events', icon: '🎪', desc: 'Exhibitions & Trunk Show Previews', badge: 'Oct 2026' },
+                    { id: 'PHOTOSHOOT', name: 'Photoshoots', icon: '📷', desc: 'High-Fashion & Studio Bridal Shoots', badge: null },
+                    { id: 'PORTFOLIO', name: 'Portfolio Shoots', icon: '🌟', desc: 'Model & Artist Editorial Portfolios', badge: null },
+                    { id: 'BTS_VIDEOS', name: 'BTS Videos', icon: '🎬', desc: 'Behind the Scenes & Reel Production', badge: 'Watch' },
+                    { id: 'MAKEUP', name: 'Makeup Packages', icon: '💄', desc: 'HD Bridal, Airbrush & Reception Glam', badge: 'Trending' },
+                    { id: 'PRE_BRIDAL', name: 'Pre-Bridals', icon: '👰', desc: 'Skin Prep, Glow Rituals & Hair Spa', badge: '30-Day' }
                   ].map((item) => (
                     <button 
-                      key={item.name}
+                      key={item.id}
                       onClick={() => {
-                        setActiveTab(item.tab);
+                        setSelectedStudioServiceCategory(item.id);
                         setSidebarOpen(false);
-                        const el = document.getElementById('catalog');
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        setIsStudioServiceModalOpen(true);
                       }}
-                      className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-black/5 transition-all text-left group"
+                      className="w-full flex items-center justify-between p-2.5 rounded-lg hover:bg-black/5 transition-all text-left group cursor-pointer"
                     >
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-serif text-base font-semibold text-gray-900 group-hover:text-luxury-gold transition-colors">
-                            {item.name}
-                          </span>
-                          {item.badge && (
-                            <span className="text-[8px] tracking-wider uppercase font-bold bg-luxury-gold/15 text-luxury-gold px-1.5 py-0.2 rounded">
-                              {item.badge}
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="text-base p-1.5 bg-luxury-gold/10 rounded-md shrink-0 group-hover:scale-110 transition-transform">
+                          {item.icon}
+                        </span>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-serif text-sm font-semibold text-gray-900 group-hover:text-luxury-gold transition-colors truncate">
+                              {item.name}
                             </span>
-                          )}
+                            {item.badge && (
+                              <span className="text-[8px] tracking-wider uppercase font-bold bg-luxury-gold/15 text-luxury-gold px-1.5 py-0.2 rounded shrink-0">
+                                {item.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-gray-500 font-light truncate">{item.desc}</p>
                         </div>
-                        <p className="text-[11px] text-gray-500 font-light mt-0.5">{item.desc}</p>
                       </div>
-                      <FiChevronRight size={16} className="text-gray-400 group-hover:text-luxury-gold group-hover:translate-x-1 transition-all" />
+                      <FiChevronRight size={15} className="text-gray-400 group-hover:text-luxury-gold group-hover:translate-x-1 transition-all shrink-0 ml-1" />
                     </button>
                   ))}
                 </div>

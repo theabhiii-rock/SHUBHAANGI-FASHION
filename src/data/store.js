@@ -723,3 +723,223 @@ export const saveOfflineOrders = (orders) => {
   }
 };
 
+// ── STUDIO SERVICES, SHOOTS & EVENTS PERSISTENCE ──
+export const INITIAL_STUDIO_SERVICES = [
+  // 1. Pre-Wedding Shoots
+  {
+    id: 'srv-prewed-1',
+    type: 'PREWEDDING',
+    categoryLabel: 'Pre-Wedding Shoots',
+    title: 'Royal Heritage Pre-Wedding Shoot',
+    subtitle: '2 Bridal Couture Outfits + Studio & Delhi NCR Sets',
+    price: '₹35,000',
+    badge: 'Popular',
+    description: 'Cinematic pre-wedding shoot with handcrafted Shubhaangi lehengas, royal jewellery sets, drone coverage, and high-fashion reel edits.',
+    image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=1000',
+    features: ['2 Shubhaangi Lehengas Included', 'Royal Polki Jewellery Sets', 'Drone & 4K Cinema Reels', '25 Retouched High-Res Photos'],
+    isActive: true
+  },
+  {
+    id: 'srv-prewed-2',
+    type: 'PREWEDDING',
+    categoryLabel: 'Pre-Wedding Shoots',
+    title: 'Vintage Fort & Palace Pre-Wedding Edit',
+    subtitle: 'Regal Destination Pre-Wedding Shoot',
+    price: '₹65,000',
+    badge: 'Luxury',
+    description: 'Complete bridal styling, two premium bespoke lehengas, royal jewellery, full photography & 4K cinematic film.',
+    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=1000',
+    features: ['Destination Palace Sets', 'Full Stylist & Makeup Artist on Set', 'Cinematic Wedding Teaser Video', 'Designer Outfits on Loan'],
+    isActive: true
+  },
+
+  // 2. Upcoming Events
+  {
+    id: 'srv-event-1',
+    type: 'EVENTS',
+    categoryLabel: 'Upcoming Events',
+    title: 'Shubhaangi Bridal Couture 2026 Showcase',
+    subtitle: 'Delhi Flagship Atelier • Laxmi Nagar (Near V3S Mall)',
+    price: 'Free VIP Entry (RSVP)',
+    badge: 'Oct 2026',
+    date: '24–26 Oct 2026',
+    description: 'Exclusive private preview of the 2026 Raw Silk & Zardozi Bridal Vault with Lead Designer Deepak Kumar and Brand Owner Ekta Jain.',
+    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=1000',
+    features: ['Private Atelier Tour', 'Exclusive 15% Pre-Booking Discount', 'One-on-One Custom Design Session', 'Complimentary Champagne & Hi-Tea'],
+    isActive: true
+  },
+  {
+    id: 'srv-event-2',
+    type: 'EVENTS',
+    categoryLabel: 'Upcoming Events',
+    title: 'Bridal Trousseau & Styling Masterclass',
+    subtitle: 'Live Draping, Jewelry Matching & Trial Experience',
+    price: 'Free by Registration',
+    badge: 'Upcoming',
+    date: '08 Nov 2026',
+    description: 'Interactive bridal trousseau planning session with Ekta Jain & Deepak Kumar. One-on-one styling consultations for winter brides.',
+    image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=1000',
+    features: ['Live Saree & Dupatta Draping', 'Jewellery Color Contrast Secrets', 'Bridal Skin Glow Consultation', 'Fitting Session Walkthrough'],
+    isActive: true
+  },
+
+  // 3. Photoshoots
+  {
+    id: 'srv-photo-1',
+    type: 'PHOTOSHOOT',
+    categoryLabel: 'Photoshoots',
+    title: 'Editorial Bridal Fashion Studio Shoot',
+    subtitle: 'Magazine Style Shoot at Shubhaangi Studio',
+    price: '₹22,000',
+    badge: 'Studio Special',
+    description: 'High-end studio photography in our Laxmi Nagar bridal suites. Includes 1 royal lehenga from our vault, makeup artist, and 20 retouched high-res photos.',
+    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1000',
+    features: ['1 Luxury Outfit Included', 'Professional Makeup & Hair', 'Vogue-Style Studio Lighting', '20 Magazine-Grade Retouches'],
+    isActive: true
+  },
+  {
+    id: 'srv-photo-2',
+    type: 'PHOTOSHOOT',
+    categoryLabel: 'Photoshoots',
+    title: 'Bridal Jewellery & Glamour Portrait Shoot',
+    subtitle: 'Heirloom Polki & Kundan Glamour Portraits',
+    price: '₹18,000',
+    badge: 'Trending',
+    description: 'Macro and portrait lighting designed to accentuate intricate jewellery, eye makeup, and traditional bridal heritage.',
+    image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=1000',
+    features: ['Choker & Mathapatti Highlight Shots', 'Cinematic Macro Beauty Lighting', 'High-Definition Skin Touch-ups', 'Same-Day Digital Previews'],
+    isActive: true
+  },
+
+  // 4. Portfolio Shoots
+  {
+    id: 'srv-port-1',
+    type: 'PORTFOLIO',
+    categoryLabel: 'Portfolio Shoots',
+    title: 'Model & Influencer Fashion Portfolio Shoot',
+    subtitle: 'Professional Fashion Agency Book',
+    price: '₹28,000',
+    badge: 'Agency Ready',
+    description: 'Full day portfolio session with 3 distinct luxury looks (Traditional Bridal, Indo-Western, Contemporary Saree). Directed by lead fashion stylists.',
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=1000',
+    features: ['3 Wardrobe Changes', 'High-Fashion Creative Direction', 'Digital Comp Card & Agency Portfolio', 'Insta-Ready Reel Edits'],
+    isActive: true
+  },
+  {
+    id: 'srv-port-2',
+    type: 'PORTFOLIO',
+    categoryLabel: 'Portfolio Shoots',
+    title: 'Bride & Groom Royal Couple Portfolio',
+    subtitle: 'Curated Romance & Editorial Posing',
+    price: '₹32,000',
+    badge: 'Couples',
+    description: 'Couples looking for bespoke visual keepsakes before the wedding rituals. Coordinated outfits and tailored studio backgrounds.',
+    image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1000',
+    features: ['Couples Coordinated Wardrobe', 'Pose Coaching by Fashion Director', 'Framed 16x24 Canvas Print Included', 'Social Media Teaser Reel'],
+    isActive: true
+  },
+
+  // 5. BTS Videos
+  {
+    id: 'srv-bts-1',
+    type: 'BTS_VIDEOS',
+    categoryLabel: 'BTS Videos',
+    title: 'The Art of Zardozi — Behind the Loom',
+    subtitle: '400 Hours of Pure Hand Embroidery Documentary',
+    price: 'Watch Reel',
+    badge: 'Craft Story',
+    description: 'Watch our master karigars in Old Delhi and Laxmi Nagar hand-embroider real dabka, sequins and golden threads onto pure raw silk fabrics.',
+    image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&q=80&w=1000',
+    features: ['Raw Karigar Craftsmanship', 'Close-up Thread & Pearl Work', 'Designer Deepak Kumar Commentary', 'Heritage Textile Insights'],
+    isActive: true
+  },
+  {
+    id: 'srv-bts-2',
+    type: 'BTS_VIDEOS',
+    categoryLabel: 'BTS Videos',
+    title: 'Bridal Transformation & Trial Suite BTS',
+    subtitle: 'Bride Simran’s Complete Fitting Journey',
+    price: 'Watch Reel',
+    badge: 'Reel',
+    description: 'Step inside our Laxmi Nagar trial suite and experience how a bride finds her dream lehenga with lead designer Deepak Kumar.',
+    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=1000',
+    features: ['Real Bride Experience', 'Cancan & Blouse Fit Adjustments', 'Final Look Reveal Reaction', 'VIP Fitting Suite Atmosphere'],
+    isActive: true
+  },
+
+  // 6. Makeup Packages
+  {
+    id: 'srv-mu-1',
+    type: 'MAKEUP',
+    categoryLabel: 'Makeup Packages',
+    title: 'Shubhaangi Signature HD Bridal Makeup',
+    subtitle: 'HD Makeup + Hair Artistry + Draping + Lashes',
+    price: '₹21,000',
+    badge: 'Signature',
+    description: 'Signature bridal look using luxury international cosmetics (Charlotte Tilbury, Dior, MAC, Huda Beauty). Includes dupatta draping, floral hair styling, and touch-up kit.',
+    image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&q=80&w=1000',
+    features: ['International Luxury Products', 'Mink Lashes & Contact Lenses', 'Fresh Floral Hair Artistry', 'Complimentary Touch-Up Kit'],
+    isActive: true
+  },
+  {
+    id: 'srv-mu-2',
+    type: 'MAKEUP',
+    categoryLabel: 'Makeup Packages',
+    title: 'Airbrush Bridal & Reception Glam',
+    subtitle: '18-Hour Waterproof Flawless Finish',
+    price: '₹28,000',
+    badge: 'Airbrush',
+    description: 'High-definition silicon-based airbrush makeup for high-stress wedding rituals and humidity. Looks weightless in real life and ultra-sharp in 4K photography.',
+    image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=1000',
+    features: ['18-Hour Waterproof Seal', 'No-Flashback 4K Camera Finish', 'Custom Color Palette Matching', 'Includes Cocktail / Reception Look'],
+    isActive: true
+  },
+
+  // 7. Pre-Bridals
+  {
+    id: 'srv-pb-1',
+    type: 'PRE_BRIDAL',
+    categoryLabel: 'Pre-Bridals',
+    title: 'The Empress 30-Day Pre-Bridal Glow Ritual',
+    subtitle: 'Complete Skin, Hair & Body Indulgence',
+    price: '₹18,500',
+    badge: '30-Day Ritual',
+    description: 'Gold collagen facial, Ayurvedic ubtan body polishing, Moroccan hair spa, deluxe manicure-pedicure, and herbal back polishing sessions across 4 sittings.',
+    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=1000',
+    features: ['4 Comprehensive Sessions', 'Gold Collagen Facial & Peel', 'Full Body Ayurvedic Polishing', 'Moroccan Argan Hair Ritual'],
+    isActive: true
+  },
+  {
+    id: 'srv-pb-2',
+    type: 'PRE_BRIDAL',
+    categoryLabel: 'Pre-Bridals',
+    title: 'Express 7-Day Bridal Radiance Package',
+    subtitle: 'Immediate Hydration & Glass Skin Therapy',
+    price: '₹12,000',
+    badge: 'Express Glow',
+    description: 'For brides short on time. Hydrafacial, brightening peel, body glow polish, and relaxing scalp therapy designed for instant bridal glow.',
+    image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80&w=1000',
+    features: ['2 Intensive Sitting Sessions', 'Medical-Grade Hydrafacial', 'Full Arms & Back Glow Bleach', 'Aromatherapy De-stress Massage'],
+    isActive: true
+  }
+];
+
+export const getStoredStudioServices = () => {
+  try {
+    const data = localStorage.getItem('shubhaangi_studio_services_v1');
+    return data ? JSON.parse(data) : INITIAL_STUDIO_SERVICES;
+  } catch (e) {
+    console.warn(e);
+    return INITIAL_STUDIO_SERVICES;
+  }
+};
+
+export const saveStudioServices = (services) => {
+  try {
+    localStorage.setItem('shubhaangi_studio_services_v1', JSON.stringify(services));
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+

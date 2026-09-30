@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   FiGrid, FiRepeat, FiShoppingBag, FiTag, 
-  FiEye, FiLogOut, FiPercent, FiBell, FiBookOpen
+  FiEye, FiLogOut, FiPercent, FiBell, FiBookOpen, FiCamera
 } from 'react-icons/fi';
 
 export default function AdminSidebar({ 
@@ -11,7 +11,8 @@ export default function AdminSidebar({
   onLogout, 
   pendingReturnsCount, 
   subscriberCount,
-  offlineOrdersCount
+  offlineOrdersCount,
+  studioServicesCount
 }) {
   const menuItems = [
     { id: 'OVERVIEW', label: 'Executive Overview', icon: FiGrid },
@@ -21,6 +22,13 @@ export default function AdminSidebar({
       icon: FiBookOpen,
       badge: offlineOrdersCount > 0 ? offlineOrdersCount : null,
       badgeColor: 'bg-amber-500 text-black'
+    },
+    {
+      id: 'STUDIO_SERVICES',
+      label: 'Shoots & Events Studio',
+      icon: FiCamera,
+      badge: studioServicesCount > 0 ? studioServicesCount : null,
+      badgeColor: 'bg-luxury-gold text-black'
     },
     { 
       id: 'RENTALS', 
