@@ -12,6 +12,7 @@ import {
   getStoredWishlist, saveWishlist, getStoredOrders,
   getStoredOfferBanner 
 } from './data/store';
+import { openProductWhatsAppChat } from './utils/whatsapp';
 import ProductDetailModal from './components/ProductDetailModal';
 import CartDrawer from './components/CartDrawer';
 import AdminDashboard from './components/AdminDashboard';
@@ -67,6 +68,25 @@ export default function App() {
   });
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedProductForModal, setSelectedProductForModal] = useState(null);
+  const [initialPhotoIndex, setInitialPhotoIndex] = useState(0);
+
+  // Auto-open Product Detail Modal when arriving from a shared WhatsApp link (?product=ID&photo=INDEX)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const pid = params.get('product');
+      const photoIdx = parseInt(params.get('photo') || '0', 10);
+      if (pid) {
+        const matched = products.find((p) => String(p.id) === String(pid));
+        if (matched) {
+          setInitialPhotoIndex(Number.isNaN(photoIdx) ? 0 : Math.max(0, photoIdx));
+          setSelectedProductForModal(matched);
+        }
+      }
+    } catch (err) {
+      console.warn('Deep-link check skipped', err);
+    }
+  }, [products]);
 
   const handleToggleWishlist = (productId) => {
     setWishlistIds((prev) => {
@@ -215,25 +235,7 @@ export default function App() {
   };
 
   const handleWhatsAppQuickClick = (product) => {
-    const fullImg = product.img?.startsWith('http') 
-      ? product.img 
-      : (typeof window !== 'undefined' ? `${window.location.origin}${product.img?.startsWith('/') ? '' : '/'}${product.img}` : product.img);
-    let message = `Hello SHUBHAANGI Studio & Designer Deepak Sir! ✨\n`;
-    message += `I am inquiring about:\n`;
-    message += `👗 *${product.name}*\n`;
-    if (product.subCategory || product.category) {
-      message += `🏷️ *Category:* ${product.subCategory || product.category}\n`;
-    }
-    if (product.fabric) {
-      message += `🧵 *Fabric:* ${product.fabric}\n`;
-    }
-    message += `📏 *Size:* FREE SIZE (Custom Alteration Available)\n`;
-    message += `💰 *Buy:* ₹${(product.buyPrice || 0).toLocaleString('en-IN')}${product.rentPrice3Days ? ` | *Rent:* ₹${product.rentPrice3Days.toLocaleString('en-IN')} (3 Days)` : ''}\n\n`;
-    if (fullImg) {
-      message += `📸 *Dress Photo Reference:*\n${fullImg}\n\n`;
-    }
-    message += `Could you please confirm bridal availability and custom fitting schedule?`;
-    window.open(`https://wa.me/916397799514?text=${encodeURIComponent(message)}`, '_blank');
+    openProductWhatsAppChat({ product, activeAngleIndex: 0 });
   };
 
   // Auth Success Handler
@@ -279,7 +281,11 @@ export default function App() {
       <ProductDetailModal
         product={selectedProductForModal ? (products.find(p => p.id === selectedProductForModal.id) || selectedProductForModal) : null}
         isOpen={!!selectedProductForModal}
-        onClose={() => setSelectedProductForModal(null)}
+        initialPhotoIndex={initialPhotoIndex}
+        onClose={() => {
+          setSelectedProductForModal(null);
+          setInitialPhotoIndex(0);
+        }}
         onAddToCart={handleAddToCart}
         isWishlisted={Boolean(selectedProductForModal && wishlistIds.includes(selectedProductForModal.id))}
         onToggleWishlist={handleToggleWishlist}

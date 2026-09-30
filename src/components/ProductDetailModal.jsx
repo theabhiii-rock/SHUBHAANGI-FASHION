@@ -5,15 +5,24 @@ import {
   FiShoppingBag, FiMessageCircle, FiHeart, 
   FiChevronLeft, FiChevronRight, FiImage 
 } from 'react-icons/fi';
+import { openProductWhatsAppChat } from '../utils/whatsapp';
 
-export default function ProductDetailModal({ product, isOpen, onClose, onAddToCart, isWishlisted, onToggleWishlist }) {
+export default function ProductDetailModal({
+  product,
+  isOpen,
+  initialPhotoIndex = 0,
+  onClose,
+  onAddToCart,
+  isWishlisted,
+  onToggleWishlist
+}) {
   // Always declare all hooks at the very top (Rules of Hooks)
   const isRentalSupported = Boolean(product?.isRentalAvailable && product?.rentPrice3Days);
   const [selectedMode, setSelectedMode] = useState(isRentalSupported ? 'RENT' : 'BUY');
   const [rentalDuration, setRentalDuration] = useState('3_DAYS'); // '3_DAYS' | '7_DAYS'
   const [selectedSize, setSelectedSize] = useState('FREE SIZE');
   const [addedAnimation, setAddedAnimation] = useState(false);
-  const [activeImgIndex, setActiveImgIndex] = useState(0);
+  const [activeImgIndex, setActiveImgIndex] = useState(initialPhotoIndex || 0);
   const [prevProductId, setPrevProductId] = useState(product?.id);
 
   if (product && product.id !== prevProductId) {
@@ -22,7 +31,7 @@ export default function ProductDetailModal({ product, isOpen, onClose, onAddToCa
     setSelectedMode(canRent ? 'RENT' : 'BUY');
     setRentalDuration('3_DAYS');
     setSelectedSize('FREE SIZE');
-    setActiveImgIndex(0);
+    setActiveImgIndex(initialPhotoIndex || 0);
   }
 
   if (!product || !isOpen) return null;
@@ -53,15 +62,6 @@ export default function ProductDetailModal({ product, isOpen, onClose, onAddToCa
     }, 500);
   };
 
-  const getFullImageUrl = (img) => {
-    if (!img) return '';
-    if (img.startsWith('http://') || img.startsWith('https://')) return img;
-    if (typeof window !== 'undefined') {
-      return `${window.location.origin}${img.startsWith('/') ? '' : '/'}${img}`;
-    }
-    return img;
-  };
-
   const galleryImages = (product.images && product.images.length > 0)
     ? product.images
     : [product.img].filter(Boolean);
@@ -78,68 +78,33 @@ export default function ProductDetailModal({ product, isOpen, onClose, onAddToCa
   };
 
   const handleDeepakFittingInquiry = () => {
-    const fullImg = getFullImageUrl(currentImage);
     const modeText = selectedMode === 'RENT' 
       ? `RENTAL (${rentalDuration === '3_DAYS' ? '3 Days' : '7 Days'})` 
       : 'PURCHASE (Buy to Own)';
+    const priceText = `₹${activePrice.toLocaleString('en-IN')}${selectedMode === 'RENT' ? ` + ₹${securityDeposit.toLocaleString('en-IN')} (Refundable Deposit)` : ''}`;
 
-    let fitMsg = `✨ *CUSTOM FITTING COMMISSION — SHUBHAANGI COUTURE* ✨\n`;
-    fitMsg += `👤 *Designer:* Deepak Kumar (Lead Designer)\n\n`;
-    fitMsg += `👗 *Dress / Outfit:* ${product.name}\n`;
-    if (product.subCategory || product.category) {
-      fitMsg += `🏷️ *Category:* ${product.subCategory || product.category}\n`;
-    }
-    if (product.color) {
-      fitMsg += `🎨 *Color:* ${product.color}\n`;
-    }
-    if (product.fabric) {
-      fitMsg += `🧵 *Fabric & Needlework:* ${product.fabric}\n`;
-    }
-    fitMsg += `📏 *Size:* FREE SIZE (Custom Bespoke Alteration Requested)\n`;
-    fitMsg += `💰 *Option:* ${modeText} — ₹${activePrice.toLocaleString('en-IN')}\n\n`;
-    if (fullImg) {
-      fitMsg += `📸 *Dress Photo Reference (Click to View):*\n${fullImg}\n`;
-      if (galleryImages.length > 1) {
-        fitMsg += `🖼️ *Lookbook Angle:* Photo ${activeImgIndex + 1} of ${galleryImages.length}\n\n`;
-      } else {
-        fitMsg += `\n`;
-      }
-    }
-    fitMsg += `✂️ *Client Message:* "Hello Deepak Sir! Mujhe is dress ka custom fitting / alteration karana hai. Kripya mujhe measurements share karne ka tareeka aur fitting schedule guide karein."`;
-
-    window.open(`https://wa.me/916397799514?text=${encodeURIComponent(fitMsg)}`, '_blank');
+    openProductWhatsAppChat({
+      product,
+      activeAngleIndex: activeImgIndex,
+      modeText,
+      priceText,
+      isFitting: true
+    });
   };
 
   const handleWhatsAppQuickInquiry = () => {
-    const fullImg = getFullImageUrl(currentImage);
     const modeText = selectedMode === 'RENT' 
       ? `RENT (${rentalDuration === '3_DAYS' ? '3 Days' : '7 Days'}, Size: FREE SIZE)`
       : `BUY (Size: FREE SIZE)`;
-    
-    let msg = `✨ *BRIDAL INQUIRY — SHUBHAANGI STUDIO* ✨\n\n`;
-    msg += `👗 *Dress / Outfit:* ${product.name}\n`;
-    if (product.subCategory || product.category) {
-      msg += `🏷️ *Category:* ${product.subCategory || product.category}\n`;
-    }
-    if (product.color) {
-      msg += `🎨 *Color:* ${product.color}\n`;
-    }
-    if (product.fabric) {
-      msg += `🧵 *Fabric:* ${product.fabric}\n`;
-    }
-    msg += `✨ *Mode:* ${modeText}\n`;
-    msg += `💰 *Price:* ₹${activePrice.toLocaleString('en-IN')}${selectedMode === 'RENT' ? ` + ₹${securityDeposit.toLocaleString('en-IN')} (Refundable Deposit)` : ''}\n\n`;
-    if (fullImg) {
-      msg += `📸 *Dress Photo Reference:*\n${fullImg}\n`;
-      if (galleryImages.length > 1) {
-        msg += `🖼️ *Angle:* Photo ${activeImgIndex + 1} of ${galleryImages.length}\n\n`;
-      } else {
-        msg += `\n`;
-      }
-    }
-    msg += `Hello Deepak Sir & Shubhaangi Team! I would like to discuss custom fitting / alterations and confirm bridal trial slots.`;
+    const priceText = `₹${activePrice.toLocaleString('en-IN')}${selectedMode === 'RENT' ? ` + ₹${securityDeposit.toLocaleString('en-IN')} (Refundable Deposit)` : ''}`;
 
-    window.open(`https://wa.me/916397799514?text=${encodeURIComponent(msg)}`, '_blank');
+    openProductWhatsAppChat({
+      product,
+      activeAngleIndex: activeImgIndex,
+      modeText,
+      priceText,
+      isFitting: false
+    });
   };
 
   return (

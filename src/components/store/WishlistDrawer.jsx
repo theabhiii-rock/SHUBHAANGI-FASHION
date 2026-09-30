@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiHeart, FiShoppingBag, FiTrash2, FiMessageCircle } from 'react-icons/fi';
+import { openProductWhatsAppChat } from '../../utils/whatsapp';
 
 export default function WishlistDrawer({
   isOpen,
@@ -134,17 +135,20 @@ export default function WishlistDrawer({
                               <FiShoppingBag size={11} /> Rent / Buy
                             </button>
 
-                            <a
-                              href={`https://wa.me/916397799514?text=${encodeURIComponent(
-                                `✨ *WISHLIST INQUIRY — SHUBHAANGI STUDIO* ✨\n👤 To: Designer Deepak Kumar & Team\n\n👗 *Outfit:* ${item.name}\n📏 *Size:* FREE SIZE (Custom Alteration Available)\n💰 *Price:* ₹${(item.buyPrice || 0).toLocaleString('en-IN')}${item.rentPrice3Days ? ` | Rent: ₹${item.rentPrice3Days.toLocaleString('en-IN')}` : ''}\n\n📸 *Dress Photo Reference:*\n${item.img?.startsWith('http') ? item.img : (typeof window !== 'undefined' ? `${window.location.origin}${item.img?.startsWith('/') ? '' : '/'}${item.img}` : item.img)}\n\nHello Deepak Sir! I saved this piece in my wishlist and would like to ask about availability and custom fitting.`
-                              )}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="p-1.5 bg-[#25D366] text-white hover:bg-[#1eb855] rounded"
-                              title="Ask on WhatsApp"
+                            <button
+                              type="button"
+                              onClick={() =>
+                                openProductWhatsAppChat({
+                                  product: item,
+                                  customNote:
+                                    'Hello Deepak Sir! I saved this piece in my wishlist and would like to ask about availability and custom fitting.'
+                                })
+                              }
+                              className="p-1.5 bg-[#25D366] text-white hover:bg-[#1eb855] rounded cursor-pointer"
+                              title="Ask on WhatsApp with Product Photo"
                             >
                               <FiMessageCircle size={13} />
-                            </a>
+                            </button>
                           </div>
                         </div>
 

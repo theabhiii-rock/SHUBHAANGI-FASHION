@@ -7,6 +7,7 @@ import {
 } from 'react-icons/fi';
 import { saveOrders, getStoredOrders, validateCouponCode, getStoredCoupons } from '../data/store';
 import { initiateRazorpayPayment } from '../utils/razorpay';
+import { getProductRichShareUrl, getPublicImageUrl } from '../utils/whatsapp';
 
 export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, onClearCart }) {
   const [customerName, setCustomerName] = useState('');
@@ -193,7 +194,9 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
       balanceDueAmount: grandTotal
     });
 
-    let message = `✨ *NEW BRIDAL COMMISSION — SHUBHAANGI COUTURE* ✨\n`;
+    const primaryShareUrl = getProductRichShareUrl(cartItems[0], 0);
+    let message = `🔗 *Product Preview & Photo Card:*\n${primaryShareUrl}\n\n`;
+    message += `✨ *NEW BRIDAL COMMISSION — SHUBHAANGI COUTURE* ✨\n`;
     message += `📋 *Booking Reference:* #${orderNumber}\n\n`;
     if (customerName) message += `👤 *Client Name:* ${customerName}\n`;
     if (customerPhone) message += `📞 *Contact Phone:* ${customerPhone}\n`;
@@ -203,15 +206,17 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
     message += `🛍️ *SELECTED PIECES:*\n`;
 
     cartItems.forEach((item, index) => {
-      const itemImgUrl = item.img?.startsWith('http') 
-        ? item.img 
-        : (typeof window !== 'undefined' ? `${window.location.origin}${item.img?.startsWith('/') ? '' : '/'}${item.img}` : item.img);
+      const itemImgUrl = getPublicImageUrl(item.img);
+      const itemShareUrl = getProductRichShareUrl(item, 0);
       message += `\n${index + 1}. *${item.name}*\n`;
       message += `   • *Type:* ${item.orderMode === 'RENT' ? `RENTAL (${item.duration})` : 'PURCHASE'}\n`;
       message += `   • *Size/Fit:* ${item.selectedSize}\n`;
       message += `   • *Price/Fee:* ₹${item.itemPrice.toLocaleString('en-IN')}\n`;
       if (item.securityDeposit > 0) {
         message += `   • *Refundable Deposit:* ₹${item.securityDeposit.toLocaleString('en-IN')}\n`;
+      }
+      if (itemShareUrl) {
+        message += `   • *Product Link:* ${itemShareUrl}\n`;
       }
       if (itemImgUrl) {
         message += `   • *Design Photo:* ${itemImgUrl}\n`;
@@ -817,13 +822,15 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onRemoveItem, o
 
                   <div className="space-y-2 pb-4">
                     <a
-                      href={`https://wa.me/916397799514?text=${encodeURIComponent(`Hello SHUBHAANGI Studio, I just placed Order #${confirmedBooking.orderNumber} (${confirmedBooking.paymentModeLabel}${confirmedBooking.transactionId ? `, Txn: ${confirmedBooking.transactionId}` : ''}). Kindly share my fitting time slot.`)}`}
+                      href={`https://wa.me/916397799514?text=${encodeURIComponent(
+                        `${cartItems[0] ? `🔗 *Product Preview & Photo Card:*\n${getProductRichShareUrl(cartItems[0], 0)}\n\n` : ''}Hello SHUBHAANGI Studio, I just placed Order #${confirmedBooking.orderNumber} (${confirmedBooking.paymentModeLabel}${confirmedBooking.transactionId ? `, Txn: ${confirmedBooking.transactionId}` : ''}).\n\n🛍️ *Ordered Pieces:*\n${cartItems.map((it, i) => `${i + 1}. *${it.name}* (${it.orderMode === 'RENT' ? `Rent ${it.duration}` : 'Buy'})\n   📸 Photo: ${getPublicImageUrl(it.img)}`).join('\n')}\n\nKindly share my fitting time slot.`
+                      )}`}
                       target="_blank"
                       rel="noreferrer"
                       className="w-full bg-[#25D366] text-white py-3 px-4 text-xs tracking-wider uppercase font-semibold flex items-center justify-center gap-2 rounded-md"
                     >
                       <FiMessageCircle size={16} />
-                      Share Receipt on WhatsApp
+                      Share Receipt &amp; Photos on WhatsApp
                     </a>
                     <button
                       onClick={() => {
