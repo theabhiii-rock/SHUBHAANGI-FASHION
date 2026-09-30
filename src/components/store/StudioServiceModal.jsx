@@ -181,10 +181,16 @@ export default function StudioServiceModal({
                     {/* Card Content */}
                     <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                       <div>
-                        {item.date && (
+                        {(item.duration || item.date) && (
                           <div className="inline-flex items-center gap-1.5 text-[11px] text-amber-800 font-bold mb-1.5 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">
                             <FiCalendar size={12} />
-                            <span>{item.date}</span>
+                            <span>{item.duration || item.date}</span>
+                          </div>
+                        )}
+                        {item.specialDetail && (
+                          <div className="text-[11px] text-stone-700 bg-stone-50 px-2.5 py-1 rounded border border-stone-200 mb-2 font-medium flex items-center gap-1.5">
+                            <span className="text-luxury-gold">✨</span>
+                            <span>{item.specialDetail}</span>
                           </div>
                         )}
                         <h3 className="text-base font-serif font-bold text-gray-900 group-hover:text-amber-900 transition-colors leading-snug">

@@ -34,6 +34,454 @@ export const STUDIO_SERVICE_TYPES = [
   { id: 'PRE_BRIDAL', label: 'Pre-Bridals', icon: '👰', desc: 'Holistic skin prep, glow rituals & hair spa sessions' },
 ];
 
+export const CATEGORY_CONFIGS = {
+  PREWEDDING: {
+    categoryTitle: 'Pre-Wedding Shoots',
+    icon: '📸',
+    tagline: 'Cinematic Heritage Palace & Destination Love Stories',
+    description: 'Bespoke destination shoots with 4K drone cinematography, royal lehenga loans, and celebrity styling.',
+    durationLabel: 'Shoot Duration',
+    durationPlaceholder: 'e.g. 2 Days • Sunrise to Sunset',
+    specialDetailLabel: 'Outfits on Loan from Vault',
+    specialDetailPlaceholder: 'e.g. 3 Luxury Vault Lehengas & Sherwanis Included',
+    pricePlaceholder: 'e.g. ₹45,000 or Starts at ₹35,000',
+    locationPlaceholder: 'e.g. Jaipur / Udaipur Palace Sets & Delhi Atelier',
+    suggestedFeatures: [
+      '4K Cinematic Teaser Reel (60s)',
+      'Drone 4K Aerial Stills',
+      '3 Luxury Outfits Included from Vault',
+      'Heritage Palace Location Access',
+      'On-Set Stylist & Makeup Artist',
+      '50 Magazine-Grade Skin Retouches',
+      'Full Raw Footage on Hard Drive',
+      'Custom Script & Mood Board'
+    ],
+    presets: [
+      {
+        title: 'Royal Heritage Palace Pre-Wedding',
+        subtitle: '2-Day Cinematic Destination Shoot in Rajasthan Palaces',
+        price: '₹55,000',
+        badge: 'Bestseller',
+        duration: '2 Days (16 Hours)',
+        specialDetail: '3 Royal Outfits Included from Vault',
+        location: 'Jaipur / Udaipur Heritage Palaces',
+        features: [
+          '4K Cinematic Teaser Reel (60s)',
+          'Drone 4K Aerial Perspectives',
+          '3 Luxury Outfits from Vault',
+          'Celebrity Makeup Artist on Set',
+          '50 High-End Magazine Retouches',
+          'Full Raw High-Bitrate Footage'
+        ],
+        description: 'An unforgettable 2-day royal cinematic shoot crafted across historical havelis, marble courtyards, and sunset sand dunes. Includes complete styling, wardrobe, and direction.',
+        image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=1000'
+      },
+      {
+        title: 'Delhi Heritage & Sunset Romance',
+        subtitle: '1-Day Iconic Monuments & Luxury Studio Session',
+        price: '₹32,000',
+        badge: 'Popular',
+        duration: '1 Full Day (8 Hours)',
+        specialDetail: '2 Designer Outfits Included',
+        location: 'Humayun Tomb, Lodhi Art District & Studio',
+        features: [
+          '1 Cinematic 4K Reel for Instagram',
+          '35 Magazine-Grade Retouches',
+          '2 Luxury Outfits from Vault',
+          'Professional Hair & Makeup on Location',
+          'Same-Day Raw Digital Previews'
+        ],
+        description: 'Capture timeless romantic moments amidst Delhi heritage monuments followed by private indoor luxury studio sets with high-fashion lighting.',
+        image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=1000'
+      },
+      {
+        title: 'Goa Coastal Sunset Destination Shoot',
+        subtitle: 'Golden Hour Beach, Vintage Yacht & Cliffside Romance',
+        price: '₹68,000',
+        badge: 'Exclusive',
+        duration: '2 Days Beach & Yacht',
+        specialDetail: '4 Bohemian & Indo-Western Sets',
+        location: 'South Goa Private Beaches & Cabo de Rama',
+        features: [
+          'Private Luxury Yacht Sunset Shoot',
+          '4K 60fps Drone Beach Sequences',
+          '4 Designer Resort & Saree Outfits',
+          'Editorial Color Grading & Sound Design',
+          '65 High-Res Master Retouches'
+        ],
+        description: 'Dreamy coastal pre-wedding film set on secluded golden sand beaches, Portuguese heritage villas, and private ocean yacht charters.',
+        image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1000'
+      }
+    ]
+  },
+
+  EVENTS: {
+    categoryTitle: 'Upcoming Events',
+    icon: '🎪',
+    tagline: 'Bridal Trunk Shows, Runway Previews & VIP Masterclasses',
+    description: 'Invite brides to exclusive private viewings, designer meet-and-greets, and seasonal collection releases.',
+    durationLabel: 'Event Dates & Timings',
+    durationPlaceholder: 'e.g. 24–26 Oct 2026 • 11:00 AM – 8:00 PM',
+    specialDetailLabel: 'Access & Pass Type',
+    specialDetailPlaceholder: 'e.g. Complimentary VIP RSVP Pass (Limited 50 Brides)',
+    pricePlaceholder: 'e.g. Free VIP RSVP or ₹1,500 / Seat',
+    locationPlaceholder: 'e.g. Flagship Atelier • Laxmi Nagar, Delhi',
+    suggestedFeatures: [
+      'Complimentary VIP RSVP Pass',
+      'Exclusive 2026 Vault Preview',
+      '1-on-1 Consultation with Ekta Jain',
+      'Champagne & High-Tea Lounge',
+      'Flat 15% Spot Booking Voucher',
+      'Goodie Bag with Silk Stole',
+      'Live Masterclass & Draping Tips'
+    ],
+    presets: [
+      {
+        title: 'Royal Bridal Couture Trunk Show 2026',
+        subtitle: 'Exclusive First Access to Unreleased Winter Bridal Vault',
+        price: 'Free VIP RSVP',
+        badge: 'Oct 2026',
+        duration: '24–26 Oct 2026 • 11 AM - 8 PM',
+        specialDetail: 'Complimentary VIP Guest Pass',
+        location: 'Shubhaangi Flagship Atelier, Laxmi Nagar',
+        features: [
+          'First Look at 40+ Unreleased Lehengas',
+          'Private Trial Suite Reservations',
+          '1-on-1 Bridal Consultation with Ekta Jain',
+          'Gourmet High-Tea & Macarons',
+          '₹5,000 Instant Token Discount on Spot Orders'
+        ],
+        description: 'Step into an intimate 3-day showcase displaying handwoven raw silk, zardozi lehengas, and heritage polki jewellery before public release.',
+        image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1000'
+      },
+      {
+        title: 'Masterclass: Art of Bridal Draping & Styling',
+        subtitle: 'Learn 12 Modern Saree & Dupatta Draping Techniques',
+        price: '₹1,500 / Seat',
+        badge: 'Limited Seats',
+        duration: '15 Nov 2026 • 2:00 PM - 6:00 PM',
+        specialDetail: 'Certificate + Luxury Draping Kit Included',
+        location: 'Shubhaangi Studio Runway Hall',
+        features: [
+          'Live Demonstration on 5 Saree Fabrics',
+          'Double Dupatta Pinning for Heavy Lehengas',
+          'Hands-on Practical Practice on Mannequins',
+          'Luxury Pin & Magnet Kit (Worth ₹1,200)',
+          'High-Tea & Certificate of Participation'
+        ],
+        description: 'Intensive 4-hour hands-on workshop designed for brides, bridesmaids, and freelance stylists to master zero-stress dupattas and regal pleated drapes.',
+        image: 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&q=80&w=1000'
+      }
+    ]
+  },
+
+  PHOTOSHOOT: {
+    categoryTitle: 'Photoshoots',
+    icon: '📷',
+    tagline: 'High-Fashion Studio Bridal & Glamour Portraits',
+    description: 'Magazine-quality studio portraits highlighting intricate zardozi craftsmanship, heirloom jewellery, and bridal glow.',
+    durationLabel: 'Session Duration',
+    durationPlaceholder: 'e.g. 4 Hours Studio Session',
+    specialDetailLabel: 'Wardrobe & Vault Lehengas',
+    specialDetailPlaceholder: 'e.g. 1 Royal Heavy Lehenga Loan Included',
+    pricePlaceholder: 'e.g. ₹22,000 or ₹18,000',
+    locationPlaceholder: 'e.g. Shubhaangi Atelier Studio • Laxmi Nagar',
+    suggestedFeatures: [
+      'Vogue High-Fashion Studio Lighting',
+      '1 Royal Lehenga Loan from Vault',
+      'Professional Makeup & Hair on Set',
+      '25 Magazine-Grade Retouched Stills',
+      'Jewellery Vault Props Included',
+      'Same-Day Raw Digital Contact Sheet',
+      'Private Trial Suite Changing Lounge'
+    ],
+    presets: [
+      {
+        title: 'Editorial Bridal Fashion Studio Shoot',
+        subtitle: 'Magazine Cover Style Shoot with Custom Studio Lighting',
+        price: '₹22,000',
+        badge: 'Studio Special',
+        duration: '4 Hours Studio',
+        specialDetail: '1 Luxury Vault Outfit Included',
+        location: 'Shubhaangi Flagship Studio, Delhi',
+        features: [
+          '1 Royal Lehenga from Vault Included',
+          'Professional HD Hair & Makeup on Set',
+          'Vogue-Style Multi-Light Backdrop Sets',
+          '20 Magazine-Grade Skin Retouches',
+          'All Unedited Raw Photos Delivered'
+        ],
+        description: 'Experience a celebrity-style editorial shoot inside our private Laxmi Nagar atelier. Includes mood-board planning, luxury outfit loan, and magazine retouching.',
+        image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=1000'
+      },
+      {
+        title: 'Bridal Jewellery & Polki Glamour Portrait',
+        subtitle: 'Macro Beauty Lighting Focused on Heirloom Jewellery',
+        price: '₹18,000',
+        badge: 'Trending',
+        duration: '3 Hours Studio',
+        specialDetail: 'Kundan & Polki Sets Provided',
+        location: 'Shubhaangi Studio, Laxmi Nagar',
+        features: [
+          'Macro Beauty Ring & Softbox Lighting',
+          'Choker, Mathapatti & Nath Accent Framing',
+          'High-Definition Retouching for Eye & Skin',
+          '15 High-Resolution Digital Master Deliverables',
+          'Instant iPad Review During Shoot'
+        ],
+        description: 'Showcase your wedding jewels in breathtaking macro clarity. Perfect for heirloom portraits and luxury wedding announcements.',
+        image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=1000'
+      }
+    ]
+  },
+
+  PORTFOLIO: {
+    categoryTitle: 'Portfolio Shoots',
+    icon: '🌟',
+    tagline: 'Agency Model Books, Couple Keepsakes & Artist Portfolios',
+    description: 'Polished editorial portfolios for aspiring models, fashion creators, and couples wanting artistic keepsake books.',
+    durationLabel: 'Session Duration',
+    durationPlaceholder: 'e.g. 5 Hours • 4 Distinct Looks',
+    specialDetailLabel: 'Look Changes & Styling',
+    specialDetailPlaceholder: 'e.g. 4 Outfit Changes (Western & Couture)',
+    pricePlaceholder: 'e.g. ₹19,500 or ₹26,000',
+    locationPlaceholder: 'e.g. Studio & Urban Exterior Sets',
+    suggestedFeatures: [
+      '4 Distinct Look Changes',
+      'Digital Comp Card for Agencies',
+      'High-Fashion Pose Coaching',
+      'Dedicated Stylist & Wardrobe Prep',
+      '30 Edited Portfolio Master Frames',
+      'Commercial Portfolio Rights',
+      'Both Studio & Natural Light Sets'
+    ],
+    presets: [
+      {
+        title: 'Professional Agency Model Portfolio',
+        subtitle: 'Industry-Standard Comp Card & High-Fashion Book',
+        price: '₹19,500',
+        badge: 'Agency Ready',
+        duration: '5 Hours Session',
+        specialDetail: '4 Full Look & Hair Changes',
+        location: 'Delhi Studio & Creative Sets',
+        features: [
+          '4 Diverse Fashion & Beauty Looks',
+          'Standard 5-Photo Agency Comp Card Design',
+          'Posing & Expression Coaching',
+          '30 Retouched High-Resolution Frames',
+          'Full Commercial Self-Promotion Rights'
+        ],
+        description: 'Complete book designed to impress leading modeling agencies and casting directors. Includes beauty headshots, editorial fashion, and body lines.',
+        image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=1000'
+      }
+    ]
+  },
+
+  BTS_VIDEOS: {
+    categoryTitle: 'BTS Videos',
+    icon: '🎬',
+    tagline: 'Karigar Zari Handloom Stories & Viral Wedding Reels',
+    description: 'High-energy vertical video production, behind-the-scenes karigar stories, and emotional bridal first looks.',
+    durationLabel: 'Coverage Duration',
+    durationPlaceholder: 'e.g. Full Day Trial & Atelier Coverage',
+    specialDetailLabel: 'Video Deliverables',
+    specialDetailPlaceholder: 'e.g. 3 Instagram Viral 4K Reels + Raw Clips',
+    pricePlaceholder: 'e.g. ₹16,000 or ₹24,000',
+    locationPlaceholder: 'e.g. Studio Workshop & Wedding Venue',
+    suggestedFeatures: [
+      '4K 60fps HDR Vertical Video',
+      'Trending Audio Beat-Sync Editing',
+      'Karigar Handloom Zari Story',
+      'Bride First-Look Emotional Clip',
+      'Trial Room Magic Transformation Reel',
+      '48-Hour Rush Delivery for Socials',
+      'Licensed Background Music Rights'
+    ],
+    presets: [
+      {
+        title: 'Viral Instagram Bridal Reel Package',
+        subtitle: '3 Cinematic 4K Vertical Reels with Trending Audio Sync',
+        price: '₹16,000',
+        badge: 'Social Hit',
+        duration: 'Full Event / Trial Session',
+        specialDetail: '3 Finished 4K Reels + Audio Mastering',
+        location: 'Delhi Atelier & Bride Venue',
+        features: [
+          '3 Vertical 4K Reels (9:16 Instagram/YouTube)',
+          'Cinematic Transition & Color Grading',
+          'Beat-Synced Editing with Trending Audio',
+          'Bride Reveal & Jewellery Macro Focus',
+          '48-Hour Rush Turnaround for Instagram'
+        ],
+        description: 'Shot on cinema-grade mobile rigs and prime lenses to capture every shimmer, slow-motion dupatta twirl, and emotional tear for social media.',
+        image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1000'
+      },
+      {
+        title: 'Heritage Karigar Handloom BTS Story',
+        subtitle: 'Authentic Documentary of Real Zari & Hand-Embroidery',
+        price: '₹12,000',
+        badge: 'Documentary',
+        duration: 'Studio Workshop',
+        specialDetail: '1 Mini-Doc (2-3 Mins) + 2 Short Reels',
+        location: 'Shubhaangi Karigar Loom Room',
+        features: [
+          'Close-up Macro Needlework & Zari Weaving',
+          'Artisan Commentary & Heritage Narrative',
+          '4K Documentary Color Science',
+          'Custom Brand Intro Watermarking',
+          'Lifetime Archival Keepsake'
+        ],
+        description: 'Document the 200+ hours of painstaking karigari that went into crafting your bridal lehenga. A generational family keepsake.',
+        image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=1000'
+      }
+    ]
+  },
+
+  MAKEUP: {
+    categoryTitle: 'Makeup Packages',
+    icon: '💄',
+    tagline: 'Signature HD & 18-Hour Airbrush Bridal Makeovers',
+    description: 'Luxury bridal hair, makeup, and draping using Dior, Chanel, Charlotte Tilbury, and MAC for a radiant 18-hour sweatproof finish.',
+    durationLabel: 'Makeup Duration',
+    durationPlaceholder: 'e.g. 3.5 Hours Private Suite Session',
+    specialDetailLabel: 'Technique & Brands Used',
+    specialDetailPlaceholder: 'e.g. 18-Hour HD Airbrush • Charlotte Tilbury & Dior',
+    pricePlaceholder: 'e.g. ₹28,000 or ₹18,000',
+    locationPlaceholder: 'e.g. Private Bridal Suite • Laxmi Nagar or Venue',
+    suggestedFeatures: [
+      '18-Hour Waterproof Airbrush HD Finish',
+      'Luxury 3D Mink Lashes & Lens',
+      'Celebrity Bridal Hair Styling & Extensions',
+      'Lehenga & Double Dupatta Draping',
+      'Charlotte Tilbury & Dior Cosmetic Suite',
+      'Emergency Bridal Touch-Up Mini Kit',
+      'Complimentary Trial Sitting Included'
+    ],
+    presets: [
+      {
+        title: 'Royal Signature Airbrush Bridal Glam',
+        subtitle: '18-Hour Waterproof HD Airbrush with International Cosmetics',
+        price: '₹28,000',
+        badge: 'Signature',
+        duration: '3.5 Hours Session',
+        specialDetail: 'Dior, Chanel & Charlotte Tilbury Suite',
+        location: 'Private Bridal Suite, Laxmi Nagar / On-Venue',
+        features: [
+          '18-Hour HD Airbrush Makeup (Tear & Sweat Proof)',
+          'Luxury 3D Silk Lashes & Cosmetic Lens',
+          'Intricate Hair Styling with Floral Accents & Extensions',
+          'Double Dupatta & Saree Precision Draping',
+          'Emergency Touch-Up Kit (Lipstick, Blotting paper, Pins)'
+        ],
+        description: 'The definitive bridal makeover designed to look radiant under 4K camera lenses, warm yellow mandap lights, and all-night celebrations.',
+        image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&q=80&w=1000'
+      },
+      {
+        title: 'Engagement & Reception HD Glass Glow',
+        subtitle: 'Dewy Natural Radiance for Sangeet & Reception Evenings',
+        price: '₹16,000',
+        badge: 'Trending',
+        duration: '2.5 Hours Session',
+        specialDetail: 'NARS, Huda Beauty & MAC Luxury Products',
+        location: 'Shubhaangi Makeup Studio, Delhi',
+        features: [
+          'Ultra-Hydrating Glass Skin Base',
+          'Smokey or Soft Glam Eye with Glitter Accents',
+          'Textured Hollywood Waves or Romantic Bun',
+          'Designer Dupatta / Gown Draping',
+          'Pre-Makeup Hydrating Sheet Mask'
+        ],
+        description: 'Fresh, radiant, and contemporary glamour designed for evening cocktails, sangeet performances, and reception stage lights.',
+        image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=1000'
+      }
+    ]
+  },
+
+  PRE_BRIDAL: {
+    categoryTitle: 'Pre-Bridals',
+    icon: '👰',
+    tagline: 'Holistic Skin Prep, 24K Gold Rituals & Luxury Hair Detox',
+    description: 'Multi-sitting skin and hair revival regimens starting 30 to 60 days before the wedding to ensure natural inner radiance.',
+    durationLabel: 'Program Duration',
+    durationPlaceholder: 'e.g. 30-Day Bridal Journey (5 Sittings)',
+    specialDetailLabel: 'Sittings & Treatments Included',
+    specialDetailPlaceholder: 'e.g. 5 Sittings • 24K Gold Facial + Full Body Polish',
+    pricePlaceholder: 'e.g. ₹24,000 or ₹15,000',
+    locationPlaceholder: 'e.g. Shubhaangi Skin & Spa Suite • Delhi',
+    suggestedFeatures: [
+      '5 Holistic In-Clinic Sittings',
+      '24K Gold Radiance Facial',
+      'Full Body Ubtan & Walnut Polish',
+      'Moroccan Argan Hair Spa Detox',
+      'Rose Petal Manicure & Pedicure',
+      'Ayurvedic Full Body De-Tan Pack',
+      'Pain-Free Full Body Waxing & Threading'
+    ],
+    presets: [
+      {
+        title: '30-Day Royal Bridal Radiance Journey',
+        subtitle: '5 Comprehensive Sittings for Complete Skin & Hair Rejuvenation',
+        price: '₹24,000',
+        badge: '30-Day Ritual',
+        duration: '30 Days (5 Sittings)',
+        specialDetail: '5 Sittings • 24K Gold Facial & Full Body Polish',
+        location: 'Shubhaangi Bridal Skin Spa, Laxmi Nagar',
+        features: [
+          'Sitting 1: Deep Cleansing & Moroccan Hair Spa',
+          'Sitting 2: Ayurvedic Full Body Ubtan & Exfoliating Scrub',
+          'Sitting 3: Medical Hydrafacial & Pigmentation Treatment',
+          'Sitting 4: 24K Pure Gold Radiance Glow Facial',
+          'Sitting 5: Crystal Spa Manicure, Pedicure & Full Body Wax'
+        ],
+        description: 'Our most comprehensive bride-to-be preparation. Every session is spaced across 4 weeks to progressively clear pores, soften skin, and create that unmatched bridal glow.',
+        image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=1000'
+      },
+      {
+        title: '15-Day Express Bridal Glow Booster',
+        subtitle: 'Rapid Skin Prep for Short-Notice Weddings',
+        price: '₹14,500',
+        badge: 'Express Glow',
+        duration: '15 Days (2 Intensive Sittings)',
+        specialDetail: 'Hydra-Infusion & Instant Polish',
+        location: 'Shubhaangi Bridal Spa, Delhi',
+        features: [
+          'Medical-Grade Hydrafacial with Hyaluronic Infusion',
+          'Full Body Brightening Peel & Polish',
+          'Aromatherapy Scalp & Hair Detox Spa',
+          'Full Arms, Legs & Back Glow Bleach',
+          'Collagen Eye & Lip Plumping Masks'
+        ],
+        description: 'For brides short on time. High-impact clinical hydra-facials, gentle body peels, and intensive hair gloss designed to give instant radiance in just 2 sittings.',
+        image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80&w=1000'
+      }
+    ]
+  }
+};
+
+export const getCategoryConfig = (type) => {
+  return CATEGORY_CONFIGS[type] || {
+    categoryTitle: 'Studio Experience',
+    icon: '✨',
+    tagline: 'Bespoke Luxury Bridal Services',
+    description: 'Custom curated atelier experiences and shoot options.',
+    durationLabel: 'Duration / Schedule',
+    durationPlaceholder: 'e.g. 1 Day / By Appointment',
+    specialDetailLabel: 'Special Inclusions & Highlights',
+    specialDetailPlaceholder: 'e.g. Dedicated Stylist & Vault Access',
+    pricePlaceholder: 'e.g. ₹20,000 or Upon Request',
+    locationPlaceholder: 'e.g. Delhi Flagship Atelier',
+    suggestedFeatures: [
+      'Private Consultation with Lead Stylist',
+      'High-Resolution Digital Delivery',
+      'Custom Mood-Board Planning',
+      'Priority Weekend Scheduling',
+      'Complementary Trial Session',
+      'Luxury Gift Voucher Included'
+    ],
+    presets: []
+  };
+};
+
 export default function AdminDashboard({ onBackToStore, onLogout }) {
   const [orders, setOrders] = useState(() => getStoredOrders());
   const [products, setProducts] = useState(() => getStoredProducts());
@@ -65,6 +513,8 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
     subtitle: '',
     price: '',
     date: '',
+    duration: '',
+    specialDetail: '',
     location: 'Delhi Atelier & Destination',
     badge: 'Popular',
     image: '',
@@ -290,25 +740,83 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
     showToast(`🗑️ Deleted: "${item?.title || 'Service entry'}"`);
   };
 
-  const handleOpenAddService = (type = 'PREWEDDING') => {
+  const handleOpenAddService = (type = 'PREWEDDING', initialPreset = null) => {
     const matched = studioTopics.find(t => t.id === type) || studioTopics[0] || { id: 'PREWEDDING', label: 'Pre-Wedding Shoots' };
+    const config = getCategoryConfig(matched.id);
     setEditingService(null);
     setServicePhotoTab('FILE');
-    setServiceForm({
-      type: matched.id,
-      categoryLabel: matched.label || matched.name,
-      title: '',
-      subtitle: '',
-      price: '',
-      date: '',
-      location: 'Delhi Atelier & Destination',
-      badge: 'Popular',
-      image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=1000',
-      description: '',
-      features: 'Destination Palace Sets\nFull Stylist & Makeup Artist on Set\nCinematic Wedding Teaser Reel',
-      isActive: true
-    });
+
+    if (initialPreset) {
+      setServiceForm({
+        type: matched.id,
+        categoryLabel: matched.label || matched.name,
+        title: initialPreset.title || '',
+        subtitle: initialPreset.subtitle || '',
+        price: initialPreset.price || '',
+        date: initialPreset.duration || '',
+        duration: initialPreset.duration || '',
+        specialDetail: initialPreset.specialDetail || '',
+        location: initialPreset.location || 'Delhi Atelier',
+        badge: initialPreset.badge || 'Popular',
+        image: initialPreset.image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=1000',
+        description: initialPreset.description || '',
+        features: Array.isArray(initialPreset.features) ? initialPreset.features.join('\n') : (initialPreset.features || ''),
+        isActive: true
+      });
+    } else {
+      const firstPreset = config.presets?.[0];
+      setServiceForm({
+        type: matched.id,
+        categoryLabel: matched.label || matched.name,
+        title: '',
+        subtitle: '',
+        price: '',
+        date: '',
+        duration: '',
+        specialDetail: '',
+        location: config.locationPlaceholder?.replace(/^e\.g\.\s*/, '') || 'Delhi Atelier & Destination',
+        badge: 'Popular',
+        image: firstPreset?.image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=1000',
+        description: '',
+        features: (config.suggestedFeatures?.slice(0, 4) || []).join('\n'),
+        isActive: true
+      });
+    }
     setIsAddServiceOpen(true);
+  };
+
+  const handleApplyPreset = (preset) => {
+    if (!preset) return;
+    setServiceForm(prev => ({
+      ...prev,
+      title: preset.title || prev.title,
+      subtitle: preset.subtitle || prev.subtitle,
+      price: preset.price || prev.price,
+      date: preset.duration || prev.date,
+      duration: preset.duration || prev.duration,
+      specialDetail: preset.specialDetail || prev.specialDetail,
+      location: preset.location || prev.location,
+      badge: preset.badge || prev.badge,
+      image: preset.image || prev.image,
+      description: preset.description || prev.description,
+      features: Array.isArray(preset.features) ? preset.features.join('\n') : (preset.features || prev.features)
+    }));
+    showToast(`⚡ Loaded preset: "${preset.title}"`);
+  };
+
+  const handleAddSuggestedFeature = (tag) => {
+    if (!tag) return;
+    setServiceForm(prev => {
+      const existing = (prev.features || '')
+        .split(/[\n,]/)
+        .map(s => s.trim())
+        .filter(Boolean);
+      if (existing.includes(tag)) {
+        return prev;
+      }
+      const updated = existing.length > 0 ? `${prev.features.trim()}\n${tag}` : tag;
+      return { ...prev, features: updated };
+    });
   };
 
   const handleOpenEditService = (service) => {
@@ -320,7 +828,9 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       title: service.title,
       subtitle: service.subtitle || '',
       price: service.price || '',
-      date: service.date || '',
+      date: service.date || service.duration || '',
+      duration: service.duration || service.date || '',
+      specialDetail: service.specialDetail || '',
       location: service.location || 'Delhi Atelier',
       badge: service.badge || '',
       image: service.image || '',
@@ -352,6 +862,9 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
           return {
             ...s,
             ...serviceForm,
+            duration: serviceForm.duration || serviceForm.date || '',
+            date: serviceForm.date || serviceForm.duration || '',
+            specialDetail: serviceForm.specialDetail || '',
             categoryLabel,
             features: featureList
           };
@@ -365,6 +878,9 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       const newEntry = {
         id: `srv-${Date.now()}`,
         ...serviceForm,
+        duration: serviceForm.duration || serviceForm.date || '',
+        date: serviceForm.date || serviceForm.duration || '',
+        specialDetail: serviceForm.specialDetail || '',
         categoryLabel,
         features: featureList
       };
@@ -3358,72 +3874,182 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
               {(() => {
                 const activeTopic = studioTopics.find(t => t.id === serviceCategoryFilter);
                 if (activeTopic) {
+                  const config = getCategoryConfig(activeTopic.id);
                   return (
-                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-luxury-gold/40 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
-                      <div className="flex items-center gap-3">
-                        <span className="text-3xl p-2.5 bg-white rounded-lg shadow-2xs border border-luxury-gold/30">
-                          {activeTopic.icon || '✨'}
-                        </span>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] uppercase font-bold tracking-wider text-amber-900 bg-amber-200/60 px-2 py-0.5 rounded">
-                              Active Topic
-                            </span>
-                            {activeTopic.badge && (
-                              <span className="text-[9px] uppercase font-bold bg-luxury-gold text-black px-1.5 py-0.5 rounded">
-                                {activeTopic.badge}
+                    <div className="bg-gradient-to-br from-zinc-950 via-[#141414] to-stone-900 border border-luxury-gold/50 p-5 sm:p-6 rounded-2xl shadow-xl text-white space-y-5 relative overflow-hidden">
+                      {/* Subtle gold decorative glow */}
+                      <div className="absolute -top-16 -right-16 w-56 h-56 bg-luxury-gold/10 rounded-full blur-3xl pointer-events-none" />
+
+                      {/* Header Row */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+                        <div className="flex items-start sm:items-center gap-3.5">
+                          <span className="text-3xl sm:text-4xl p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-luxury-gold/40 shadow-md shrink-0">
+                            {activeTopic.icon || config.icon || '✨'}
+                          </span>
+                          <div>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-luxury-gold bg-luxury-gold/15 px-2.5 py-0.5 rounded-full border border-luxury-gold/30">
+                                Atelier Category Focus
                               </span>
-                            )}
+                              {activeTopic.badge && (
+                                <span className="text-[9px] uppercase font-bold bg-luxury-gold text-black px-2 py-0.5 rounded-md shadow-xs">
+                                  {activeTopic.badge}
+                                </span>
+                              )}
+                              <span className="text-[10px] text-gray-400">
+                                • {filteredServices.length} Published Subtopics
+                              </span>
+                            </div>
+                            <h3 className="text-lg sm:text-2xl font-serif font-bold text-white tracking-tight mt-1">
+                              {activeTopic.label || activeTopic.name}
+                            </h3>
+                            <p className="text-xs text-luxury-gold/90 font-medium italic mt-0.5">
+                              "{config.tagline || activeTopic.desc}"
+                            </p>
+                            <p className="text-xs text-gray-300 mt-1 max-w-2xl leading-relaxed">
+                              {config.description || activeTopic.desc}
+                            </p>
                           </div>
-                          <h3 className="text-base sm:text-lg font-serif font-bold text-gray-900 mt-0.5">
-                            {activeTopic.label || activeTopic.name} ({filteredServices.length} Subtopic Packages)
-                          </h3>
-                          <p className="text-xs text-gray-600 mt-0.5">
-                            {activeTopic.desc || 'Add as many subtopics / shoot packages under this category as needed.'}
-                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                          <button
+                            onClick={() => handleOpenAddService(activeTopic.id)}
+                            className="px-4 py-2.5 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-md flex items-center gap-2 cursor-pointer active:scale-95"
+                          >
+                            <FiPlus size={16} />
+                            <span>Create Subtopic Package</span>
+                          </button>
+                          {studioTopics.length > 1 && (
+                            <button
+                              onClick={() => handleDeleteTopic(activeTopic.id)}
+                              className="p-2.5 text-gray-400 hover:text-rose-400 hover:bg-rose-950/40 border border-white/10 rounded-lg transition-colors cursor-pointer"
+                              title={`Delete topic "${activeTopic.label}"`}
+                            >
+                              <FiTrash2 size={16} />
+                            </button>
+                          )}
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0">
-                        <button
-                          onClick={() => handleOpenAddService(activeTopic.id)}
-                          className="px-3.5 py-2 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <FiPlus size={15} />
-                          <span>+ Add Subtopic in {(activeTopic.label || activeTopic.name).split(' ')[0]}</span>
-                        </button>
-                        {studioTopics.length > 1 && (
-                          <button
-                            onClick={() => handleDeleteTopic(activeTopic.id)}
-                            className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                            title={`Delete topic "${activeTopic.label}"`}
-                          >
-                            <FiTrash2 size={16} />
-                          </button>
-                        )}
-                      </div>
+                      {/* ⚡ One-Click Starter Packages Grid */}
+                      {config.presets && config.presets.length > 0 && (
+                        <div className="pt-3 border-t border-white/10 relative z-10 space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold uppercase tracking-wider text-luxury-gold flex items-center gap-1.5">
+                              <span>⚡ One-Click Starter Packages (Vogue Luxury Presets)</span>
+                              <span className="text-[10px] text-gray-400 normal-case font-normal hidden sm:inline">— Click to instantly populate details & edit</span>
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {config.presets.map((preset, pIdx) => (
+                              <div
+                                key={pIdx}
+                                className="bg-white/5 hover:bg-white/10 border border-luxury-gold/30 hover:border-luxury-gold rounded-xl p-3.5 transition-all flex flex-col justify-between group shadow-sm"
+                              >
+                                <div className="space-y-2">
+                                  <div className="flex items-start justify-between gap-2">
+                                    <h4 className="font-serif font-bold text-white text-sm group-hover:text-luxury-gold transition-colors leading-snug">
+                                      {preset.title}
+                                    </h4>
+                                    <span className="text-xs font-mono font-bold text-luxury-gold bg-black/60 px-2 py-0.5 rounded border border-luxury-gold/30 shrink-0">
+                                      {preset.price}
+                                    </span>
+                                  </div>
+                                  <p className="text-[11px] text-gray-300 line-clamp-1">
+                                    {preset.subtitle}
+                                  </p>
+
+                                  <div className="flex flex-wrap gap-1 text-[10px] text-gray-400">
+                                    {preset.duration && (
+                                      <span className="bg-white/10 px-2 py-0.5 rounded text-amber-200">
+                                        ⏱️ {preset.duration}
+                                      </span>
+                                    )}
+                                    {preset.badge && (
+                                      <span className="bg-luxury-gold/20 text-luxury-gold px-1.5 py-0.5 rounded">
+                                        ★ {preset.badge}
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {/* Inclusions sample */}
+                                  <div className="space-y-0.5 pt-1 text-[11px] text-gray-300">
+                                    {(preset.features || []).slice(0, 3).map((feat, fIdx) => (
+                                      <div key={fIdx} className="flex items-center gap-1.5 truncate">
+                                        <span className="text-luxury-gold text-[10px]">✓</span>
+                                        <span className="truncate">{feat}</span>
+                                      </div>
+                                    ))}
+                                    {(preset.features || []).length > 3 && (
+                                      <span className="text-[10px] text-gray-400 block pt-0.5">
+                                        + {(preset.features || []).length - 3} more luxury inclusions...
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenAddService(activeTopic.id, preset)}
+                                  className="mt-3 w-full py-2 bg-luxury-gold/20 hover:bg-luxury-gold text-luxury-gold hover:text-black font-bold text-xs uppercase tracking-wider rounded-lg border border-luxury-gold/50 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                                >
+                                  <span>⚡ Use This Package</span>
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* ✨ Recommended Inclusions Chip Cloud */}
+                      {config.suggestedFeatures && config.suggestedFeatures.length > 0 && (
+                        <div className="pt-2 border-t border-white/10 relative z-10 flex flex-col sm:flex-row sm:items-center gap-2">
+                          <span className="text-[11px] uppercase tracking-wider font-bold text-gray-300 shrink-0 flex items-center gap-1">
+                            <span>✨ Suggested Inclusions:</span>
+                          </span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {config.suggestedFeatures.map((feat, fIdx) => (
+                              <button
+                                key={fIdx}
+                                type="button"
+                                onClick={() => {
+                                  handleOpenAddService(activeTopic.id);
+                                  handleAddSuggestedFeature(feat);
+                                }}
+                                className="px-2.5 py-1 bg-white/10 hover:bg-luxury-gold hover:text-black text-gray-200 text-[10px] rounded-full border border-white/15 transition-all flex items-center gap-1 cursor-pointer"
+                                title="Click to create subtopic with this feature"
+                              >
+                                <span>+</span>
+                                <span>{feat}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 }
                 return (
-                  <div className="bg-gradient-to-r from-stone-900 via-zinc-900 to-stone-900 text-white p-4 sm:p-5 rounded-xl border border-luxury-gold/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+                  <div className="bg-gradient-to-r from-stone-900 via-zinc-900 to-stone-900 text-white p-5 rounded-2xl border border-luxury-gold/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
                     <div>
-                      <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-luxury-gold block">
+                      <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-luxury-gold block">
                         All Studio Categories
                       </span>
-                      <h3 className="text-base sm:text-lg font-serif font-bold text-white mt-0.5">
+                      <h3 className="text-base sm:text-xl font-serif font-bold text-white mt-1">
                         Showing All {studioServices.length} Subtopics across {studioTopics.length} Main Topics
                       </h3>
-                      <p className="text-xs text-gray-300 mt-0.5">
-                        Click any topic pill above to filter and add specific packages under that category.
+                      <p className="text-xs text-gray-300 mt-1 max-w-xl">
+                        Click any category pill above to see curated Vogue presets, suggested inclusions, and add tailored packages for that shoot or bridal service.
                       </p>
                     </div>
                     <button
                       onClick={() => handleOpenAddService(studioTopics[0]?.id || 'PREWEDDING')}
-                      className="px-4 py-2 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-xs flex items-center gap-1.5 shrink-0 cursor-pointer"
+                      className="px-4 py-2.5 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-md flex items-center gap-2 shrink-0 cursor-pointer active:scale-95"
                     >
-                      <FiPlus size={15} />
-                      <span>+ Add New Subtopic</span>
+                      <FiPlus size={16} />
+                      <span>Create New Subtopic</span>
                     </button>
                   </div>
                 );
@@ -3431,7 +4057,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
 
               {/* Service Cards Grid */}
               {filteredServices.length === 0 ? (
-                <div className="bg-white rounded-lg border border-dashed border-gray-300 p-12 text-center">
+                <div className="bg-white rounded-xl border border-dashed border-gray-300 p-12 text-center">
                   <p className="text-gray-400 text-sm mb-3">No services found for this filter or search query.</p>
                   <button
                     onClick={() => handleOpenAddService(serviceCategoryFilter === 'ALL' ? 'PREWEDDING' : serviceCategoryFilter)}
@@ -3492,16 +4118,16 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                                   {service.price}
                                 </span>
                               )}
-                              {service.date && !service.price && (
+                              {(service.duration || service.date) && !service.price && (
                                 <span className="text-xs font-semibold text-luxury-gold bg-black/70 px-2 py-0.5 rounded inline-block mb-1">
-                                  📅 {service.date}
+                                  ⏱️ {service.duration || service.date}
                                 </span>
                               )}
                             </div>
                           </div>
 
                           {/* Content Body */}
-                          <div className="p-4 space-y-3">
+                          <div className="p-4 space-y-2.5">
                             <div>
                               <h4 className="text-base font-serif font-bold text-gray-900 leading-snug">
                                 {service.title}
@@ -3513,21 +4139,38 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                               )}
                             </div>
 
+                            {/* Duration / Schedule Pill */}
+                            {(service.duration || service.date) && (
+                              <div className="inline-flex items-center gap-1 text-[11px] text-amber-900 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60 font-medium">
+                                <span>⏱️</span>
+                                <span>{service.duration || service.date}</span>
+                              </div>
+                            )}
+
+                            {/* Special Detail Highlight (e.g. Vault Wardrobe, Makeup technique) */}
+                            {service.specialDetail && (
+                              <div className="text-[11px] text-stone-700 bg-stone-100/80 px-2.5 py-1 rounded-md border border-stone-200 font-medium flex items-center gap-1.5">
+                                <span className="text-luxury-gold">✨</span>
+                                <span className="truncate">{service.specialDetail}</span>
+                              </div>
+                            )}
+
                             {service.description && (
-                              <p className="text-xs text-gray-600 line-clamp-2">
+                              <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
                                 {service.description}
                               </p>
                             )}
 
-                            {/* Features list */}
+                            {/* Features list with gold checks */}
                             {Array.isArray(service.features) && service.features.length > 0 && (
                               <div className="flex flex-wrap gap-1 pt-1">
                                 {service.features.map((feat, fIdx) => (
                                   <span
                                     key={fIdx}
-                                    className="px-2 py-0.5 bg-gray-100 text-gray-700 text-[10px] rounded-md font-medium"
+                                    className="px-2 py-0.5 bg-gray-100 text-gray-700 text-[10px] rounded-md font-medium flex items-center gap-1"
                                   >
-                                    ✓ {feat}
+                                    <span className="text-emerald-600 font-bold">✓</span>
+                                    <span>{feat}</span>
                                   </span>
                                 ))}
                               </div>
@@ -3598,266 +4241,364 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
         })()}
 
         {/* ── ADD / EDIT STUDIO SERVICE MODAL ───────────────────────── */}
-        {isAddServiceOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xs overflow-y-auto">
-            <div className="bg-white max-w-xl w-full p-5 sm:p-6 rounded-xl shadow-2xl relative border border-gray-200 my-auto max-h-[92vh] overflow-y-auto">
-              <button
-                onClick={() => setIsAddServiceOpen(false)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-black p-1.5 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
-                aria-label="Close"
-              >
-                <FiX size={20} />
-              </button>
+        {isAddServiceOpen && (() => {
+          const activeConfig = getCategoryConfig(serviceForm.type);
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+              <div className="bg-white max-w-2xl w-full p-5 sm:p-7 rounded-2xl shadow-2xl relative border border-luxury-gold/40 my-auto max-h-[92vh] overflow-y-auto">
+                <button
+                  onClick={() => setIsAddServiceOpen(false)}
+                  className="absolute top-4 right-4 text-gray-400 hover:text-black p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer z-10"
+                  aria-label="Close"
+                >
+                  <FiX size={20} />
+                </button>
 
-              <div className="flex items-center gap-3 mb-3">
-                <span className="p-2.5 bg-luxury-gold/20 text-luxury-gold rounded-lg border border-luxury-gold/40 text-xl shrink-0">
-                  <FiCamera size={20} />
-                </span>
-                <div>
-                  <h3 className="text-base sm:text-lg font-serif font-bold text-gray-900 leading-tight">
-                    {editingService ? 'Edit Subtopic / Package' : 'Add New Subtopic / Package'}
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    Add unlimited packages and shoot options under your selected main category
-                  </p>
-                </div>
-              </div>
-
-              <form onSubmit={handleSaveService} className="space-y-3.5 text-xs">
-                {/* Category Type Selector */}
-                <div>
-                  <label className="font-semibold block mb-1 text-gray-800">
-                    Main Category / Parent Topic *
-                  </label>
-                  <select
-                    value={serviceForm.type}
-                    onChange={(e) => {
-                      const selected = studioTopics.find(t => t.id === e.target.value);
-                      setServiceForm({
-                        ...serviceForm,
-                        type: e.target.value,
-                        categoryLabel: selected ? (selected.label || selected.name) : e.target.value
-                      });
-                    }}
-                    className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-semibold text-xs"
-                  >
-                    {studioTopics.map(topic => (
-                      <option key={topic.id} value={topic.id}>
-                        {topic.icon || '✨'} {topic.label || topic.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Title and Subtitle */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Modal Header */}
+                <div className="flex items-start gap-3.5 mb-4 pr-10">
+                  <span className="p-3 bg-luxury-gold/20 text-luxury-gold rounded-xl border border-luxury-gold/40 text-2xl shrink-0 shadow-xs">
+                    {activeConfig.icon || '✨'}
+                  </span>
                   <div>
-                    <label className="font-semibold block mb-1 text-gray-800">Title / Package Name *</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Royal Heritage Pre-Wedding Shoot"
-                      value={serviceForm.title}
-                      onChange={(e) => setServiceForm({ ...serviceForm, title: e.target.value })}
-                      required
-                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-medium"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-semibold block mb-1 text-gray-800">Subtitle / Tagline</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 2 Days Cinematic Palace Shoot"
-                      value={serviceForm.subtitle}
-                      onChange={(e) => setServiceForm({ ...serviceForm, subtitle: e.target.value })}
-                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white"
-                    />
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] uppercase font-bold tracking-widest text-amber-900 bg-amber-100 px-2 py-0.5 rounded">
+                        {activeConfig.categoryTitle}
+                      </span>
+                      <span className="text-[10px] text-gray-400 font-medium">
+                        Atelier Studio Catalog
+                      </span>
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-serif font-bold text-gray-900 leading-tight mt-0.5">
+                      {editingService ? `Edit Package: ${serviceForm.title || 'Subtopic'}` : `Create New ${activeConfig.categoryTitle} Package`}
+                    </h3>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {activeConfig.tagline}
+                    </p>
                   </div>
                 </div>
 
-                {/* Price, Date, Badge */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="font-semibold block mb-1 text-gray-800">Price / Charges</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. ₹25,000 or Watch Reel"
-                      value={serviceForm.price}
-                      onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
-                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-mono"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-semibold block mb-1 text-gray-800">Event Date (if event)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 24–26 Oct 2026"
-                      value={serviceForm.date}
-                      onChange={(e) => setServiceForm({ ...serviceForm, date: e.target.value })}
-                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-semibold block mb-1 text-gray-800">Badge Tag</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Popular / 30-Day / Oct 2026"
-                      value={serviceForm.badge}
-                      onChange={(e) => setServiceForm({ ...serviceForm, badge: e.target.value })}
-                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white"
-                    />
-                  </div>
-                </div>
-
-                {/* Location */}
-                <div>
-                  <label className="font-semibold block mb-1 text-gray-800">Studio / Shoot Location</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Delhi Flagship Atelier • Laxmi Nagar (Near V3S Mall)"
-                    value={serviceForm.location}
-                    onChange={(e) => setServiceForm({ ...serviceForm, location: e.target.value })}
-                    className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white"
-                  />
-                </div>
-
-                {/* Photo Upload: File or URL */}
-                <div className="bg-gray-50 p-3.5 rounded-lg border border-gray-200 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="font-semibold text-gray-800">Cover Photo / Showcase Visual</label>
-                    <div className="flex gap-1 bg-white p-0.5 rounded border border-gray-200">
-                      <button
-                        type="button"
-                        onClick={() => setServicePhotoTab('FILE')}
-                        className={`px-2.5 py-1 text-[10px] font-bold rounded uppercase transition-colors cursor-pointer ${
-                          servicePhotoTab === 'FILE' ? 'bg-black text-white' : 'text-gray-500 hover:text-black'
-                        }`}
-                      >
-                        Upload File
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setServicePhotoTab('URL')}
-                        className={`px-2.5 py-1 text-[10px] font-bold rounded uppercase transition-colors cursor-pointer ${
-                          servicePhotoTab === 'URL' ? 'bg-black text-white' : 'text-gray-500 hover:text-black'
-                        }`}
-                      >
-                        Image URL
-                      </button>
+                {/* ⚡ One-Click Preset Chips inside Modal */}
+                {activeConfig.presets && activeConfig.presets.length > 0 && !editingService && (
+                  <div className="mb-4 p-3 bg-amber-50/70 border border-luxury-gold/40 rounded-xl space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
+                        <span>⚡ 1-Click Quick Fill Presets:</span>
+                      </span>
+                      <span className="text-[10px] text-amber-800 italic">Click any preset to pre-fill all fields</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {activeConfig.presets.map((preset, pIdx) => (
+                        <button
+                          key={pIdx}
+                          type="button"
+                          onClick={() => handleApplyPreset(preset)}
+                          className="px-2.5 py-1.5 bg-white hover:bg-luxury-gold hover:text-black text-gray-800 rounded-lg border border-amber-200 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer group"
+                        >
+                          <span className="text-amber-600 group-hover:text-black">⚡</span>
+                          <span>{preset.title}</span>
+                          <span className="font-mono text-black font-bold text-[11px]">({preset.price})</span>
+                        </button>
+                      ))}
                     </div>
                   </div>
+                )}
 
-                  {servicePhotoTab === 'FILE' ? (
+                <form onSubmit={handleSaveService} className="space-y-4 text-xs">
+                  {/* Category Type Selector */}
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">
+                      Parent Category / Studio Pillar *
+                    </label>
+                    <select
+                      value={serviceForm.type}
+                      onChange={(e) => {
+                        const selected = studioTopics.find(t => t.id === e.target.value);
+                        const newConfig = getCategoryConfig(e.target.value);
+                        setServiceForm({
+                          ...serviceForm,
+                          type: e.target.value,
+                          categoryLabel: selected ? (selected.label || selected.name) : e.target.value,
+                          location: newConfig.locationPlaceholder?.replace(/^e\.g\.\s*/, '') || serviceForm.location
+                        });
+                      }}
+                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white font-semibold text-xs shadow-2xs"
+                    >
+                      {studioTopics.map(topic => (
+                        <option key={topic.id} value={topic.id}>
+                          {topic.icon || '✨'} {topic.label || topic.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Title and Subtitle */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="border-2 border-dashed border-gray-300 hover:border-black rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer bg-white transition-colors">
-                        {isUploadingServicePhoto ? (
-                          <div className="flex items-center gap-2 text-gray-500">
-                            <FiLoader className="animate-spin text-luxury-gold" size={18} />
-                            <span>Optimizing & compressing photo...</span>
-                          </div>
-                        ) : (
-                          <>
-                            <FiUploadCloud size={24} className="text-gray-400 mb-1" />
-                            <span className="font-semibold text-gray-700">Click to choose image file</span>
-                            <span className="text-[10px] text-gray-400 mt-0.5">JPG, PNG, WEBP automatically compressed</span>
-                          </>
-                        )}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          disabled={isUploadingServicePhoto}
-                          onChange={handleServicePhotoFileChange}
-                        />
+                      <label className="font-semibold block mb-1 text-gray-800">
+                        Package Title / Service Name *
                       </label>
-                    </div>
-                  ) : (
-                    <div>
                       <input
-                        type="url"
-                        placeholder="https://images.unsplash.com/... or paste image link"
-                        value={serviceForm.image}
-                        onChange={(e) => setServiceForm({ ...serviceForm, image: e.target.value })}
-                        className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-mono text-xs"
+                        type="text"
+                        placeholder={`e.g. ${activeConfig.presets?.[0]?.title || 'Signature Luxury Experience'}`}
+                        value={serviceForm.title}
+                        onChange={(e) => setServiceForm({ ...serviceForm, title: e.target.value })}
+                        required
+                        className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white font-medium"
                       />
                     </div>
-                  )}
-
-                  {/* Photo Preview */}
-                  {serviceForm.image && (
-                    <div className="flex items-center gap-3 pt-2">
-                      <img
-                        src={serviceForm.image}
-                        alt="Preview"
-                        className="w-16 h-16 object-cover rounded border border-gray-300 shadow-xs"
+                    <div>
+                      <label className="font-semibold block mb-1 text-gray-800">
+                        Editorial Subtitle / Tagline
+                      </label>
+                      <input
+                        type="text"
+                        placeholder={`e.g. ${activeConfig.presets?.[0]?.subtitle || 'Exclusive Studio Session'}`}
+                        value={serviceForm.subtitle}
+                        onChange={(e) => setServiceForm({ ...serviceForm, subtitle: e.target.value })}
+                        className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white"
                       />
-                      <div className="flex-1 min-w-0 text-[11px] text-gray-500">
-                        <span className="text-emerald-700 font-semibold block">✓ Image ready</span>
-                        <span className="truncate block font-mono text-[10px]">{serviceForm.image.slice(0, 50)}...</span>
+                    </div>
+                  </div>
+
+                  {/* Price, Tailored Duration, Badge */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="font-semibold block mb-1 text-gray-800">
+                        Price / Investment
+                      </label>
+                      <input
+                        type="text"
+                        placeholder={activeConfig.pricePlaceholder || 'e.g. ₹25,000 or Upon Request'}
+                        value={serviceForm.price}
+                        onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
+                        className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-semibold block mb-1 text-gray-800">
+                        {activeConfig.durationLabel || 'Duration / Schedule'}
+                      </label>
+                      <input
+                        type="text"
+                        placeholder={activeConfig.durationPlaceholder || 'e.g. 1 Full Day / By Appointment'}
+                        value={serviceForm.duration || serviceForm.date || ''}
+                        onChange={(e) => setServiceForm({ ...serviceForm, duration: e.target.value, date: e.target.value })}
+                        className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-semibold block mb-1 text-gray-800">
+                        Badge Highlight Tag
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Bestseller / Popular / Limited"
+                        value={serviceForm.badge}
+                        onChange={(e) => setServiceForm({ ...serviceForm, badge: e.target.value })}
+                        className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Special Tailored Detail (Category-specific!) */}
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800 flex items-center justify-between">
+                      <span>{activeConfig.specialDetailLabel || 'Special Inclusions & Highlights'}</span>
+                      <span className="text-[10px] text-gray-400 font-normal">Category Specific Feature</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder={activeConfig.specialDetailPlaceholder || 'e.g. Vault Wardrobe Included'}
+                      value={serviceForm.specialDetail || ''}
+                      onChange={(e) => setServiceForm({ ...serviceForm, specialDetail: e.target.value })}
+                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white"
+                    />
+                  </div>
+
+                  {/* Location */}
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">
+                      Studio / Shoot Location
+                    </label>
+                    <input
+                      type="text"
+                      placeholder={activeConfig.locationPlaceholder || 'Delhi Flagship Atelier • Laxmi Nagar'}
+                      value={serviceForm.location}
+                      onChange={(e) => setServiceForm({ ...serviceForm, location: e.target.value })}
+                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white"
+                    />
+                  </div>
+
+                  {/* Photo Upload: File or URL */}
+                  <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-200 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="font-semibold text-gray-800">Cover Photo / Showcase Visual</label>
+                      <div className="flex gap-1 bg-white p-0.5 rounded-md border border-gray-200 shadow-2xs">
+                        <button
+                          type="button"
+                          onClick={() => setServicePhotoTab('FILE')}
+                          className={`px-2.5 py-1 text-[10px] font-bold rounded uppercase transition-colors cursor-pointer ${
+                            servicePhotoTab === 'FILE' ? 'bg-black text-white' : 'text-gray-500 hover:text-black'
+                          }`}
+                        >
+                          Upload File
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setServicePhotoTab('URL')}
+                          className={`px-2.5 py-1 text-[10px] font-bold rounded uppercase transition-colors cursor-pointer ${
+                            servicePhotoTab === 'URL' ? 'bg-black text-white' : 'text-gray-500 hover:text-black'
+                          }`}
+                        >
+                          Image URL
+                        </button>
                       </div>
                     </div>
-                  )}
-                </div>
 
-                {/* Description */}
-                <div>
-                  <label className="font-semibold block mb-1 text-gray-800">Description</label>
-                  <textarea
-                    rows={2}
-                    placeholder="Details about this shoot package, event schedule, or service experience..."
-                    value={serviceForm.description}
-                    onChange={(e) => setServiceForm({ ...serviceForm, description: e.target.value })}
-                    className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white text-xs"
-                  />
-                </div>
+                    {servicePhotoTab === 'FILE' ? (
+                      <div>
+                        <label className="border-2 border-dashed border-gray-300 hover:border-black rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer bg-white transition-colors">
+                          {isUploadingServicePhoto ? (
+                            <div className="flex items-center gap-2 text-gray-500">
+                              <FiLoader className="animate-spin text-luxury-gold" size={18} />
+                              <span>Optimizing & compressing photo...</span>
+                            </div>
+                          ) : (
+                            <>
+                              <FiUploadCloud size={24} className="text-gray-400 mb-1" />
+                              <span className="font-semibold text-gray-700">Click to choose image file</span>
+                              <span className="text-[10px] text-gray-400 mt-0.5">JPG, PNG, WEBP automatically compressed</span>
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            disabled={isUploadingServicePhoto}
+                            onChange={handleServicePhotoFileChange}
+                          />
+                        </label>
+                      </div>
+                    ) : (
+                      <div>
+                        <input
+                          type="url"
+                          placeholder="https://images.unsplash.com/... or paste image link"
+                          value={serviceForm.image}
+                          onChange={(e) => setServiceForm({ ...serviceForm, image: e.target.value })}
+                          className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white font-mono text-xs"
+                        />
+                      </div>
+                    )}
 
-                {/* Inclusions / Highlights */}
-                <div>
-                  <label className="font-semibold block mb-1 text-gray-800">
-                    Inclusions / Key Highlights (One per line or comma-separated)
-                  </label>
-                  <textarea
-                    rows={3}
-                    placeholder="Destination Palace Sets&#10;Full Stylist & Makeup Artist on Set&#10;Cinematic Wedding Teaser Reel&#10;Designer Outfits on Loan"
-                    value={serviceForm.features}
-                    onChange={(e) => setServiceForm({ ...serviceForm, features: e.target.value })}
-                    className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white text-xs font-mono"
-                  />
-                </div>
+                    {/* Photo Preview */}
+                    {serviceForm.image && (
+                      <div className="flex items-center gap-3 pt-2">
+                        <img
+                          src={serviceForm.image}
+                          alt="Preview"
+                          className="w-16 h-16 object-cover rounded-lg border border-gray-300 shadow-xs"
+                        />
+                        <div className="flex-1 min-w-0 text-[11px] text-gray-500">
+                          <span className="text-emerald-700 font-semibold block">✓ Image ready</span>
+                          <span className="truncate block font-mono text-[10px]">{serviceForm.image.slice(0, 50)}...</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
-                {/* Active Switch */}
-                <div className="flex items-center gap-2 pt-1">
-                  <input
-                    type="checkbox"
-                    id="isActiveCheckbox"
-                    checked={serviceForm.isActive}
-                    onChange={(e) => setServiceForm({ ...serviceForm, isActive: e.target.checked })}
-                    className="w-4 h-4 accent-luxury-gold cursor-pointer"
-                  />
-                  <label htmlFor="isActiveCheckbox" className="font-semibold text-gray-800 cursor-pointer">
-                    Active & visible on client website menu drawer
-                  </label>
-                </div>
+                  {/* Description */}
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">
+                      Editorial Description & Details
+                    </label>
+                    <textarea
+                      rows={2}
+                      placeholder={activeConfig.presets?.[0]?.description || 'Details about this shoot package, event schedule, or service experience...'}
+                      value={serviceForm.description}
+                      onChange={(e) => setServiceForm({ ...serviceForm, description: e.target.value })}
+                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white text-xs leading-relaxed"
+                    />
+                  </div>
 
-                {/* Submit Buttons */}
-                <div className="pt-3 flex flex-col sm:flex-row gap-2.5 border-t border-gray-200">
-                  <button
-                    type="submit"
-                    className="flex-1 py-3 bg-black hover:bg-luxury-gold hover:text-black text-white font-bold uppercase tracking-wider rounded-md transition-colors shadow-xs cursor-pointer text-xs"
-                  >
-                    {editingService ? 'Save Changes' : 'Publish Service to Studio'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsAddServiceOpen(false)}
-                    className="px-5 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 font-medium cursor-pointer text-xs"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
+                  {/* Clickable Suggested Features & Inclusions */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="font-semibold text-gray-800">
+                        Inclusions & Deliverables (One per line)
+                      </label>
+                      <span className="text-[10px] text-gray-500">
+                        {serviceForm.features ? `${serviceForm.features.split('\n').filter(Boolean).length} items added` : 'None added'}
+                      </span>
+                    </div>
+
+                    {/* Clickable Feature Suggestions Cloud */}
+                    {activeConfig.suggestedFeatures && activeConfig.suggestedFeatures.length > 0 && (
+                      <div className="mb-2 p-2.5 bg-gray-50 border border-gray-200 rounded-lg">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-600 block mb-1.5">
+                          💡 Click to add suggested features for {activeConfig.categoryTitle}:
+                        </span>
+                        <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto">
+                          {activeConfig.suggestedFeatures.map((feat, fIdx) => (
+                            <button
+                              key={fIdx}
+                              type="button"
+                              onClick={() => handleAddSuggestedFeature(feat)}
+                              className="px-2.5 py-1 bg-white hover:bg-luxury-gold hover:text-black text-gray-700 rounded-full border border-gray-300 text-[11px] font-medium transition-all shadow-2xs flex items-center gap-1 cursor-pointer active:scale-95"
+                            >
+                              <span className="text-luxury-gold group-hover:text-black font-bold">+</span>
+                              <span>{feat}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <textarea
+                      rows={3}
+                      placeholder={activeConfig.suggestedFeatures?.slice(0, 4).join('\n') || 'Enter package inclusions here...'}
+                      value={serviceForm.features}
+                      onChange={(e) => setServiceForm({ ...serviceForm, features: e.target.value })}
+                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white text-xs font-mono"
+                    />
+                  </div>
+
+                  {/* Active Switch */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <input
+                      type="checkbox"
+                      id="isActiveCheckbox"
+                      checked={serviceForm.isActive}
+                      onChange={(e) => setServiceForm({ ...serviceForm, isActive: e.target.checked })}
+                      className="w-4 h-4 accent-luxury-gold cursor-pointer"
+                    />
+                    <label htmlFor="isActiveCheckbox" className="font-semibold text-gray-800 cursor-pointer text-xs">
+                      Active & visible on client website menu drawer
+                    </label>
+                  </div>
+
+                  {/* Submit Buttons */}
+                  <div className="pt-3 flex flex-col sm:flex-row gap-2.5 border-t border-gray-200">
+                    <button
+                      type="submit"
+                      className="flex-1 py-3 bg-black hover:bg-luxury-gold hover:text-black text-white font-bold uppercase tracking-wider rounded-lg transition-colors shadow-md cursor-pointer text-xs flex items-center justify-center gap-2"
+                    >
+                      <FiCheck size={16} />
+                      <span>{editingService ? 'Save Changes' : 'Publish Package to Studio'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddServiceOpen(false)}
+                      className="px-5 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium cursor-pointer text-xs"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* ── ADD MAIN TOPIC MODAL ───────────────────────────────────── */}
         {isAddTopicOpen && (
