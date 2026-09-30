@@ -933,25 +933,64 @@ export default function App() {
             </a>
           </div>
           
-          <h3 className="text-2xl md:text-3xl font-serif tracking-[0.1em] mb-8 text-gray-900">
-            Follow The Glamour @shubhaangi.official
-          </h3>
-          <div className="flex justify-center gap-6 overflow-x-auto pb-4 no-scrollbar px-4">
+          <div className="mb-10">
+            <span className="text-[10px] tracking-[0.35em] uppercase text-luxury-gold font-semibold block mb-2">
+              The Visionaries Behind The Crown
+            </span>
+            <h3 className="text-2xl md:text-3xl font-serif tracking-[0.08em] text-gray-900">
+              Follow The Glamour @shubhaangi.official
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto px-4">
             {[
-              { img: '/images/shubhaangi-rani-pink-bridal-lehenga.jpg', title: 'Rani Pink Heritage Zardozi' },
-              { img: '/images/shubhaangi-mauve-shimmer-gown.jpg', title: 'Mauve Shimmer Reception Gown' },
-              { img: '/images/shubhaangi-antique-gold-tissue.jpg', title: 'Antique Gold Tissue Ensemble' },
-              { img: '/images/shubhaangi-royal-plum-cape.jpg', title: 'Deep Plum Sequin Cape Set' },
-            ].map((item, idx) => (
-              <div key={idx} className="w-48 h-60 md:w-60 md:h-72 overflow-hidden flex-shrink-0 cursor-pointer group rounded-sm bg-gray-100 relative shadow-md">
-                <img 
-                  src={item.img} 
-                  alt={item.title} 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4 text-left">
-                  <span className="text-[9px] uppercase tracking-widest text-luxury-gold font-semibold">Couture Spotlight</span>
-                  <p className="text-xs text-white font-serif font-bold">{item.title}</p>
+              {
+                img: '/images/team/ekta-jain.jpg',
+                name: 'EKTA JAIN',
+                role: 'Owner — Shubhaangi',
+                objectPos: 'object-top'
+              },
+              {
+                img: '/images/team/sachin-jain.jpg',
+                name: 'SACHIN JAIN',
+                role: 'Owner & Founder',
+                objectPos: 'object-top'
+              },
+              {
+                img: '/images/team/deepak-kumar.jpg',
+                name: 'DEEPAK KUMAR',
+                role: 'Fashion Designer & Stylist',
+                objectPos: 'object-top'
+              },
+              {
+                img: '/images/team/maniya-singhal.png',
+                name: 'MANIYA SINGHAL',
+                role: 'Makeup Artist Head',
+                objectPos: 'object-top'
+              },
+            ].map((member, idx) => (
+              <div
+                key={idx}
+                className="group relative overflow-hidden rounded-lg bg-zinc-950 shadow-lg border border-gray-200/80 hover:border-luxury-gold transition-all duration-500 flex flex-col"
+              >
+                <div className="aspect-[3/4] w-full overflow-hidden relative bg-zinc-900">
+                  <img
+                    src={member.img}
+                    alt={member.name}
+                    className={`w-full h-full object-cover ${member.objectPos} group-hover:scale-105 transition-transform duration-700`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+
+                  {/* Always-visible Luxury Nameplate */}
+                  <div className="absolute bottom-0 inset-x-0 p-3.5 sm:p-4 text-left">
+                    <div className="w-7 h-[1.5px] bg-luxury-gold mb-2 group-hover:w-12 transition-all duration-500" />
+                    <h4 className="text-xs sm:text-sm md:text-base text-white font-serif font-bold tracking-wider uppercase leading-snug drop-shadow-xs">
+                      {member.name}
+                    </h4>
+                    <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.14em] text-luxury-gold font-semibold mt-0.5">
+                      {member.role}
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}
