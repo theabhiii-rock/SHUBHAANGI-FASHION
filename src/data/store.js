@@ -794,6 +794,11 @@ export const INITIAL_STUDIO_SERVICES = [
     badge: 'Studio Special',
     description: 'High-end studio photography in our Laxmi Nagar bridal suites. Includes 1 royal lehenga from our vault, makeup artist, and 20 retouched high-res photos.',
     image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1000',
+    gallery: [
+      'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=1000'
+    ],
     features: ['1 Luxury Outfit Included', 'Professional Makeup & Hair', 'Vogue-Style Studio Lighting', '20 Magazine-Grade Retouches'],
     isActive: true
   },
@@ -807,6 +812,10 @@ export const INITIAL_STUDIO_SERVICES = [
     badge: 'Trending',
     description: 'Macro and portrait lighting designed to accentuate intricate jewellery, eye makeup, and traditional bridal heritage.',
     image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=1000',
+    gallery: [
+      'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=1000'
+    ],
     features: ['Choker & Mathapatti Highlight Shots', 'Cinematic Macro Beauty Lighting', 'High-Definition Skin Touch-ups', 'Same-Day Digital Previews'],
     isActive: true
   },
@@ -822,6 +831,11 @@ export const INITIAL_STUDIO_SERVICES = [
     badge: 'Agency Ready',
     description: 'Full day portfolio session with 3 distinct luxury looks (Traditional Bridal, Indo-Western, Contemporary Saree). Directed by lead fashion stylists.',
     image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=1000',
+    gallery: [
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=1000'
+    ],
     features: ['3 Wardrobe Changes', 'High-Fashion Creative Direction', 'Digital Comp Card & Agency Portfolio', 'Insta-Ready Reel Edits'],
     isActive: true
   },
@@ -835,6 +849,10 @@ export const INITIAL_STUDIO_SERVICES = [
     badge: 'Couples',
     description: 'Couples looking for bespoke visual keepsakes before the wedding rituals. Coordinated outfits and tailored studio backgrounds.',
     image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1000',
+    gallery: [
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=1000'
+    ],
     features: ['Couples Coordinated Wardrobe', 'Pose Coaching by Fashion Director', 'Framed 16x24 Canvas Print Included', 'Social Media Teaser Reel'],
     isActive: true
   },
@@ -846,11 +864,12 @@ export const INITIAL_STUDIO_SERVICES = [
     categoryLabel: 'BTS Videos',
     title: 'The Art of Zardozi — Behind the Loom',
     subtitle: '400 Hours of Pure Hand Embroidery Documentary',
-    price: 'Watch Reel',
+    duration: '0:45s • 4K Reel',
     badge: 'Craft Story',
     description: 'Watch our master karigars in Old Delhi and Laxmi Nagar hand-embroider real dabka, sequins and golden threads onto pure raw silk fabrics.',
     image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&q=80&w=1000',
-    features: ['Raw Karigar Craftsmanship', 'Close-up Thread & Pearl Work', 'Designer Deepak Kumar Commentary', 'Heritage Textile Insights'],
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    features: ['Raw Karigar Craftsmanship', 'Close-up Thread & Pearl Work'],
     isActive: true
   },
   {
@@ -859,11 +878,12 @@ export const INITIAL_STUDIO_SERVICES = [
     categoryLabel: 'BTS Videos',
     title: 'Bridal Transformation & Trial Suite BTS',
     subtitle: 'Bride Simran’s Complete Fitting Journey',
-    price: 'Watch Reel',
+    duration: '0:30s • Studio Reel',
     badge: 'Reel',
     description: 'Step inside our Laxmi Nagar trial suite and experience how a bride finds her dream lehenga with lead designer Deepak Kumar.',
     image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=1000',
-    features: ['Real Bride Experience', 'Cancan & Blouse Fit Adjustments', 'Final Look Reveal Reaction', 'VIP Fitting Suite Atmosphere'],
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    features: ['Real Bride Experience', 'Final Look Reveal Reaction'],
     isActive: true
   },
 
@@ -955,7 +975,23 @@ export const saveStudioTopics = (topics) => {
 export const getStoredStudioServices = () => {
   try {
     const data = localStorage.getItem('shubhaangi_studio_services_v1');
-    return data ? JSON.parse(data) : INITIAL_STUDIO_SERVICES;
+    if (!data) return INITIAL_STUDIO_SERVICES;
+    const parsed = JSON.parse(data);
+    return parsed.map(item => {
+      if (item.type === 'BTS_VIDEOS' && !item.videoUrl) {
+        return {
+          ...item,
+          videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
+        };
+      }
+      if ((item.type === 'PHOTOSHOOT' || item.type === 'PORTFOLIO') && (!item.gallery || item.gallery.length === 0)) {
+        return {
+          ...item,
+          gallery: item.image ? [item.image] : []
+        };
+      }
+      return item;
+    });
   } catch (e) {
     console.warn(e);
     return INITIAL_STUDIO_SERVICES;
