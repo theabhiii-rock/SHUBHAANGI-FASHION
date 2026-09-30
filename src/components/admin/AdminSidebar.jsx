@@ -18,14 +18,14 @@ export default function AdminSidebar({
     { id: 'OVERVIEW', label: 'Executive Overview', icon: FiGrid },
     { 
       id: 'OFFLINE_ORDERS', 
-      label: 'Studio Walk-In Register', 
+      label: 'Offline Khata Register', 
       icon: FiBookOpen,
       badge: offlineOrdersCount > 0 ? offlineOrdersCount : null,
       badgeColor: 'bg-amber-500 text-black'
     },
     {
       id: 'STUDIO_SERVICES',
-      label: 'Shoots & Events Studio',
+      label: 'Studio Menu & Subtopics',
       icon: FiCamera,
       badge: studioServicesCount > 0 ? studioServicesCount : null,
       badgeColor: 'bg-luxury-gold text-black'

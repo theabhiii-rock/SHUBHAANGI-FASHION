@@ -10,7 +10,7 @@ import Lenis from '@studio-freight/lenis';
 import { 
   getStoredProducts, getVisitorCount, 
   getStoredWishlist, saveWishlist, getStoredOrders,
-  getStoredOfferBanner, getStoredStudioServices
+  getStoredOfferBanner, getStoredStudioServices, getStoredStudioTopics
 } from './data/store';
 import { openProductWhatsAppChat } from './utils/whatsapp';
 import ProductDetailModal from './components/ProductDetailModal';
@@ -58,6 +58,7 @@ export default function App() {
   const [isOrderTrackerOpen, setIsOrderTrackerOpen] = useState(false);
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [offerBanner, setOfferBanner] = useState(() => getStoredOfferBanner());
+  const [studioTopics, setStudioTopics] = useState(() => getStoredStudioTopics());
   const [studioServices, setStudioServices] = useState(() => getStoredStudioServices());
   const [isStudioServiceModalOpen, setIsStudioServiceModalOpen] = useState(false);
   const [selectedStudioServiceCategory, setSelectedStudioServiceCategory] = useState('PREWEDDING');
@@ -261,6 +262,7 @@ export default function App() {
           setProducts(getStoredProducts());
           setOfferBanner(getStoredOfferBanner());
           setStudioServices(getStoredStudioServices());
+          setStudioTopics(getStoredStudioTopics());
           setCurrentView('store');
           window.location.hash = '';
         }}
@@ -363,6 +365,7 @@ export default function App() {
         onClose={() => setIsStudioServiceModalOpen(false)}
         initialCategory={selectedStudioServiceCategory}
         services={studioServices}
+        topics={studioTopics}
       />
 
       {/* 8. PURE CLIENT LUXURY HEADER */}
@@ -451,15 +454,7 @@ export default function App() {
                   </span>
                 </div>
                 <div className="space-y-1">
-                  {[
-                    { id: 'PREWEDDING', name: 'Pre-Wedding Shoots', icon: '📸', desc: 'Cinematic Heritage & Destination Shoots', badge: 'Popular' },
-                    { id: 'EVENTS', name: 'Upcoming Events', icon: '🎪', desc: 'Exhibitions & Trunk Show Previews', badge: 'Oct 2026' },
-                    { id: 'PHOTOSHOOT', name: 'Photoshoots', icon: '📷', desc: 'High-Fashion & Studio Bridal Shoots', badge: null },
-                    { id: 'PORTFOLIO', name: 'Portfolio Shoots', icon: '🌟', desc: 'Model & Artist Editorial Portfolios', badge: null },
-                    { id: 'BTS_VIDEOS', name: 'BTS Videos', icon: '🎬', desc: 'Behind the Scenes & Reel Production', badge: 'Watch' },
-                    { id: 'MAKEUP', name: 'Makeup Packages', icon: '💄', desc: 'HD Bridal, Airbrush & Reception Glam', badge: 'Trending' },
-                    { id: 'PRE_BRIDAL', name: 'Pre-Bridals', icon: '👰', desc: 'Skin Prep, Glow Rituals & Hair Spa', badge: '30-Day' }
-                  ].map((item) => (
+                  {studioTopics.map((item) => (
                     <button 
                       key={item.id}
                       onClick={() => {
@@ -471,12 +466,12 @@ export default function App() {
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <span className="text-base p-1.5 bg-luxury-gold/10 rounded-md shrink-0 group-hover:scale-110 transition-transform">
-                          {item.icon}
+                          {item.icon || '✨'}
                         </span>
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
                             <span className="font-serif text-sm font-semibold text-gray-900 group-hover:text-luxury-gold transition-colors truncate">
-                              {item.name}
+                              {item.label || item.name}
                             </span>
                             {item.badge && (
                               <span className="text-[8px] tracking-wider uppercase font-bold bg-luxury-gold/15 text-luxury-gold px-1.5 py-0.2 rounded shrink-0">

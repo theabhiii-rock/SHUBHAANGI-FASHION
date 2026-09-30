@@ -12,7 +12,8 @@ import {
   getStoredOrders, saveOrders, getStoredProducts, saveProducts, getVisitorCount, 
   getStoredCoupons, saveCoupons, getStoredOfferBanner, saveOfferBanner,
   getStoredOfflineOrders, saveOfflineOrders,
-  getStoredStudioServices, saveStudioServices
+  getStoredStudioServices, saveStudioServices,
+  getStoredStudioTopics, saveStudioTopics
 } from '../data/store';
 import {
   broadcastNewDressAlert,
@@ -47,8 +48,11 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Shoots, Events & Studio Experiences State
+  const [studioTopics, setStudioTopics] = useState(() => getStoredStudioTopics());
   const [studioServices, setStudioServices] = useState(() => getStoredStudioServices());
   const [isAddServiceOpen, setIsAddServiceOpen] = useState(false);
+  const [isAddTopicOpen, setIsAddTopicOpen] = useState(false);
+  const [newTopicForm, setNewTopicForm] = useState({ id: '', label: '', icon: '📸', desc: '', badge: '' });
   const [editingService, setEditingService] = useState(null);
   const [serviceCategoryFilter, setServiceCategoryFilter] = useState('ALL');
   const [serviceSearch, setServiceSearch] = useState('');
@@ -287,12 +291,12 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
   };
 
   const handleOpenAddService = (type = 'PREWEDDING') => {
-    const matched = STUDIO_SERVICE_TYPES.find(t => t.id === type) || STUDIO_SERVICE_TYPES[0];
+    const matched = studioTopics.find(t => t.id === type) || studioTopics[0] || { id: 'PREWEDDING', label: 'Pre-Wedding Shoots' };
     setEditingService(null);
     setServicePhotoTab('FILE');
     setServiceForm({
       type: matched.id,
-      categoryLabel: matched.label,
+      categoryLabel: matched.label || matched.name,
       title: '',
       subtitle: '',
       price: '',
@@ -330,7 +334,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
   const handleSaveService = (e) => {
     e.preventDefault();
     if (!serviceForm.title.trim()) {
-      alert('Please provide a title for the service or event.');
+      alert('Please provide a title for the subtopic or service package.');
       return;
     }
 
@@ -339,8 +343,8 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       .map(f => f.trim())
       .filter(Boolean);
 
-    const matchedType = STUDIO_SERVICE_TYPES.find(t => t.id === serviceForm.type);
-    const categoryLabel = matchedType ? matchedType.label : serviceForm.categoryLabel;
+    const matchedType = studioTopics.find(t => t.id === serviceForm.type);
+    const categoryLabel = matchedType ? (matchedType.label || matchedType.name) : serviceForm.categoryLabel;
 
     if (editingService) {
       const updated = studioServices.map(s => {
@@ -356,7 +360,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       });
       setStudioServices(updated);
       saveStudioServices(updated);
-      showToast(`✨ Updated: "${serviceForm.title}"`);
+      showToast(`✨ Updated subtopic: "${serviceForm.title}"`);
     } else {
       const newEntry = {
         id: `srv-${Date.now()}`,
@@ -367,11 +371,62 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       const updated = [newEntry, ...studioServices];
       setStudioServices(updated);
       saveStudioServices(updated);
-      showToast(`🎉 Added new studio experience: "${serviceForm.title}"`);
+      showToast(`🎉 Added new subtopic/package: "${serviceForm.title}"`);
     }
 
     setIsAddServiceOpen(false);
     setEditingService(null);
+  };
+
+  const handleSaveNewTopic = (e) => {
+    e.preventDefault();
+    if (!newTopicForm.label.trim()) {
+      alert('Please enter a category / topic name.');
+      return;
+    }
+
+    const topicId = newTopicForm.id.trim()
+      ? newTopicForm.id.trim().toUpperCase().replace(/[^A-Z0-9_]/g, '_')
+      : newTopicForm.label.trim().toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+
+    if (studioTopics.some(t => t.id === topicId)) {
+      alert('A topic with this ID or name already exists!');
+      return;
+    }
+
+    const newTopic = {
+      id: topicId,
+      label: newTopicForm.label.trim(),
+      icon: newTopicForm.icon.trim() || '📸',
+      desc: newTopicForm.desc.trim() || 'Exclusive Studio Category',
+      badge: newTopicForm.badge.trim() || null
+    };
+
+    const updated = [...studioTopics, newTopic];
+    setStudioTopics(updated);
+    saveStudioTopics(updated);
+    setIsAddTopicOpen(false);
+    setNewTopicForm({ id: '', label: '', icon: '📸', desc: '', badge: '' });
+    setServiceCategoryFilter(newTopic.id);
+    showToast(`🎉 New Main Topic added: "${newTopic.label}"! You can now add subtopics under it.`);
+  };
+
+  const handleDeleteTopic = (topicId) => {
+    if (studioTopics.length <= 1) {
+      alert('At least one topic must remain in the menu.');
+      return;
+    }
+    const topic = studioTopics.find(t => t.id === topicId);
+    if (!window.confirm(`Delete topic "${topic?.label || topicId}"? Subtopics under this topic will remain in database.`)) {
+      return;
+    }
+    const updated = studioTopics.filter(t => t.id !== topicId);
+    setStudioTopics(updated);
+    saveStudioTopics(updated);
+    if (serviceCategoryFilter === topicId) {
+      setServiceCategoryFilter('ALL');
+    }
+    showToast(`🗑️ Topic "${topic?.label || topicId}" removed.`);
   };
 
   const handleServicePhotoFileChange = async (e) => {
@@ -838,151 +893,150 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
         )}
 
         <main className="p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6 sm:space-y-8">
-          {/* Dual Business Channels: Online Storefront vs Studio Walk-In Register */}
-          <div className="bg-gradient-to-r from-zinc-950 via-[#141414] to-zinc-950 text-white p-4 sm:p-5 rounded-xl border border-luxury-gold/50 shadow-lg">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg bg-luxury-gold/20 text-luxury-gold flex items-center justify-center shrink-0 border border-luxury-gold/40 shadow-sm">
-                  <FiBookOpen size={24} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-luxury-gold">
-                      Revenue Stream Comparison
-                    </span>
-                    <span className="text-[9px] bg-white/10 text-gray-300 px-2 py-0.5 rounded font-mono">
-                      Online vs Studio Walk-In Counter
-                    </span>
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-serif font-bold text-white mt-0.5">
-                    Studio Walk-In Orders vs. Online Storefront
-                  </h3>
-                </div>
-              </div>
-
-              {/* 3 Channel Figures */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white/5 p-3 rounded-lg border border-white/10">
-                <div className="border-b sm:border-b-0 sm:border-r border-white/10 pb-2 sm:pb-0 sm:pr-4">
-                  <span className="text-[10px] text-gray-400 uppercase tracking-wider block font-semibold">🌐 Online Website</span>
-                  <span className="text-base sm:text-lg font-bold font-mono text-emerald-400">₹{totalRevenue.toLocaleString('en-IN')}</span>
-                  <span className="text-[10px] text-gray-400 block mt-0.5">{orders.length} digital orders</span>
-                </div>
-                <div className="border-b sm:border-b-0 sm:border-r border-white/10 pb-2 sm:pb-0 sm:pr-4">
-                  <span className="text-[10px] text-amber-300 uppercase tracking-wider block font-semibold">🏢 Studio Walk-In Counter</span>
-                  <span className="text-base sm:text-lg font-bold font-mono text-amber-400">₹{offlineGrossRevenue.toLocaleString('en-IN')}</span>
-                  <span className="text-[10px] text-gray-300 block mt-0.5">
-                    ₹{offlineCollectedRevenue.toLocaleString('en-IN')} cash in-hand • ₹{offlineBalanceDue.toLocaleString('en-IN')} due
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-luxury-gold uppercase tracking-wider block font-semibold">👑 Grand Studio Total</span>
-                  <span className="text-base sm:text-lg font-bold font-mono text-luxury-gold">₹{grandCombinedRevenue.toLocaleString('en-IN')}</span>
-                  <span className="text-[10px] text-gray-400 block mt-0.5">{orders.length + offlineOrders.length} total clients</span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => {
-                  setActiveTab('OFFLINE_ORDERS');
-                  setIsAddOfflineOpen(true);
-                }}
-                className="px-4 py-2.5 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-md transition-all shadow-md shrink-0 flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <FiPlus size={15} />
-                <span>+ Walk-In Order</span>
-              </button>
-            </div>
-          </div>
-
-          {/* KPI CARDS (Always visible on Overview) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-            {/* Card 1: Gross Revenue */}
-            <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200 shadow-xs relative overflow-hidden flex flex-col justify-between hover:border-gray-300 transition-colors">
-              <div className="flex justify-between items-start gap-2">
-                <div className="min-w-0">
-                  <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold truncate">
-                    Gross Store Revenue
-                  </p>
-                  <h3 className="text-2xl sm:text-3xl font-serif font-bold text-gray-900 tracking-tight mt-1 truncate">
-                    ₹{totalRevenue.toLocaleString('en-IN')}
-                  </h3>
-                </div>
-                <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-full shrink-0">
-                  <FiDollarSign size={20} />
-                </div>
-              </div>
-              <div className="pt-2.5 mt-3 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
-                <span>Rentals: <strong className="text-emerald-700 font-semibold">₹{rentalRevenue.toLocaleString('en-IN')}</strong></span>
-                <span>Sales: <strong className="text-blue-700 font-semibold">₹{buyRevenue.toLocaleString('en-IN')}</strong></span>
-              </div>
-            </div>
-
-            {/* Card 2: Visitors */}
-            <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200 shadow-xs relative overflow-hidden flex flex-col justify-between hover:border-gray-300 transition-colors">
-              <div className="flex justify-between items-start gap-2">
-                <div className="min-w-0">
-                  <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold truncate">
-                    Total Store Visitors
-                  </p>
-                  <h3 className="text-2xl sm:text-3xl font-serif font-bold text-gray-900 tracking-tight mt-1 truncate">
-                    {visitors.toLocaleString()}
-                  </h3>
-                </div>
-                <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-full shrink-0">
-                  <FiUsers size={20} />
-                </div>
-              </div>
-              <div className="pt-2.5 mt-3 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
-                <span>Active Inquiries: <strong className="font-semibold text-gray-800">{orders.length}</strong></span>
-                <span>Conv. Rate: <strong className="text-indigo-600 font-semibold">{conversionRate}%</strong></span>
-              </div>
-            </div>
-
-            {/* Card 3: Active Rentals */}
-            <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200 shadow-xs relative overflow-hidden flex flex-col justify-between hover:border-gray-300 transition-colors">
-              <div className="flex justify-between items-start gap-2">
-                <div className="min-w-0">
-                  <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold truncate">
-                    Active Rentals (With Clients)
-                  </p>
-                  <h3 className="text-2xl sm:text-3xl font-serif font-bold text-amber-600 tracking-tight mt-1 truncate">
-                    {activeRentals.length} Outfits
-                  </h3>
-                </div>
-                <div className="p-2.5 bg-amber-50 text-amber-600 rounded-full shrink-0">
-                  <FiClock size={20} />
-                </div>
-              </div>
-              <div className="pt-2.5 mt-3 border-t border-gray-100 text-xs text-gray-500 truncate">
-                Total Deposits Held: <strong className="text-gray-900 font-semibold">₹{activeRentals.reduce((a, b) => a + (b.deposit || 0), 0).toLocaleString('en-IN')}</strong>
-              </div>
-            </div>
-
-            {/* Card 4: Returns Due */}
-            <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200 shadow-xs relative overflow-hidden flex flex-col justify-between hover:border-gray-300 transition-colors">
-              <div className="flex justify-between items-start gap-2">
-                <div className="min-w-0">
-                  <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold truncate">
-                    Rental Returns Due
-                  </p>
-                  <h3 className="text-2xl sm:text-3xl font-serif font-bold text-rose-600 tracking-tight mt-1 truncate">
-                    {pendingReturns.length} Overdue/Today
-                  </h3>
-                </div>
-                <div className="p-2.5 bg-rose-50 text-rose-600 rounded-full shrink-0">
-                  <FiRepeat size={20} />
-                </div>
-              </div>
-              <div className="pt-2.5 mt-3 border-t border-gray-100 text-xs text-gray-500 flex justify-between items-center">
-                <span>Completed: <strong className="font-semibold text-gray-800">{returnedRentals.length}</strong></span>
-                <span className="text-rose-600 font-semibold">Returns Tracker</span>
-              </div>
-            </div>
-          </div>
-
           {/* TAB 1: OVERVIEW */}
           {activeTab === 'OVERVIEW' && (
-            <div className="space-y-6">
+            <div className="space-y-6 sm:space-y-8">
+              {/* Dual Business Channels: Online Storefront vs Studio Walk-In Register */}
+              <div className="bg-gradient-to-r from-zinc-950 via-[#141414] to-zinc-950 text-white p-4 sm:p-5 rounded-xl border border-luxury-gold/50 shadow-lg">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-luxury-gold/20 text-luxury-gold flex items-center justify-center shrink-0 border border-luxury-gold/40 shadow-sm">
+                      <FiBookOpen size={24} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-luxury-gold">
+                          Revenue Stream Comparison
+                        </span>
+                        <span className="text-[9px] bg-white/10 text-gray-300 px-2 py-0.5 rounded font-mono">
+                          Online vs Studio Walk-In Counter
+                        </span>
+                      </div>
+                      <h3 className="text-lg sm:text-xl font-serif font-bold text-white mt-0.5">
+                        Studio Walk-In Orders vs. Online Storefront
+                      </h3>
+                    </div>
+                  </div>
+
+                  {/* 3 Channel Figures */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white/5 p-3 rounded-lg border border-white/10">
+                    <div className="border-b sm:border-b-0 sm:border-r border-white/10 pb-2 sm:pb-0 sm:pr-4">
+                      <span className="text-[10px] text-gray-400 uppercase tracking-wider block font-semibold">🌐 Online Website</span>
+                      <span className="text-base sm:text-lg font-bold font-mono text-emerald-400">₹{totalRevenue.toLocaleString('en-IN')}</span>
+                      <span className="text-[10px] text-gray-400 block mt-0.5">{orders.length} digital orders</span>
+                    </div>
+                    <div className="border-b sm:border-b-0 sm:border-r border-white/10 pb-2 sm:pb-0 sm:pr-4">
+                      <span className="text-[10px] text-amber-300 uppercase tracking-wider block font-semibold">🏢 Studio Walk-In Counter</span>
+                      <span className="text-base sm:text-lg font-bold font-mono text-amber-400">₹{offlineGrossRevenue.toLocaleString('en-IN')}</span>
+                      <span className="text-[10px] text-gray-300 block mt-0.5">
+                        ₹{offlineCollectedRevenue.toLocaleString('en-IN')} cash in-hand • ₹{offlineBalanceDue.toLocaleString('en-IN')} due
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-luxury-gold uppercase tracking-wider block font-semibold">👑 Grand Studio Total</span>
+                      <span className="text-base sm:text-lg font-bold font-mono text-luxury-gold">₹{grandCombinedRevenue.toLocaleString('en-IN')}</span>
+                      <span className="text-[10px] text-gray-400 block mt-0.5">{orders.length + offlineOrders.length} total clients</span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setActiveTab('OFFLINE_ORDERS');
+                      setIsAddOfflineOpen(true);
+                    }}
+                    className="px-4 py-2.5 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-md transition-all shadow-md shrink-0 flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <FiPlus size={15} />
+                    <span>+ Walk-In Order</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* KPI CARDS (Only visible on Overview) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                {/* Card 1: Gross Revenue */}
+                <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200 shadow-xs relative overflow-hidden flex flex-col justify-between hover:border-gray-300 transition-colors">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="min-w-0">
+                      <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold truncate">
+                        Gross Store Revenue
+                      </p>
+                      <h3 className="text-2xl sm:text-3xl font-serif font-bold text-gray-900 tracking-tight mt-1 truncate">
+                        ₹{totalRevenue.toLocaleString('en-IN')}
+                      </h3>
+                    </div>
+                    <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-full shrink-0">
+                      <FiDollarSign size={20} />
+                    </div>
+                  </div>
+                  <div className="pt-2.5 mt-3 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
+                    <span>Rentals: <strong className="text-emerald-700 font-semibold">₹{rentalRevenue.toLocaleString('en-IN')}</strong></span>
+                    <span>Sales: <strong className="text-blue-700 font-semibold">₹{buyRevenue.toLocaleString('en-IN')}</strong></span>
+                  </div>
+                </div>
+
+                {/* Card 2: Visitors */}
+                <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200 shadow-xs relative overflow-hidden flex flex-col justify-between hover:border-gray-300 transition-colors">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="min-w-0">
+                      <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold truncate">
+                        Total Store Visitors
+                      </p>
+                      <h3 className="text-2xl sm:text-3xl font-serif font-bold text-gray-900 tracking-tight mt-1 truncate">
+                        {visitors.toLocaleString()}
+                      </h3>
+                    </div>
+                    <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-full shrink-0">
+                      <FiUsers size={20} />
+                    </div>
+                  </div>
+                  <div className="pt-2.5 mt-3 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
+                    <span>Active Inquiries: <strong className="font-semibold text-gray-800">{orders.length}</strong></span>
+                    <span>Conv. Rate: <strong className="text-indigo-600 font-semibold">{conversionRate}%</strong></span>
+                  </div>
+                </div>
+
+                {/* Card 3: Active Rentals */}
+                <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200 shadow-xs relative overflow-hidden flex flex-col justify-between hover:border-gray-300 transition-colors">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="min-w-0">
+                      <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold truncate">
+                        Active Rentals (With Clients)
+                      </p>
+                      <h3 className="text-2xl sm:text-3xl font-serif font-bold text-amber-600 tracking-tight mt-1 truncate">
+                        {activeRentals.length} Outfits
+                      </h3>
+                    </div>
+                    <div className="p-2.5 bg-amber-50 text-amber-600 rounded-full shrink-0">
+                      <FiClock size={20} />
+                    </div>
+                  </div>
+                  <div className="pt-2.5 mt-3 border-t border-gray-100 text-xs text-gray-500 truncate">
+                    Total Deposits Held: <strong className="text-gray-900 font-semibold">₹{activeRentals.reduce((a, b) => a + (b.deposit || 0), 0).toLocaleString('en-IN')}</strong>
+                  </div>
+                </div>
+
+                {/* Card 4: Returns Due */}
+                <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200 shadow-xs relative overflow-hidden flex flex-col justify-between hover:border-gray-300 transition-colors">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="min-w-0">
+                      <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold truncate">
+                        Rental Returns Due
+                      </p>
+                      <h3 className="text-2xl sm:text-3xl font-serif font-bold text-rose-600 tracking-tight mt-1 truncate">
+                        {pendingReturns.length} Overdue/Today
+                      </h3>
+                    </div>
+                    <div className="p-2.5 bg-rose-50 text-rose-600 rounded-full shrink-0">
+                      <FiRepeat size={20} />
+                    </div>
+                  </div>
+                  <div className="pt-2.5 mt-3 border-t border-gray-100 text-xs text-gray-500 flex justify-between items-center">
+                    <span>Completed: <strong className="font-semibold text-gray-800">{returnedRentals.length}</strong></span>
+                    <span className="text-rose-600 font-semibold">Returns Tracker</span>
+                  </div>
+                </div>
+              </div>
               {pendingReturns.length > 0 && (
                 <div className="bg-rose-50 border border-rose-200 border-l-4 border-l-rose-500 p-4 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
                   <div className="flex items-center gap-3">
@@ -2421,6 +2475,39 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
 
           return (
             <div className="space-y-6">
+              {/* Dedicated Offline Khata Banner */}
+              <div className="bg-gradient-to-r from-stone-950 via-zinc-900 to-stone-950 text-white p-5 rounded-xl border border-amber-500/40 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/40 shadow-sm text-2xl">
+                    📖
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-amber-400">
+                        Studio Offline Khata Register
+                      </span>
+                      <span className="text-[9px] bg-amber-400/20 text-amber-200 px-2 py-0.5 rounded font-bold">
+                        दुकान का खाता बही
+                      </span>
+                    </div>
+                    <h2 className="text-xl sm:text-2xl font-serif font-bold text-white mt-0.5">
+                      Physical Walk-In Ledger & Counter Bookings
+                    </h2>
+                    <p className="text-xs text-gray-300 mt-0.5">
+                      Pure offline walk-in orders, cash/UPI advances, pending balance dues, alteration fitting notes, and WhatsApp slips — 100% isolated from website metrics.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setIsAddOfflineOpen(true)}
+                  className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-black text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-md shrink-0 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <FiPlus size={16} />
+                  <span>+ New Walk-In Customer</span>
+                </button>
+              </div>
+
               {/* Top Revenue & Performance Metrics */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
@@ -3147,33 +3234,47 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                     <FiCamera size={26} />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-luxury-gold block">
-                      Client Menu & Studio Manager
-                    </span>
-                    <h2 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight">
-                      Shoots, Events & Bridal Services
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-luxury-gold block">
+                        Studio Menu & Subtopics Manager
+                      </span>
+                      <span className="text-[9px] bg-luxury-gold/20 text-luxury-gold px-2 py-0.5 rounded font-bold">
+                        दुकान का मेनू और सब-टॉपिक्स
+                      </span>
+                    </div>
+                    <h2 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight mt-0.5">
+                      Studio Shoots, Events & Bridal Packages
                     </h2>
                     <p className="text-xs text-gray-400 mt-0.5">
-                      Directly controls the 7 studio experience options visible in the website's slide-out menu drawer.
+                      Create unlimited subtopics and packages under each category. All updates sync live to the client drawer and booking system.
                     </p>
                   </div>
                 </div>
 
-                <button
-                  onClick={() => handleOpenAddService(serviceCategoryFilter === 'ALL' ? 'PREWEDDING' : serviceCategoryFilter)}
-                  className="px-4 py-2.5 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-md flex items-center gap-2 cursor-pointer shrink-0"
-                >
-                  <FiPlus size={16} />
-                  <span>+ Add Service / Event</span>
-                </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => setIsAddTopicOpen(true)}
+                    className="px-3.5 py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider rounded-lg border border-white/20 transition-all flex items-center gap-2 cursor-pointer"
+                  >
+                    <FiPlus size={15} />
+                    <span>+ Add Main Topic</span>
+                  </button>
+                  <button
+                    onClick={() => handleOpenAddService(serviceCategoryFilter === 'ALL' ? (studioTopics[0]?.id || 'PREWEDDING') : serviceCategoryFilter)}
+                    className="px-4 py-2.5 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-md flex items-center gap-2 cursor-pointer"
+                  >
+                    <FiPlus size={16} />
+                    <span>+ Add Subtopic / Package</span>
+                  </button>
+                </div>
               </div>
 
               {/* Stat Counters */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                 <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
-                  <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Total Studio Offerings</p>
+                  <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Total Subtopic Packages</p>
                   <h3 className="text-2xl font-serif font-bold text-gray-900 mt-1">{studioServices.length}</h3>
-                  <p className="text-[10px] text-gray-400 mt-1">Across 7 distinct categories</p>
+                  <p className="text-[10px] text-gray-400 mt-1">Under {studioTopics.length} main categories</p>
                 </div>
                 <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
                   <p className="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold">Active On Website</p>
@@ -3186,9 +3287,9 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                   <p className="text-[10px] text-gray-400 mt-1">Temporarily offline</p>
                 </div>
                 <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
-                  <p className="text-[11px] uppercase tracking-wider text-indigo-700 font-semibold">WhatsApp Concierge</p>
-                  <h3 className="text-2xl font-serif font-bold text-indigo-700 mt-1">+91 6397799514</h3>
-                  <p className="text-[10px] text-gray-400 mt-1">Direct booking link</p>
+                  <p className="text-[11px] uppercase tracking-wider text-indigo-700 font-semibold">Main Topics</p>
+                  <h3 className="text-2xl font-serif font-bold text-indigo-700 mt-1">{studioTopics.length}</h3>
+                  <p className="text-[10px] text-gray-400 mt-1">Categories in drawer menu</p>
                 </div>
               </div>
 
@@ -3208,12 +3309,12 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                   </div>
 
                   <span className="text-xs text-gray-500 font-medium">
-                    Showing <strong className="text-gray-900">{filteredServices.length}</strong> of {studioServices.length} experiences
+                    Showing <strong className="text-gray-900">{filteredServices.length}</strong> of {studioServices.length} subtopics
                   </span>
                 </div>
 
-                {/* 7 Category Pills */}
-                <div className="flex gap-1.5 overflow-x-auto no-scrollbar pt-1">
+                {/* Dynamic Category Pills */}
+                <div className="flex gap-1.5 overflow-x-auto no-scrollbar pt-1 items-center">
                   <button
                     onClick={() => setServiceCategoryFilter('ALL')}
                     className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
@@ -3222,28 +3323,111 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
-                    🌟 All Services ({studioServices.length})
+                    🌟 All Subtopics ({studioServices.length})
                   </button>
-                  {STUDIO_SERVICE_TYPES.map((cat) => {
-                    const count = studioServices.filter(s => s.type === cat.id).length;
-                    const isSelected = serviceCategoryFilter === cat.id;
+                  {studioTopics.map((topic) => {
+                    const count = studioServices.filter(s => s.type === topic.id).length;
+                    const isSelected = serviceCategoryFilter === topic.id;
                     return (
                       <button
-                        key={cat.id}
-                        onClick={() => setServiceCategoryFilter(cat.id)}
+                        key={topic.id}
+                        onClick={() => setServiceCategoryFilter(topic.id)}
                         className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                           isSelected
                             ? 'bg-luxury-gold text-black shadow-xs font-bold'
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                       >
-                        <span>{cat.icon}</span>
-                        <span>{cat.label} ({count})</span>
+                        <span>{topic.icon || '✨'}</span>
+                        <span>{topic.label || topic.name} ({count})</span>
                       </button>
                     );
                   })}
+
+                  <button
+                    onClick={() => setIsAddTopicOpen(true)}
+                    className="px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 bg-gray-900 text-white hover:bg-black border border-gray-700 shadow-xs shrink-0"
+                  >
+                    <FiPlus size={13} />
+                    <span>+ Add Topic</span>
+                  </button>
                 </div>
               </div>
+
+              {/* Active Selected Category Focus Header */}
+              {(() => {
+                const activeTopic = studioTopics.find(t => t.id === serviceCategoryFilter);
+                if (activeTopic) {
+                  return (
+                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-luxury-gold/40 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl p-2.5 bg-white rounded-lg shadow-2xs border border-luxury-gold/30">
+                          {activeTopic.icon || '✨'}
+                        </span>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-amber-900 bg-amber-200/60 px-2 py-0.5 rounded">
+                              Active Topic
+                            </span>
+                            {activeTopic.badge && (
+                              <span className="text-[9px] uppercase font-bold bg-luxury-gold text-black px-1.5 py-0.5 rounded">
+                                {activeTopic.badge}
+                              </span>
+                            )}
+                          </div>
+                          <h3 className="text-base sm:text-lg font-serif font-bold text-gray-900 mt-0.5">
+                            {activeTopic.label || activeTopic.name} ({filteredServices.length} Subtopic Packages)
+                          </h3>
+                          <p className="text-xs text-gray-600 mt-0.5">
+                            {activeTopic.desc || 'Add as many subtopics / shoot packages under this category as needed.'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          onClick={() => handleOpenAddService(activeTopic.id)}
+                          className="px-3.5 py-2 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <FiPlus size={15} />
+                          <span>+ Add Subtopic in {(activeTopic.label || activeTopic.name).split(' ')[0]}</span>
+                        </button>
+                        {studioTopics.length > 1 && (
+                          <button
+                            onClick={() => handleDeleteTopic(activeTopic.id)}
+                            className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                            title={`Delete topic "${activeTopic.label}"`}
+                          >
+                            <FiTrash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+                return (
+                  <div className="bg-gradient-to-r from-stone-900 via-zinc-900 to-stone-900 text-white p-4 sm:p-5 rounded-xl border border-luxury-gold/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-luxury-gold block">
+                        All Studio Categories
+                      </span>
+                      <h3 className="text-base sm:text-lg font-serif font-bold text-white mt-0.5">
+                        Showing All {studioServices.length} Subtopics across {studioTopics.length} Main Topics
+                      </h3>
+                      <p className="text-xs text-gray-300 mt-0.5">
+                        Click any topic pill above to filter and add specific packages under that category.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleOpenAddService(studioTopics[0]?.id || 'PREWEDDING')}
+                      className="px-4 py-2 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-xs flex items-center gap-1.5 shrink-0 cursor-pointer"
+                    >
+                      <FiPlus size={15} />
+                      <span>+ Add New Subtopic</span>
+                    </button>
+                  </div>
+                );
+              })()}
 
               {/* Service Cards Grid */}
               {filteredServices.length === 0 ? (
@@ -3259,7 +3443,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   {filteredServices.map((service) => {
-                    const typeMeta = STUDIO_SERVICE_TYPES.find(t => t.id === service.type) || { icon: '✨', label: service.categoryLabel || service.type };
+                    const typeMeta = studioTopics.find(t => t.id === service.type) || { icon: '✨', label: service.categoryLabel || service.type };
                     const isServiceActive = service.isActive !== false;
 
                     return (
@@ -3431,10 +3615,10 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                 </span>
                 <div>
                   <h3 className="text-base sm:text-lg font-serif font-bold text-gray-900 leading-tight">
-                    {editingService ? 'Edit Studio Experience' : 'Add New Studio Service / Event'}
+                    {editingService ? 'Edit Subtopic / Package' : 'Add New Subtopic / Package'}
                   </h3>
                   <p className="text-xs text-gray-500">
-                    Controls client menu options & showcase details at Shubhaangi Delhi Atelier
+                    Add unlimited packages and shoot options under your selected main category
                   </p>
                 </div>
               </div>
@@ -3443,23 +3627,23 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                 {/* Category Type Selector */}
                 <div>
                   <label className="font-semibold block mb-1 text-gray-800">
-                    Service Category * (7 Menu Options)
+                    Main Category / Parent Topic *
                   </label>
                   <select
                     value={serviceForm.type}
                     onChange={(e) => {
-                      const selected = STUDIO_SERVICE_TYPES.find(t => t.id === e.target.value);
+                      const selected = studioTopics.find(t => t.id === e.target.value);
                       setServiceForm({
                         ...serviceForm,
                         type: e.target.value,
-                        categoryLabel: selected ? selected.label : e.target.value
+                        categoryLabel: selected ? (selected.label || selected.name) : e.target.value
                       });
                     }}
                     className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-semibold text-xs"
                   >
-                    {STUDIO_SERVICE_TYPES.map(cat => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.icon} {cat.label}
+                    {studioTopics.map(topic => (
+                      <option key={topic.id} value={topic.id}>
+                        {topic.icon || '✨'} {topic.label || topic.name}
                       </option>
                     ))}
                   </select>
@@ -3668,6 +3852,107 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                     className="px-5 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 font-medium cursor-pointer text-xs"
                   >
                     Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ── ADD MAIN TOPIC MODAL ───────────────────────────────────── */}
+        {isAddTopicOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xs overflow-y-auto">
+            <div className="bg-white max-w-md w-full p-5 sm:p-6 rounded-xl shadow-2xl relative border border-gray-200 my-auto">
+              <button
+                onClick={() => setIsAddTopicOpen(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-black p-1.5 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+                aria-label="Close"
+              >
+                <FiX size={20} />
+              </button>
+
+              <div className="flex items-center gap-3 mb-4">
+                <span className="p-2.5 bg-luxury-gold/20 text-luxury-gold rounded-lg border border-luxury-gold/40 text-xl shrink-0">
+                  <FiTag size={20} />
+                </span>
+                <div>
+                  <h3 className="text-base font-serif font-bold text-gray-900 leading-tight">
+                    Add New Main Category / Topic
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    Appears directly in the client slide-out menu drawer & studio modal
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={handleSaveNewTopic} className="space-y-3.5 text-xs">
+                <div>
+                  <label className="font-semibold block mb-1 text-gray-800">
+                    Category Name / Label *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Bridal Jewellery Styling, Runway Shows, Masterclasses"
+                    value={newTopicForm.label}
+                    onChange={(e) => setNewTopicForm({ ...newTopicForm, label: e.target.value })}
+                    required
+                    className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-medium"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">
+                      Icon Emoji
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 📸, 💎, 👑, 👗, 💄, 🎪"
+                      value={newTopicForm.icon}
+                      onChange={(e) => setNewTopicForm({ ...newTopicForm, icon: e.target.value })}
+                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white text-base text-center"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">
+                      Badge (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. New, Popular, VIP"
+                      value={newTopicForm.badge}
+                      onChange={(e) => setNewTopicForm({ ...newTopicForm, badge: e.target.value })}
+                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="font-semibold block mb-1 text-gray-800">
+                    Short Description
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Exclusive styling & VIP bridal consultation sessions"
+                    value={newTopicForm.desc}
+                    onChange={(e) => setNewTopicForm({ ...newTopicForm, desc: e.target.value })}
+                    className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white"
+                  />
+                </div>
+
+                <div className="pt-3 border-t border-gray-100 flex gap-2 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddTopicOpen(false)}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-luxury-gold hover:bg-[#dfb956] text-black font-bold uppercase tracking-wider rounded-md transition-colors shadow-xs cursor-pointer"
+                  >
+                    Create Main Topic
                   </button>
                 </div>
               </form>

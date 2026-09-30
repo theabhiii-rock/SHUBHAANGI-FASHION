@@ -924,6 +924,34 @@ export const INITIAL_STUDIO_SERVICES = [
   }
 ];
 
+export const INITIAL_STUDIO_TOPICS = [
+  { id: 'PREWEDDING', label: 'Pre-Wedding Shoots', icon: '📸', desc: 'Cinematic Heritage & Destination Shoots', badge: 'Popular' },
+  { id: 'EVENTS', label: 'Upcoming Events', icon: '🎪', desc: 'Exhibitions & Trunk Show Previews', badge: 'Oct 2026' },
+  { id: 'PHOTOSHOOT', label: 'Photoshoots', icon: '📷', desc: 'High-Fashion & Studio Bridal Shoots', badge: null },
+  { id: 'PORTFOLIO', label: 'Portfolio Shoots', icon: '🌟', desc: 'Model & Artist Editorial Portfolios', badge: null },
+  { id: 'BTS_VIDEOS', label: 'BTS Videos', icon: '🎬', desc: 'Behind the Scenes & Reel Production', badge: 'Watch' },
+  { id: 'MAKEUP', label: 'Makeup Packages', icon: '💄', desc: 'HD Bridal, Airbrush & Reception Glam', badge: 'Trending' },
+  { id: 'PRE_BRIDAL', label: 'Pre-Bridals', icon: '👰', desc: 'Skin Prep, Glow Rituals & Hair Spa', badge: '30-Day' },
+];
+
+export const getStoredStudioTopics = () => {
+  try {
+    const data = localStorage.getItem('shubhaangi_studio_topics_v1');
+    return data ? JSON.parse(data) : INITIAL_STUDIO_TOPICS;
+  } catch (e) {
+    console.warn(e);
+    return INITIAL_STUDIO_TOPICS;
+  }
+};
+
+export const saveStudioTopics = (topics) => {
+  try {
+    localStorage.setItem('shubhaangi_studio_topics_v1', JSON.stringify(topics));
+  } catch (e) {
+    console.error(e);
+  }
+};
+
 export const getStoredStudioServices = () => {
   try {
     const data = localStorage.getItem('shubhaangi_studio_services_v1');

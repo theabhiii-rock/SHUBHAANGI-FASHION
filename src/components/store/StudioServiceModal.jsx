@@ -19,9 +19,12 @@ export default function StudioServiceModal({
   isOpen,
   onClose,
   initialCategory = 'PREWEDDING',
-  services = []
+  services = [],
+  topics = []
 }) {
   const [activeCategory, setActiveCategory] = useState(initialCategory);
+
+  const activeTabsList = (topics && topics.length > 0) ? topics : SERVICE_TABS;
 
   useEffect(() => {
     if (initialCategory) {
@@ -31,7 +34,7 @@ export default function StudioServiceModal({
 
   if (!isOpen) return null;
 
-  const currentTab = SERVICE_TABS.find(t => t.id === activeCategory) || SERVICE_TABS[0];
+  const currentTab = activeTabsList.find(t => t.id === activeCategory) || activeTabsList[0];
   const items = services.filter(s => s.type === activeCategory && s.isActive !== false);
 
   const handleInquireWhatsApp = (item) => {
@@ -95,7 +98,7 @@ export default function StudioServiceModal({
 
             {/* Horizontal 7-Category Tab Switcher */}
             <div className="flex gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pt-3 mt-2.5 border-t border-white/10">
-              {SERVICE_TABS.map((tab) => {
+              {activeTabsList.map((tab) => {
                 const isActive = activeCategory === tab.id;
                 return (
                   <button
