@@ -1,19 +1,34 @@
 import React from 'react';
 import { 
   FiGrid, FiRepeat, FiShoppingBag, FiTag, 
-  FiEye, FiLogOut, FiPercent, FiBell
+  FiEye, FiLogOut, FiPercent, FiBell, FiBookOpen
 } from 'react-icons/fi';
 
-export default function AdminSidebar({ activeTab, onSelectTab, onBackToStore, onLogout, pendingReturnsCount, subscriberCount }) {
+export default function AdminSidebar({ 
+  activeTab, 
+  onSelectTab, 
+  onBackToStore, 
+  onLogout, 
+  pendingReturnsCount, 
+  subscriberCount,
+  offlineOrdersCount
+}) {
   const menuItems = [
     { id: 'OVERVIEW', label: 'Executive Overview', icon: FiGrid },
+    { 
+      id: 'OFFLINE_ORDERS', 
+      label: 'Studio Walk-In Register', 
+      icon: FiBookOpen,
+      badge: offlineOrdersCount > 0 ? offlineOrdersCount : null,
+      badgeColor: 'bg-amber-500 text-black'
+    },
     { 
       id: 'RENTALS', 
       label: 'Rental Returns Tracker', 
       icon: FiRepeat,
       badge: pendingReturnsCount > 0 ? pendingReturnsCount : null
     },
-    { id: 'ORDERS', label: 'Client Bookings CRM', icon: FiShoppingBag },
+    { id: 'ORDERS', label: 'Online Bookings CRM', icon: FiShoppingBag },
     { id: 'INVENTORY', label: 'Inventory & Prices', icon: FiTag },
     { id: 'COUPONS', label: 'Offers & Discounts', icon: FiPercent },
     {

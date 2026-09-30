@@ -643,3 +643,83 @@ export const validateCouponCode = (code, subtotal) => {
     message: `Applied: ${found.description} (-₹${discount.toLocaleString('en-IN')})`
   };
 };
+
+// ── OFFLINE STUDIO ORDERS PERSISTENCE (WALK-IN POS & BOOKINGS) ──
+export const INITIAL_OFFLINE_ORDERS = [
+  {
+    id: 'OFF-101',
+    customerName: 'Megha Singhania',
+    customerPhone: '+91 98112 34567',
+    item: 'Rani Pink Zardozi Velvet Bridal Lehenga',
+    category: 'DRESS',
+    mode: 'RENT',
+    amount: 18500,
+    advancePaid: 8500,
+    balanceDue: 10000,
+    deposit: 15000,
+    paymentMethod: 'UPI_QR',
+    paymentStatus: 'PARTIAL_ADVANCE',
+    bookingDate: '28 Sep 2026',
+    eventDate: '12 Nov 2026',
+    returnDate: '15 Nov 2026',
+    notes: 'Blouse alteration: chest 34, waist 28. Extra latkans requested.',
+    status: 'IN_ALTERATION'
+  },
+  {
+    id: 'OFF-102',
+    customerName: 'Ananya Verma',
+    customerPhone: '+91 98731 88921',
+    item: 'Royal Polki & Emerald Bridal Choker Set',
+    category: 'JEWELLERY',
+    mode: 'RENT',
+    amount: 8500,
+    advancePaid: 8500,
+    balanceDue: 0,
+    deposit: 8000,
+    paymentMethod: 'CASH',
+    paymentStatus: 'PAID',
+    bookingDate: '29 Sep 2026',
+    eventDate: '05 Oct 2026',
+    returnDate: '08 Oct 2026',
+    notes: 'Matching earrings & maang tikka packed in studio velvet box.',
+    status: 'READY_FOR_PICKUP'
+  },
+  {
+    id: 'OFF-103',
+    customerName: 'Ritika Malhotra',
+    customerPhone: '+91 96540 12890',
+    item: 'Bespoke Antique Gold Tissue Silk Bridal Saree',
+    category: 'DRESS',
+    mode: 'BUY',
+    amount: 125000,
+    advancePaid: 50000,
+    balanceDue: 75000,
+    deposit: 0,
+    paymentMethod: 'CARD',
+    paymentStatus: 'PARTIAL_ADVANCE',
+    bookingDate: '25 Sep 2026',
+    eventDate: '20 Dec 2026',
+    returnDate: null,
+    notes: 'Custom hand embroidery on pallu with bride & groom initials.',
+    status: 'CONFIRMED'
+  }
+];
+
+export const getStoredOfflineOrders = () => {
+  try {
+    const data = localStorage.getItem('shubhaangi_offline_orders');
+    return data ? JSON.parse(data) : INITIAL_OFFLINE_ORDERS;
+  } catch (e) {
+    console.warn(e);
+    return INITIAL_OFFLINE_ORDERS;
+  }
+};
+
+export const saveOfflineOrders = (orders) => {
+  try {
+    localStorage.setItem('shubhaangi_offline_orders', JSON.stringify(orders));
+  } catch (e) {
+    console.error(e);
+  }
+};
+

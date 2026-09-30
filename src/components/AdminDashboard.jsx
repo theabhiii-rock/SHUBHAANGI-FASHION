@@ -4,11 +4,13 @@ import {
   FiClock, FiAlertCircle, FiPhone, FiMessageCircle, 
   FiEdit2, FiSearch, FiMenu, FiX, FiPlus, FiCheck,
   FiTag, FiPercent, FiCopy, FiTrash2, FiVolume2,
-  FiImage, FiUploadCloud, FiCamera, FiCheckCircle, FiLoader
+  FiImage, FiUploadCloud, FiCamera, FiCheckCircle, FiLoader,
+  FiBookOpen, FiClipboard, FiCreditCard, FiSend, FiScissors
 } from 'react-icons/fi';
 import { 
   getStoredOrders, saveOrders, getStoredProducts, saveProducts, getVisitorCount, 
-  getStoredCoupons, saveCoupons, getStoredOfferBanner, saveOfferBanner
+  getStoredCoupons, saveCoupons, getStoredOfferBanner, saveOfferBanner,
+  getStoredOfflineOrders, saveOfflineOrders
 } from '../data/store';
 import {
   broadcastNewDressAlert,
@@ -23,7 +25,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
   const [orders, setOrders] = useState(() => getStoredOrders());
   const [products, setProducts] = useState(() => getStoredProducts());
   const [visitors] = useState(() => getVisitorCount());
-  const [activeTab, setActiveTab] = useState('OVERVIEW'); // 'OVERVIEW' | 'RENTALS' | 'ORDERS' | 'INVENTORY' | 'COUPONS' | 'NEWSLETTER'
+  const [activeTab, setActiveTab] = useState('OVERVIEW'); // 'OVERVIEW' | 'OFFLINE_ORDERS' | 'RENTALS' | 'ORDERS' | 'INVENTORY' | 'COUPONS' | 'NEWSLETTER'
   const [editingProduct, setEditingProduct] = useState(null);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [photoManagerProduct, setPhotoManagerProduct] = useState(null);
@@ -31,6 +33,28 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
   const [notification, setNotification] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Offline Studio Orders (Walk-In Desk Register)
+  const [offlineOrders, setOfflineOrders] = useState(() => getStoredOfflineOrders());
+  const [isAddOfflineOpen, setIsAddOfflineOpen] = useState(false);
+  const [offlineSearch, setOfflineSearch] = useState('');
+  const [offlineFilter, setOfflineFilter] = useState('ALL'); // 'ALL' | 'DUE' | 'IN_ALTERATION' | 'READY' | 'RENT' | 'BUY'
+  const [newOfflineOrder, setNewOfflineOrder] = useState({
+    customerName: '',
+    customerPhone: '',
+    item: '',
+    category: 'DRESS',
+    mode: 'RENT',
+    amount: '',
+    advancePaid: '',
+    deposit: '',
+    paymentMethod: 'UPI_QR',
+    bookingDate: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+    eventDate: '',
+    returnDate: '',
+    notes: '',
+    status: 'CONFIRMED'
+  });
 
   // Photo upload states for Add Product & Gallery Manager
   const [coverPhotoTab, setCoverPhotoTab] = useState('FILE'); // 'FILE' | 'URL'
@@ -85,6 +109,15 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
     .filter(o => o.mode === 'BUY')
     .reduce((acc, order) => acc + (order.amount || 0), 0);
 
+  // Aggregate Metrics (Offline Walk-In Studio Counter)
+  const offlineGrossRevenue = offlineOrders.reduce((acc, o) => acc + (Number(o.amount) || 0), 0);
+  const offlineCollectedRevenue = offlineOrders.reduce((acc, o) => acc + (Number(o.advancePaid) || 0), 0);
+  const offlineBalanceDue = offlineOrders.reduce((acc, o) => acc + (Number(o.balanceDue) || 0), 0);
+  const offlineDepositsHeld = offlineOrders
+    .filter(o => o.mode === 'RENT' && o.status !== 'RETURNED')
+    .reduce((acc, o) => acc + (Number(o.deposit) || 0), 0);
+  const grandCombinedRevenue = totalRevenue + offlineGrossRevenue;
+
   const activeRentals = orders.filter(o => o.status === 'ACTIVE_RENTAL');
   const pendingReturns = orders.filter(o => o.status === 'RETURN_PENDING');
   const returnedRentals = orders.filter(o => o.status === 'RETURNED');
@@ -93,6 +126,106 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
   const showToast = (msg) => {
     setNotification(msg);
     setTimeout(() => setNotification(''), 4000);
+  };
+
+  // ── Offline Studio Order Handlers ──
+  const handleCreateOfflineOrder = (e) => {
+    e.preventDefault();
+    if (!newOfflineOrder.customerName || !newOfflineOrder.item || !newOfflineOrder.amount) {
+      alert('Please fill in Customer Name, Garment Name, and Agreed Price.');
+      return;
+    }
+
+    const totalAmt = Number(newOfflineOrder.amount) || 0;
+    const advPaid = Number(newOfflineOrder.advancePaid) || 0;
+    const balDue = Math.max(0, totalAmt - advPaid);
+    const payStatus = advPaid >= totalAmt ? 'PAID' : (advPaid > 0 ? 'PARTIAL_ADVANCE' : 'PENDING');
+
+    const createdOrder = {
+      id: `OFF-${Date.now().toString().slice(-4)}`,
+      customerName: newOfflineOrder.customerName.trim(),
+      customerPhone: newOfflineOrder.customerPhone.trim() || '+91 99999 99999',
+      item: newOfflineOrder.item.trim(),
+      category: newOfflineOrder.category,
+      mode: newOfflineOrder.mode,
+      amount: totalAmt,
+      advancePaid: advPaid,
+      balanceDue: balDue,
+      deposit: Number(newOfflineOrder.deposit) || 0,
+      paymentMethod: newOfflineOrder.paymentMethod,
+      paymentStatus: payStatus,
+      bookingDate: newOfflineOrder.bookingDate || new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+      eventDate: newOfflineOrder.eventDate || 'TBD',
+      returnDate: newOfflineOrder.returnDate || null,
+      notes: newOfflineOrder.notes.trim() || '',
+      status: newOfflineOrder.status || 'CONFIRMED'
+    };
+
+    const updated = [createdOrder, ...offlineOrders];
+    setOfflineOrders(updated);
+    saveOfflineOrders(updated);
+    setIsAddOfflineOpen(false);
+    setNewOfflineOrder({
+      customerName: '',
+      customerPhone: '',
+      item: '',
+      category: 'DRESS',
+      mode: 'RENT',
+      amount: '',
+      advancePaid: '',
+      deposit: '',
+      paymentMethod: 'UPI_QR',
+      bookingDate: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+      eventDate: '',
+      returnDate: '',
+      notes: '',
+      status: 'CONFIRMED'
+    });
+    showToast(`📝 Studio Walk-in order #${createdOrder.id} saved! Advance: ₹${advPaid.toLocaleString('en-IN')}`);
+  };
+
+  const handleUpdateOfflineStatus = (orderId, newStatus) => {
+    const updated = offlineOrders.map(o => o.id === orderId ? { ...o, status: newStatus } : o);
+    setOfflineOrders(updated);
+    saveOfflineOrders(updated);
+    showToast(`✅ Studio order #${orderId} status set to: ${newStatus.replace(/_/g, ' ')}`);
+  };
+
+  const handleCollectOfflineBalance = (orderId) => {
+    const updated = offlineOrders.map(o => {
+      if (o.id === orderId) {
+        return {
+          ...o,
+          advancePaid: o.amount,
+          balanceDue: 0,
+          paymentStatus: 'PAID'
+        };
+      }
+      return o;
+    });
+    setOfflineOrders(updated);
+    saveOfflineOrders(updated);
+    showToast(`💰 Balance received for #${orderId}! Marked as FULLY PAID.`);
+  };
+
+  const handleDeleteOfflineOrder = (orderId) => {
+    if (!window.confirm(`Delete offline order record #${orderId}? This cannot be undone.`)) return;
+    const updated = offlineOrders.filter(o => o.id !== orderId);
+    setOfflineOrders(updated);
+    saveOfflineOrders(updated);
+    showToast(`🗑️ Order #${orderId} removed from offline register.`);
+  };
+
+  const handleSendWhatsAppReceipt = (order) => {
+    const phone = (order.customerPhone || '').replace(/[^0-9]/g, '');
+    const cleanPhone = phone.startsWith('91') ? phone : (phone.length === 10 ? `91${phone}` : phone);
+    const balanceText = order.balanceDue > 0 ? `⚠️ Balance Due upon pickup: ₹${order.balanceDue.toLocaleString('en-IN')}` : `✅ Payment Status: FULLY PAID`;
+    const rentalText = order.mode === 'RENT' ? `\n• Security Deposit: ₹${(order.deposit || 0).toLocaleString('en-IN')} (Refundable)\n• Return Date: ${order.returnDate || 'As agreed'}` : '';
+
+    const text = `*SHUBHAANGI — THE ULTIMATE BRIDE*\n_Official Studio Booking Slip_\n\nNamaste ${order.customerName} ji! ✨\nThank you for choosing SHUBHAANGI Bridal Studio (Laxmi Nagar, Delhi).\n\n*Booking Details:*\n• Slip ID: #${order.id}\n• Outfit / Set: ${order.item}\n• Category: ${order.category === 'DRESS' ? 'Bridal Lehenga / Saree' : (order.category === 'JEWELLERY' ? 'Royal Jewellery' : 'Bridal Makeup')}\n• Order Type: ${order.mode === 'RENT' ? 'Bridal Rental' : 'Bespoke Purchase'}\n• Function Date: ${order.eventDate || 'As scheduled'}${rentalText}\n\n*Payment Summary:*\n• Total Agreed: ₹${order.amount.toLocaleString('en-IN')}\n• Advance Received: ₹${order.advancePaid.toLocaleString('en-IN')} (${order.paymentMethod})\n• ${balanceText}\n\n${order.notes ? `*Alteration / Fitting Notes:* ${order.notes}\n\n` : ''}📍 *Studio Address:* B-125, First Floor, Laxmi Nagar, Delhi (Near V3S Mall)\n📞 *Contact:* +91 6397799514\n\n_We look forward to crafting your bridal royalty!_ 👑`;
+
+    const url = `https://wa.me/${cleanPhone || '916397799514'}?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
   };
 
   // Actions
@@ -494,6 +627,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
             onLogout={onLogout}
             pendingReturnsCount={pendingReturns.length}
             subscriberCount={subscribers.length}
+            offlineOrdersCount={offlineOrders.length}
           />
         </div>
       </div>
@@ -505,8 +639,9 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
           <div className="min-w-0">
             <h1 className="text-lg sm:text-xl md:text-2xl font-serif font-bold text-gray-900 tracking-tight">
               {activeTab === 'OVERVIEW' && 'Executive Business Intelligence'}
+              {activeTab === 'OFFLINE_ORDERS' && 'Studio Walk-In Bookings & Offline Register'}
               {activeTab === 'RENTALS' && 'Rental Returns & Escrow Tracker'}
-              {activeTab === 'ORDERS' && 'Client Bookings & Orders CRM'}
+              {activeTab === 'ORDERS' && 'Online Client Bookings CRM'}
               {activeTab === 'INVENTORY' && 'Inventory & Live Pricing Studio'}
               {activeTab === 'COUPONS' && 'Bridal Offers, Promo Vouchers & Discounts'}
               {activeTab === 'NEWSLETTER' && 'Newsletter Users & Push Subscribers'}
@@ -533,6 +668,62 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
         )}
 
         <main className="p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6 sm:space-y-8">
+          {/* Dual Business Channels: Online Storefront vs Studio Walk-In Register */}
+          <div className="bg-gradient-to-r from-zinc-950 via-[#141414] to-zinc-950 text-white p-4 sm:p-5 rounded-xl border border-luxury-gold/50 shadow-lg">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-lg bg-luxury-gold/20 text-luxury-gold flex items-center justify-center shrink-0 border border-luxury-gold/40 shadow-sm">
+                  <FiBookOpen size={24} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-luxury-gold">
+                      Revenue Stream Comparison
+                    </span>
+                    <span className="text-[9px] bg-white/10 text-gray-300 px-2 py-0.5 rounded font-mono">
+                      Online vs Studio Walk-In Counter
+                    </span>
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-serif font-bold text-white mt-0.5">
+                    Studio Walk-In Orders vs. Online Storefront
+                  </h3>
+                </div>
+              </div>
+
+              {/* 3 Channel Figures */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white/5 p-3 rounded-lg border border-white/10">
+                <div className="border-b sm:border-b-0 sm:border-r border-white/10 pb-2 sm:pb-0 sm:pr-4">
+                  <span className="text-[10px] text-gray-400 uppercase tracking-wider block font-semibold">🌐 Online Website</span>
+                  <span className="text-base sm:text-lg font-bold font-mono text-emerald-400">₹{totalRevenue.toLocaleString('en-IN')}</span>
+                  <span className="text-[10px] text-gray-400 block mt-0.5">{orders.length} digital orders</span>
+                </div>
+                <div className="border-b sm:border-b-0 sm:border-r border-white/10 pb-2 sm:pb-0 sm:pr-4">
+                  <span className="text-[10px] text-amber-300 uppercase tracking-wider block font-semibold">🏢 Studio Walk-In Counter</span>
+                  <span className="text-base sm:text-lg font-bold font-mono text-amber-400">₹{offlineGrossRevenue.toLocaleString('en-IN')}</span>
+                  <span className="text-[10px] text-gray-300 block mt-0.5">
+                    ₹{offlineCollectedRevenue.toLocaleString('en-IN')} cash in-hand • ₹{offlineBalanceDue.toLocaleString('en-IN')} due
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-luxury-gold uppercase tracking-wider block font-semibold">👑 Grand Studio Total</span>
+                  <span className="text-base sm:text-lg font-bold font-mono text-luxury-gold">₹{grandCombinedRevenue.toLocaleString('en-IN')}</span>
+                  <span className="text-[10px] text-gray-400 block mt-0.5">{orders.length + offlineOrders.length} total clients</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  setActiveTab('OFFLINE_ORDERS');
+                  setIsAddOfflineOpen(true);
+                }}
+                className="px-4 py-2.5 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-md transition-all shadow-md shrink-0 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <FiPlus size={15} />
+                <span>+ Walk-In Order</span>
+              </button>
+            </div>
+          </div>
+
           {/* KPI CARDS (Always visible on Overview) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
             {/* Card 1: Gross Revenue */}
@@ -2029,6 +2220,585 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                     type="button"
                     onClick={() => setIsAddCouponOpen(false)}
                     className="px-5 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 font-medium"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ── OFFLINE STUDIO ORDERS TAB (WALK-IN POS & DESK REGISTER) ── */}
+        {activeTab === 'OFFLINE_ORDERS' && (() => {
+          const filteredOffline = offlineOrders.filter(o => {
+            const q = offlineSearch.toLowerCase();
+            const matchesQuery = !q ||
+              (o.customerName && o.customerName.toLowerCase().includes(q)) ||
+              (o.customerPhone && o.customerPhone.includes(q)) ||
+              (o.item && o.item.toLowerCase().includes(q)) ||
+              (o.id && o.id.toLowerCase().includes(q));
+
+            const matchesFilter = offlineFilter === 'ALL'
+              || (offlineFilter === 'DUE' && o.balanceDue > 0)
+              || (offlineFilter === 'IN_ALTERATION' && o.status === 'IN_ALTERATION')
+              || (offlineFilter === 'READY' && o.status === 'READY_FOR_PICKUP')
+              || (offlineFilter === 'RENT' && o.mode === 'RENT')
+              || (offlineFilter === 'BUY' && o.mode === 'BUY');
+
+            return matchesQuery && matchesFilter;
+          });
+
+          return (
+            <div className="space-y-6">
+              {/* Top Revenue & Performance Metrics */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Total Offline Value</p>
+                      <h3 className="text-2xl font-serif font-bold text-gray-900 mt-1">₹{offlineGrossRevenue.toLocaleString('en-IN')}</h3>
+                    </div>
+                    <div className="p-2.5 bg-amber-50 text-amber-700 rounded-full">
+                      <FiDollarSign size={18} />
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-gray-500 mt-2 pt-2 border-t border-gray-100 flex justify-between">
+                    <span>{offlineOrders.length} Walk-in Bookings</span>
+                    <span className="font-semibold text-gray-800">Counter Sales</span>
+                  </p>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold">Cash / UPI In-Hand</p>
+                      <h3 className="text-2xl font-serif font-bold text-emerald-700 mt-1">₹{offlineCollectedRevenue.toLocaleString('en-IN')}</h3>
+                    </div>
+                    <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-full">
+                      <FiCheckCircle size={18} />
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-gray-500 mt-2 pt-2 border-t border-gray-100 flex justify-between">
+                    <span>Advance Collected</span>
+                    <span className="text-emerald-700 font-semibold">{((offlineCollectedRevenue / Math.max(1, offlineGrossRevenue)) * 100).toFixed(0)}% Paid</span>
+                  </p>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wider text-rose-700 font-semibold">Pending Balance Due</p>
+                      <h3 className="text-2xl font-serif font-bold text-rose-700 mt-1">₹{offlineBalanceDue.toLocaleString('en-IN')}</h3>
+                    </div>
+                    <div className="p-2.5 bg-rose-50 text-rose-600 rounded-full">
+                      <FiAlertCircle size={18} />
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-gray-500 mt-2 pt-2 border-t border-gray-100 flex justify-between">
+                    <span>To Collect at Delivery</span>
+                    <span className="text-rose-600 font-semibold">{offlineOrders.filter(o => o.balanceDue > 0).length} Clients Pending</span>
+                  </p>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wider text-indigo-700 font-semibold">Security Deposits Held</p>
+                      <h3 className="text-2xl font-serif font-bold text-indigo-700 mt-1">₹{offlineDepositsHeld.toLocaleString('en-IN')}</h3>
+                    </div>
+                    <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-full">
+                      <FiRepeat size={18} />
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-gray-500 mt-2 pt-2 border-t border-gray-100 flex justify-between">
+                    <span>Refundable Escrow</span>
+                    <span className="text-indigo-700 font-semibold">Rental Security</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Action & Filter Bar */}
+              <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 bg-white p-3.5 rounded-lg border border-gray-200">
+                <div className="relative flex-1 min-w-[220px]">
+                  <FiSearch className="absolute left-3 top-3 text-gray-400" size={14} />
+                  <input
+                    type="text"
+                    placeholder="Search bride name, phone, outfit, or slip #..."
+                    value={offlineSearch}
+                    onChange={(e) => setOfflineSearch(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 text-xs border border-gray-300 rounded-md focus:border-black outline-none bg-gray-50 focus:bg-white"
+                  />
+                </div>
+
+                <div className="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                  {[
+                    { id: 'ALL', label: 'All Orders' },
+                    { id: 'DUE', label: '⚠️ Balance Due' },
+                    { id: 'IN_ALTERATION', label: '✂️ In Alteration' },
+                    { id: 'READY', label: '🛍️ Ready Pickup' },
+                    { id: 'RENT', label: '👗 Rentals' },
+                    { id: 'BUY', label: '👑 Purchases' }
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setOfflineFilter(tab.id)}
+                      className={`px-3 py-1.5 rounded-md text-[11px] font-bold whitespace-nowrap transition-colors cursor-pointer ${
+                        offlineFilter === tab.id
+                          ? 'bg-black text-white shadow-xs'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setIsAddOfflineOpen(true)}
+                  className="px-4 py-2 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-md transition-colors shadow-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+                >
+                  <FiPlus size={14} />
+                  <span>+ Record Walk-In Order</span>
+                </button>
+              </div>
+
+              {/* Offline Orders Table */}
+              <div className="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
+                <div className="p-3.5 bg-gray-50 border-b border-gray-200 flex justify-between items-center text-xs">
+                  <span className="font-bold text-gray-800 uppercase tracking-wider text-[11px]">
+                    Walk-In Studio Bookings ({filteredOffline.length} Records)
+                  </span>
+                  <span className="text-gray-500 text-[11px]">
+                    Replaces paper registers • Syncs across all studio devices
+                  </span>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="border-b border-gray-200 bg-gray-50/50 text-[10px] uppercase font-bold text-gray-500 tracking-wider">
+                        <th className="p-3">Order Slip</th>
+                        <th className="p-3">Bride / Client</th>
+                        <th className="p-3">Outfit & Service</th>
+                        <th className="p-3">Financials & Balance</th>
+                        <th className="p-3">Key Dates</th>
+                        <th className="p-3">Fitting / Notes</th>
+                        <th className="p-3">Status</th>
+                        <th className="p-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {filteredOffline.length === 0 ? (
+                        <tr>
+                          <td colSpan={8} className="p-8 text-center text-gray-400">
+                            No walk-in bookings found. Tap <strong>"+ Record Walk-In Order"</strong> to add an offline order!
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredOffline.map((order) => {
+                          const hasDue = order.balanceDue > 0;
+                          return (
+                            <tr key={order.id} className="hover:bg-amber-50/30 transition-colors">
+                              {/* Order Slip ID */}
+                              <td className="p-3 align-top">
+                                <span className="font-mono font-bold text-gray-900 block">{order.id}</span>
+                                <span className="text-[10px] text-gray-400 block">{order.bookingDate}</span>
+                                <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-bold uppercase tracking-wider inline-block mt-1">
+                                  Studio POS
+                                </span>
+                              </td>
+
+                              {/* Bride details */}
+                              <td className="p-3 align-top min-w-[140px]">
+                                <span className="font-bold text-gray-900 block text-xs">{order.customerName}</span>
+                                <div className="flex items-center gap-1 text-[11px] text-gray-600 mt-0.5">
+                                  <FiPhone size={11} className="text-gray-400 shrink-0" />
+                                  <span>{order.customerPhone}</span>
+                                </div>
+                              </td>
+
+                              {/* Outfit & Service */}
+                              <td className="p-3 align-top min-w-[180px]">
+                                <span className="font-medium text-gray-900 block leading-snug">{order.item}</span>
+                                <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                                  <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
+                                    order.mode === 'RENT' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                                  }`}>
+                                    {order.mode === 'RENT' ? 'Bridal Rental' : 'Purchase / Custom'}
+                                  </span>
+                                  {order.deposit > 0 && (
+                                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 font-mono">
+                                      Dep: ₹{order.deposit.toLocaleString('en-IN')}
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+
+                              {/* Financials & Balance */}
+                              <td className="p-3 align-top min-w-[160px]">
+                                <div className="space-y-1">
+                                  <div className="flex justify-between items-center text-[11px]">
+                                    <span className="text-gray-500">Agreed Total:</span>
+                                    <strong className="font-mono text-gray-900">₹{order.amount.toLocaleString('en-IN')}</strong>
+                                  </div>
+                                  <div className="flex justify-between items-center text-[11px]">
+                                    <span className="text-gray-500">Advance Paid:</span>
+                                    <span className="font-mono text-emerald-700 font-bold">₹{order.advancePaid.toLocaleString('en-IN')}</span>
+                                  </div>
+                                  <div className="pt-1 border-t border-gray-100 flex justify-between items-center">
+                                    <span className="text-[10px] text-gray-500 uppercase font-semibold">Balance:</span>
+                                    {hasDue ? (
+                                      <span className="text-[10px] font-bold font-mono px-1.5 py-0.5 rounded bg-rose-100 text-rose-700">
+                                        ₹{order.balanceDue.toLocaleString('en-IN')} DUE
+                                      </span>
+                                    ) : (
+                                      <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">
+                                        ✓ ALL PAID
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-[9px] text-gray-400 block text-right font-mono">
+                                    Via: {order.paymentMethod}
+                                  </span>
+                                </div>
+                              </td>
+
+                              {/* Key Dates */}
+                              <td className="p-3 align-top min-w-[130px] text-[11px]">
+                                <div className="space-y-0.5">
+                                  <div>
+                                    <span className="text-[9px] uppercase tracking-wider text-gray-400 block font-semibold">Wedding Date</span>
+                                    <strong className="text-gray-800">{order.eventDate || '—'}</strong>
+                                  </div>
+                                  {order.returnDate && (
+                                    <div className="pt-1">
+                                      <span className="text-[9px] uppercase tracking-wider text-rose-500 block font-semibold">Return Due</span>
+                                      <span className="text-rose-700 font-bold">{order.returnDate}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+
+                              {/* Fitting / Alteration Notes */}
+                              <td className="p-3 align-top min-w-[160px] max-w-[200px]">
+                                {order.notes ? (
+                                  <div className="p-1.5 bg-gray-50 rounded border border-gray-200 text-[11px] text-gray-700">
+                                    <div className="flex items-center gap-1 text-[9px] uppercase text-amber-800 font-bold mb-0.5">
+                                      <FiScissors size={10} />
+                                      <span>Measurements / Fitting</span>
+                                    </div>
+                                    <p className="line-clamp-3 leading-snug">{order.notes}</p>
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-400 text-[11px]">Standard Size</span>
+                                )}
+                              </td>
+
+                              {/* Status Dropdown */}
+                              <td className="p-3 align-top">
+                                <select
+                                  value={order.status}
+                                  onChange={(e) => handleUpdateOfflineStatus(order.id, e.target.value)}
+                                  className="w-full text-[11px] p-1.5 border border-gray-300 rounded font-semibold focus:border-black outline-none bg-white cursor-pointer"
+                                >
+                                  <option value="CONFIRMED">Confirmed</option>
+                                  <option value="IN_ALTERATION">In Alteration</option>
+                                  <option value="READY_FOR_PICKUP">Ready for Pickup</option>
+                                  <option value="COLLECTED">Collected / With Bride</option>
+                                  <option value="RETURNED">Returned (Deposit Back)</option>
+                                  <option value="COMPLETED">Completed</option>
+                                </select>
+                              </td>
+
+                              {/* Actions */}
+                              <td className="p-3 align-top text-right min-w-[130px]">
+                                <div className="flex flex-col gap-1.5 items-end">
+                                  {/* Send WhatsApp Slip */}
+                                  <button
+                                    onClick={() => handleSendWhatsAppReceipt(order)}
+                                    className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-colors shadow-xs w-full justify-center cursor-pointer"
+                                    title="Send WhatsApp booking slip to bride"
+                                  >
+                                    <FiMessageCircle size={12} />
+                                    <span>WhatsApp Slip</span>
+                                  </button>
+
+                                  {/* Collect Balance Button if Due */}
+                                  {hasDue && (
+                                    <button
+                                      onClick={() => handleCollectOfflineBalance(order.id)}
+                                      className="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-black rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-colors shadow-xs w-full justify-center cursor-pointer"
+                                      title="Mark remaining balance as paid"
+                                    >
+                                      <FiCreditCard size={11} />
+                                      <span>Clear Balance</span>
+                                    </button>
+                                  )}
+
+                                  {/* Delete */}
+                                  <button
+                                    onClick={() => handleDeleteOfflineOrder(order.id)}
+                                    className="text-gray-400 hover:text-rose-600 text-[10px] font-medium hover:underline p-0.5 cursor-pointer"
+                                  >
+                                    Delete Record
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="p-3 bg-gray-50 border-t border-gray-200 flex justify-between items-center text-xs text-gray-500">
+                  <span>Showing {filteredOffline.length} of {offlineOrders.length} offline bookings</span>
+                  <button
+                    onClick={() => setIsAddOfflineOpen(true)}
+                    className="font-bold text-luxury-gold hover:underline uppercase tracking-wider text-[11px] cursor-pointer"
+                  >
+                    + Add Another Walk-In Client
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* ADD OFFLINE STUDIO ORDER MODAL */}
+        {isAddOfflineOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-xs overflow-y-auto">
+            <div className="bg-white max-w-xl w-full p-5 sm:p-6 rounded-lg shadow-2xl relative border border-gray-200 my-auto max-h-[92vh] overflow-y-auto">
+              <button
+                onClick={() => setIsAddOfflineOpen(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-black p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+                aria-label="Close"
+              >
+                <FiX size={20} />
+              </button>
+
+              <div className="flex items-center gap-2 mb-1">
+                <span className="p-2 bg-black text-luxury-gold rounded-md shrink-0">
+                  <FiBookOpen size={18} />
+                </span>
+                <div>
+                  <h3 className="text-base sm:text-lg font-serif font-bold text-gray-900 leading-tight">
+                    Record Studio Walk-In Order
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    Offline studio register • Auto-calculates balance and sends WhatsApp slip
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={handleCreateOfflineOrder} className="space-y-3.5 text-xs mt-3">
+                {/* Client Details */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">Bride / Client Name *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Simran Gill"
+                      value={newOfflineOrder.customerName}
+                      onChange={(e) => setNewOfflineOrder({ ...newOfflineOrder, customerName: e.target.value })}
+                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">WhatsApp / Mobile Number *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="+91 98XXX XXXXX"
+                      value={newOfflineOrder.customerPhone}
+                      onChange={(e) => setNewOfflineOrder({ ...newOfflineOrder, customerPhone: e.target.value })}
+                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-mono"
+                    />
+                  </div>
+                </div>
+
+                {/* Outfit & Category */}
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="font-semibold text-gray-800">Outfit / Bridal Set Name *</label>
+                    <select
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          const chosen = products.find(p => p.name === e.target.value);
+                          if (chosen) {
+                            setNewOfflineOrder(prev => ({
+                              ...prev,
+                              item: chosen.name,
+                              category: chosen.category,
+                              amount: prev.mode === 'RENT' ? (chosen.rentPrice3Days || chosen.buyPrice) : chosen.buyPrice,
+                              deposit: chosen.deposit || 0
+                            }));
+                          }
+                        }
+                      }}
+                      className="text-[10px] text-gray-500 bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5 cursor-pointer"
+                    >
+                      <option value="">Quick Pick from Studio Catalog</option>
+                      {products.map(p => (
+                        <option key={p.id} value={p.name}>{p.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Royal Maroon Velvet Zardozi Bridal Lehenga + Double Dupatta"
+                    value={newOfflineOrder.item}
+                    onChange={(e) => setNewOfflineOrder({ ...newOfflineOrder, item: e.target.value })}
+                    className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white"
+                  />
+                </div>
+
+                {/* Category & Order Type */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">Category</label>
+                    <select
+                      value={newOfflineOrder.category}
+                      onChange={(e) => setNewOfflineOrder({ ...newOfflineOrder, category: e.target.value })}
+                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white cursor-pointer"
+                    >
+                      <option value="DRESS">Bridal Lehenga / Saree</option>
+                      <option value="JEWELLERY">Bridal Jewellery</option>
+                      <option value="MAKEUP">Bridal Makeup Package</option>
+                      <option value="SHERWANI">Groom Sherwani</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">Order Type</label>
+                    <select
+                      value={newOfflineOrder.mode}
+                      onChange={(e) => setNewOfflineOrder({ ...newOfflineOrder, mode: e.target.value })}
+                      className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white cursor-pointer"
+                    >
+                      <option value="RENT">Bridal Rental (3/7 Days)</option>
+                      <option value="BUY">Bespoke Purchase / Stitching</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Pricing & Advance */}
+                <div className="bg-gray-50 p-3.5 rounded-lg border border-gray-200 space-y-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="font-bold block mb-1 text-gray-800">Total Agreed Price (₹) *</label>
+                      <input
+                        type="number"
+                        required
+                        placeholder="e.g. 18500"
+                        value={newOfflineOrder.amount}
+                        onChange={(e) => setNewOfflineOrder({ ...newOfflineOrder, amount: e.target.value })}
+                        className="w-full p-2 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-mono font-bold text-gray-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold block mb-1 text-emerald-700">Advance Paid (₹)</label>
+                      <input
+                        type="number"
+                        placeholder="e.g. 8500"
+                        value={newOfflineOrder.advancePaid}
+                        onChange={(e) => setNewOfflineOrder({ ...newOfflineOrder, advancePaid: e.target.value })}
+                        className="w-full p-2 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-mono font-bold text-emerald-700"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold block mb-1 text-gray-800">Security Deposit (₹)</label>
+                      <input
+                        type="number"
+                        placeholder="e.g. 15000"
+                        value={newOfflineOrder.deposit}
+                        onChange={(e) => setNewOfflineOrder({ ...newOfflineOrder, deposit: e.target.value })}
+                        className="w-full p-2 border border-gray-300 rounded-md focus:border-black outline-none bg-white font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Auto Balance calculation preview */}
+                  <div className="pt-2 border-t border-gray-200 flex justify-between items-center text-xs">
+                    <span className="text-gray-500 font-medium">Payment Method:</span>
+                    <div className="flex gap-2">
+                      {['UPI_QR', 'CASH', 'CARD', 'SPLIT'].map(method => (
+                        <label key={method} className="flex items-center gap-1 cursor-pointer text-[11px] font-semibold text-gray-700">
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value={method}
+                            checked={newOfflineOrder.paymentMethod === method}
+                            onChange={(e) => setNewOfflineOrder({ ...newOfflineOrder, paymentMethod: e.target.value })}
+                            className="accent-black"
+                          />
+                          <span>{method === 'UPI_QR' ? 'UPI' : method}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-2 rounded border border-gray-200 flex justify-between items-center text-xs">
+                    <span className="font-semibold text-gray-700">Auto Calculated Balance Due upon delivery:</span>
+                    <strong className="font-mono text-sm text-rose-600 font-bold">
+                      ₹{Math.max(0, (Number(newOfflineOrder.amount) || 0) - (Number(newOfflineOrder.advancePaid) || 0)).toLocaleString('en-IN')}
+                    </strong>
+                  </div>
+                </div>
+
+                {/* Important Dates */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">Wedding / Function Date</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 15 Nov 2026"
+                      value={newOfflineOrder.eventDate}
+                      onChange={(e) => setNewOfflineOrder({ ...newOfflineOrder, eventDate: e.target.value })}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:border-black outline-none bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1 text-gray-800">Rental Return Due Date</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 18 Nov 2026 (if rental)"
+                      value={newOfflineOrder.returnDate}
+                      onChange={(e) => setNewOfflineOrder({ ...newOfflineOrder, returnDate: e.target.value })}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:border-black outline-none bg-white"
+                    />
+                  </div>
+                </div>
+
+                {/* Custom Measurements & Fitting Notes */}
+                <div>
+                  <label className="font-semibold block mb-1 text-gray-800">
+                    Fitting, Measurements & Blouse Alteration Notes
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="e.g. Chest 34, Waist 28, Height 5'4. Extra 2-inch sleeve margin. Double cancan flare requested."
+                    value={newOfflineOrder.notes}
+                    onChange={(e) => setNewOfflineOrder({ ...newOfflineOrder, notes: e.target.value })}
+                    className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white text-xs"
+                  />
+                </div>
+
+                {/* Submit buttons */}
+                <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
+                  <button
+                    type="submit"
+                    className="flex-1 py-3 bg-black text-white hover:bg-luxury-gold uppercase tracking-wider font-semibold rounded-md transition-colors shadow-xs cursor-pointer"
+                  >
+                    Save Walk-In Booking to Register
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddOfflineOpen(false)}
+                    className="px-5 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 font-medium cursor-pointer"
                   >
                     Cancel
                   </button>
