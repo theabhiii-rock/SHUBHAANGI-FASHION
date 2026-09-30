@@ -142,18 +142,18 @@ export default function NewsletterPopupModal({
                 <FiX size={18} />
               </button>
 
-              {/* Left Visual Column — Full Bridal Portrait */}
+              {/* Left Visual Column — Shubhaangi Logo */}
               <div className="relative w-full md:w-5/12 h-56 sm:h-64 md:h-auto bg-zinc-950 flex items-center justify-center overflow-hidden shrink-0 border-b md:border-b-0 md:border-r border-white/10">
                 <img
-                  src="/images/shubhaangi-rani-pink-bridal-lehenga.jpg"
+                  src="/images/shubhaangi-official-logo.jpg"
                   alt=""
                   aria-hidden="true"
-                  className="absolute inset-0 w-full h-full object-cover blur-xl opacity-35 scale-110 pointer-events-none"
+                  className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-20 scale-125 pointer-events-none"
                 />
                 <img
-                  src="/images/shubhaangi-rani-pink-bridal-lehenga.jpg"
-                  alt="SHUBHAANGI Bridal Couture"
-                  className="relative z-10 w-full h-full object-contain"
+                  src="/images/shubhaangi-official-logo.jpg"
+                  alt="SHUBHAANGI Official Logo"
+                  className="relative z-10 w-4/5 h-4/5 object-contain drop-shadow-[0_0_28px_rgba(200,169,81,0.35)] p-4"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-20 flex flex-col justify-end p-5">
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-luxury-gold text-black text-[9px] font-extrabold uppercase tracking-[0.2em] rounded-sm w-fit mb-2 shadow-md">
