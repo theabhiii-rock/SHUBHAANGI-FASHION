@@ -23,7 +23,6 @@ import FeaturedCollections from './components/store/FeaturedCollections';
 import HorizontalScrollSection from './components/store/HorizontalScrollSection';
 import LookbookCarousel from './components/store/LookbookCarousel';
 import BrandStatement from './components/store/BrandStatement';
-import ShopByCategory from './components/store/ShopByCategory';
 import VideoStorySection from './components/store/VideoStorySection';
 import StudioTrialSection from './components/store/StudioTrialSection';
 import NewsletterSection from './components/store/NewsletterSection';
@@ -673,18 +672,7 @@ export default function App() {
       {/* 11. BRAND STATEMENT (VOGUE TYPOGRAPHY) */}
       <BrandStatement fadeUp={fadeUp} />
 
-      {/* 12. SHOP BY CATEGORY (6 HIGH-FASHION TAXONOMY CARDS) */}
-      <ShopByCategory
-        fadeUp={fadeUp}
-        staggerContainer={staggerContainer}
-        onSelectCategory={(category) => {
-          setActiveTab(category);
-          const el = document.getElementById('catalog');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }}
-      />
-
-      {/* 13. MAIN BRIDAL CATALOG WITH DUAL RENT / BUY */}
+      {/* 12. MAIN BRIDAL CATALOG WITH DUAL RENT / BUY */}
       <main id="catalog" className="max-w-7xl mx-auto px-6 py-28 border-t border-gray-200">
         <div className="text-center mb-16">
           <span className="text-[10px] tracking-[0.4em] uppercase text-luxury-gold font-semibold block mb-2">
