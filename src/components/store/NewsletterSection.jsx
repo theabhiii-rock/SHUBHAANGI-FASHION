@@ -1,14 +1,16 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiMail, FiCheckCircle } from 'react-icons/fi';
+import { FiMail, FiCheckCircle, FiBell } from 'react-icons/fi';
+import { subscribeUserToAlerts } from '../../utils/notifications';
 
 export default function NewsletterSection({ fadeUp }) {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
-  const handleSubscribe = (e) => {
+  const handleSubscribe = async (e) => {
     e.preventDefault();
     if (!email) return;
+    await subscribeUserToAlerts({ contact: email });
     setSubscribed(true);
     setTimeout(() => {
       setEmail('');

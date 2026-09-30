@@ -10,6 +10,11 @@ import {
   getStoredOrders, saveOrders, getStoredProducts, saveProducts, getVisitorCount, 
   getStoredCoupons, saveCoupons, getStoredOfferBanner, saveOfferBanner
 } from '../data/store';
+import {
+  broadcastNewDressAlert,
+  broadcastOfferAlert,
+  getStoredSubscribers
+} from '../utils/notifications';
 import AdminSidebar from './admin/AdminSidebar';
 import RentalTimelineCard from './admin/RentalTimelineCard';
 
@@ -179,7 +184,9 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       galleryUrls: '',
       isRentalAvailable: true
     });
-    showToast(`✨ Added "${created.name}" with ${allImages.length} photos to live bridal catalog!`);
+    broadcastNewDressAlert(created);
+    const subCount = getStoredSubscribers().length;
+    showToast(`🔔 Added "${created.name}" & sent instant Push Notification to ${subCount} VIP Subscribers!`);
   };
 
   const handleAddPhotoToProduct = (productId, photoUrl) => {
@@ -320,13 +327,25 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       badge: 'Seasonal Offer',
       isActive: true
     });
-    showToast(`✨ New promo voucher "${created.code}" created and live!`);
+    broadcastOfferAlert({
+      title: `🎉 New Bridal Offer: ${created.badge}`,
+      body: `${created.description}! Use voucher code "${created.code}" at SHUBHAANGI Studio.`,
+      couponCode: created.code
+    });
+    showToast(`🔔 New voucher "${created.code}" live & push notification sent to VIP subscribers!`);
   };
 
   const handleSaveOfferBanner = (e) => {
     e.preventDefault();
     saveOfferBanner(offerBanner);
-    showToast('✨ Storefront Promotional Announcement Banner updated live!');
+    if (offerBanner?.enabled) {
+      broadcastOfferAlert({
+        title: `✨ ${offerBanner.badge || 'LIMITED OFFER'} — SHUBHAANGI Studio`,
+        body: `${offerBanner.text}${offerBanner.couponCode ? ` (Use Code: ${offerBanner.couponCode})` : ''}`,
+        couponCode: offerBanner.couponCode
+      });
+    }
+    showToast('🔔 Storefront Offer Banner updated & push alert sent to VIP subscribers!');
   };
 
   const handleQuickAddPreset = (preset) => {
@@ -345,7 +364,12 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
     const updated = [created, ...coupons.filter(c => c.code !== preset.code)];
     setCoupons(updated);
     saveCoupons(updated);
-    showToast(`✨ Quick Offer "${preset.code}" enabled and live!`);
+    broadcastOfferAlert({
+      title: `🎉 Flash Bridal Offer: ${preset.badge}`,
+      body: `${preset.description}! Use code "${preset.code}" at checkout.`,
+      couponCode: preset.code
+    });
+    showToast(`🔔 Quick Offer "${preset.code}" enabled & push notification broadcasted!`);
   };
 
   const handleCopyCode = (code) => {

@@ -2,7 +2,8 @@ import React from 'react';
 import { 
   FiMenu as Menu, FiSearch as Search, 
   FiShoppingBag as ShoppingBag,
-  FiHeart as Heart, FiPackage as Package, FiCalendar as Calendar
+  FiHeart as Heart, FiPackage as Package, FiCalendar as Calendar,
+  FiBell as Bell
 } from 'react-icons/fi';
 
 export default function StoreHeader({
@@ -13,6 +14,7 @@ export default function StoreHeader({
   onOpenWishlist,
   onOpenOrderTracker,
   onOpenAppointment,
+  onOpenNewsletter,
   cartCount,
   wishlistCount,
   offerBanner
@@ -119,8 +121,22 @@ export default function StoreHeader({
           </div>
         </div>
 
-        {/* Right: Search, Wishlist & Shopping Bag */}
+        {/* Right: Alerts, Search, Wishlist & Shopping Bag */}
         <div className="flex items-center gap-1 sm:gap-2.5 text-white">
+          {/* VIP Push Alerts & Newsletter */}
+          {onOpenNewsletter && (
+            <button
+              onClick={onOpenNewsletter}
+              className="p-2 text-luxury-gold hover:text-white transition-colors relative"
+              title="Enable Instant Alerts for New Dresses & Offers"
+              aria-label="Enable Instant Alerts"
+            >
+              <Bell size={20} />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-400 rounded-full animate-ping" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-400 rounded-full" />
+            </button>
+          )}
+
           {/* Quick Search */}
           <button
             onClick={onOpenSearch}

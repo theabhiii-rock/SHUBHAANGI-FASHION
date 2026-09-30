@@ -37,6 +37,7 @@ import AppointmentModal from './components/store/AppointmentModal';
 import OrderTrackerModal from './components/store/OrderTrackerModal';
 import CustomerReviewsSection from './components/store/CustomerReviewsSection';
 import MobileBottomBar from './components/store/MobileBottomBar';
+import NewsletterPopupModal from './components/store/NewsletterPopupModal';
 
 export default function App() {
   const [currentView, setCurrentView] = useState('store'); // 'store' | 'admin'
@@ -55,6 +56,7 @@ export default function App() {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isAppointmentOpen, setIsAppointmentOpen] = useState(false);
   const [isOrderTrackerOpen, setIsOrderTrackerOpen] = useState(false);
+  const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [offerBanner, setOfferBanner] = useState(() => getStoredOfferBanner());
 
   const [cartItems, setCartItems] = useState(() => {
@@ -176,6 +178,7 @@ export default function App() {
     isWishlistOpen ||
     isAppointmentOpen ||
     isOrderTrackerOpen ||
+    isNewsletterOpen ||
     isAuthModalOpen
   );
 
@@ -337,6 +340,18 @@ export default function App() {
         orders={getStoredOrders()}
       />
 
+      {/* 7B. AUTOMATIC VIP NEWSLETTER & INSTANT PUSH ALERT POPUP */}
+      <NewsletterPopupModal
+        isOpenExternal={isNewsletterOpen}
+        onCloseExternal={() => setIsNewsletterOpen(false)}
+        onSelectProductById={(pid) => {
+          const matched = products.find((p) => String(p.id) === String(pid));
+          if (matched) {
+            setSelectedProductForModal(matched);
+          }
+        }}
+      />
+
       {/* 8. PURE CLIENT LUXURY HEADER */}
       <StoreHeader
         scrolled={scrolled}
@@ -347,6 +362,7 @@ export default function App() {
         onOpenWishlist={() => setIsWishlistOpen(true)}
         onOpenOrderTracker={() => setIsOrderTrackerOpen(true)}
         onOpenAppointment={() => setIsAppointmentOpen(true)}
+        onOpenNewsletter={() => setIsNewsletterOpen(true)}
         cartCount={cartItems.length}
         wishlistCount={wishlistIds.length}
         offerBanner={offerBanner}
