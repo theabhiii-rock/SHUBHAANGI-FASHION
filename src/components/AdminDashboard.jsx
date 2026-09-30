@@ -22,7 +22,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
   const [orders, setOrders] = useState(() => getStoredOrders());
   const [products, setProducts] = useState(() => getStoredProducts());
   const [visitors] = useState(() => getVisitorCount());
-  const [activeTab, setActiveTab] = useState('OVERVIEW'); // 'OVERVIEW' | 'RENTALS' | 'ORDERS' | 'INVENTORY' | 'COUPONS'
+  const [activeTab, setActiveTab] = useState('OVERVIEW'); // 'OVERVIEW' | 'RENTALS' | 'ORDERS' | 'INVENTORY' | 'COUPONS' | 'NEWSLETTER'
   const [editingProduct, setEditingProduct] = useState(null);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [photoManagerProduct, setPhotoManagerProduct] = useState(null);
@@ -30,6 +30,11 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
   const [notification, setNotification] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Newsletter subscribers
+  const [subscribers, setSubscribers] = useState(() => getStoredSubscribers());
+  const [nlSearch, setNlSearch] = useState('');
+  const [nlFilter, setNlFilter] = useState('ALL'); // ALL | PUSH | NO_PUSH | DRESS | OFFERS
 
   // Offers & Promo Vouchers state
   const [coupons, setCoupons] = useState(() => getStoredCoupons());
@@ -423,6 +428,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
             onBackToStore={onBackToStore}
             onLogout={onLogout}
             pendingReturnsCount={pendingReturns.length}
+            subscriberCount={subscribers.length}
           />
         </div>
       </div>
@@ -438,6 +444,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
               {activeTab === 'ORDERS' && 'Client Bookings & Orders CRM'}
               {activeTab === 'INVENTORY' && 'Inventory & Live Pricing Studio'}
               {activeTab === 'COUPONS' && 'Bridal Offers, Promo Vouchers & Discounts'}
+              {activeTab === 'NEWSLETTER' && 'Newsletter Users & Push Subscribers'}
             </h1>
             <p className="text-xs text-gray-500 mt-0.5 truncate">
               B-125, First Floor, Laxmi Nagar, Delhi (Near V3S Mall) • Official Studio Portal
@@ -1785,6 +1792,150 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
             </div>
           </div>
         )}
+
+        {/* ── NEWSLETTER USERS TAB ─────────────────────────────────── */}
+        {activeTab === 'NEWSLETTER' && (() => {
+          const pushGranted = subscribers.filter(s => s.pushGranted).length;
+          const whatsappSubs = subscribers.filter(s => s.contact && (s.contact.includes('+') || /^\d{10}/.test(s.contact.replace(/\s/g,'')))).length;
+
+          const nlFiltered = subscribers.filter(sub => {
+            const q = nlSearch.toLowerCase();
+            const matchQ = !q || sub.name?.toLowerCase().includes(q) || sub.contact?.toLowerCase().includes(q);
+            const matchF = nlFilter === 'ALL'
+              || (nlFilter === 'PUSH' && sub.pushGranted)
+              || (nlFilter === 'NO_PUSH' && !sub.pushGranted)
+              || (nlFilter === 'DRESS' && sub.notifyNewDresses)
+              || (nlFilter === 'OFFERS' && sub.notifyOffers);
+            return matchQ && matchF;
+          });
+
+          const handleDeleteSub = (subId) => {
+            if (!window.confirm('Remove this subscriber from the list?')) return;
+            const updated = subscribers.filter(s => s.id !== subId);
+            setSubscribers(updated);
+            try { localStorage.setItem('shubhaangi_vip_subscribers', JSON.stringify(updated)); } catch {}
+            showToast('Subscriber removed.');
+          };
+
+          const handleBroadcastToAll = async () => {
+            if (!window.confirm(`Send a push notification to all ${subscribers.length} subscribers now?`)) return;
+            await broadcastOfferAlert({
+              title: '🌟 SHUBHAANGI — Latest Bridal Collection',
+              body: 'New arrivals & exclusive offers are live now! Visit the studio or book a trial appointment.',
+              couponCode: 'ROYAL10'
+            });
+            showToast(`✅ Broadcast sent to ${subscribers.length} subscribers!`);
+          };
+
+          return (
+            <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+              {/* Stats row */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                {[
+                  { label: 'Total Subscribers', value: subscribers.length, color: 'text-gray-900', bg: 'bg-white' },
+                  { label: 'Push Granted', value: pushGranted, color: 'text-emerald-700', bg: 'bg-emerald-50' },
+                  { label: 'WhatsApp / Phone', value: whatsappSubs, color: 'text-green-700', bg: 'bg-green-50' },
+                  { label: 'Email Subscribers', value: subscribers.length - whatsappSubs, color: 'text-blue-700', bg: 'bg-blue-50' },
+                ].map(({ label, value, color, bg }) => (
+                  <div key={label} className={`${bg} rounded-lg border border-gray-200 p-3 sm:p-4`}>
+                    <p className="text-[11px] text-gray-500 uppercase tracking-wider font-medium">{label}</p>
+                    <p className={`text-2xl sm:text-3xl font-bold font-serif mt-1 ${color}`}>{value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Controls */}
+              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                <div className="relative flex-1 max-w-xs">
+                  <FiSearch className="absolute left-3 top-2.5 text-gray-400" size={14} />
+                  <input
+                    type="text"
+                    placeholder="Search name or contact..."
+                    value={nlSearch}
+                    onChange={e => setNlSearch(e.target.value)}
+                    className="w-full pl-8 pr-3 py-2 text-xs border border-gray-300 rounded-md focus:outline-none focus:border-gray-500"
+                  />
+                </div>
+                <div className="flex gap-1.5 flex-wrap">
+                  {['ALL','PUSH','NO_PUSH','DRESS','OFFERS'].map(f => (
+                    <button
+                      key={f}
+                      onClick={() => setNlFilter(f)}
+                      className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors ${nlFilter === f ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                    >
+                      {f === 'NO_PUSH' ? 'No Push' : f === 'DRESS' ? '👗 Dresses' : f === 'OFFERS' ? '🏷️ Offers' : f === 'PUSH' ? '🔔 Push On' : 'All'}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={handleBroadcastToAll}
+                  className="ml-auto flex items-center gap-2 px-4 py-2 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-md transition-colors shadow-sm"
+                >
+                  <FiVolume2 size={13} /> Broadcast to All
+                </button>
+              </div>
+
+              {/* Subscriber table */}
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        {['#','Name','WhatsApp / Email','Joined','👗 Dresses','🏷️ Offers','🔔 Push','Action'].map(h => (
+                          <th key={h} className="px-3 py-2.5 text-left text-[10px] uppercase tracking-wider text-gray-500 font-semibold whitespace-nowrap">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {nlFiltered.length === 0 ? (
+                        <tr>
+                          <td colSpan={8} className="px-4 py-10 text-center text-gray-400">
+                            No subscribers found{nlSearch ? ` for "${nlSearch}"` : ''}.
+                          </td>
+                        </tr>
+                      ) : nlFiltered.map((sub, idx) => (
+                        <tr key={sub.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-3 py-3 text-gray-400 font-mono">{idx + 1}</td>
+                          <td className="px-3 py-3 font-semibold text-gray-800 whitespace-nowrap">{sub.name || '—'}</td>
+                          <td className="px-3 py-3 text-gray-600 max-w-[160px] truncate">{sub.contact || '—'}</td>
+                          <td className="px-3 py-3 text-gray-500 whitespace-nowrap">{sub.joinedAt || '—'}</td>
+                          <td className="px-3 py-3 text-center">
+                            <span className={`inline-flex w-5 h-5 rounded-full text-white text-[10px] items-center justify-center font-bold ${sub.notifyNewDresses ? 'bg-emerald-500' : 'bg-gray-200 text-gray-400'}`}>
+                              {sub.notifyNewDresses ? '✓' : '✗'}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 text-center">
+                            <span className={`inline-flex w-5 h-5 rounded-full text-white text-[10px] items-center justify-center font-bold ${sub.notifyOffers ? 'bg-emerald-500' : 'bg-gray-200 text-gray-400'}`}>
+                              {sub.notifyOffers ? '✓' : '✗'}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 text-center">
+                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${sub.pushGranted ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
+                              {sub.pushGranted ? 'Granted' : 'Denied'}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3">
+                            <button
+                              onClick={() => handleDeleteSub(sub.id)}
+                              className="p-1.5 text-gray-400 hover:text-rose-500 hover:bg-rose-50 rounded transition-colors"
+                              title="Remove subscriber"
+                            >
+                              <FiTrash2 size={13} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="px-4 py-2.5 bg-gray-50 border-t border-gray-200 text-[10px] text-gray-500">
+                  Showing {nlFiltered.length} of {subscribers.length} subscribers • Data stored in browser localStorage
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
       </div>
     </div>
   );

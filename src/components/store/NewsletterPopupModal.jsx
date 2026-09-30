@@ -29,6 +29,7 @@ export default function NewsletterPopupModal({
   const [notifyOffers, setNotifyOffers] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [subscribedSuccess, setSubscribedSuccess] = useState(false);
+  const [contactError, setContactError] = useState('');
   const [liveToast, setLiveToast] = useState(null);
 
   const isVisible = Boolean(isOpenExternal || autoOpen);
@@ -85,11 +86,24 @@ export default function NewsletterPopupModal({
   const handleAllowAndSubscribe = async (e) => {
     if (e) e.preventDefault();
     if (isSubmitting) return;
+
+    // Validate: contact (WhatsApp or email) is required
+    const trimmedContact = contact.trim();
+    if (!trimmedContact) {
+      setContactError('Please enter your WhatsApp number or email to continue.');
+      return;
+    }
+    // Basic format check — at least 6 chars (phone or email min length)
+    if (trimmedContact.length < 6) {
+      setContactError('Please enter a valid WhatsApp number or email.');
+      return;
+    }
+    setContactError('');
     setIsSubmitting(true);
 
     await subscribeUserToAlerts({
-      contact,
-      name,
+      contact: trimmedContact,
+      name: name.trim() || 'VIP Bride',
       notifyNewDresses,
       notifyOffers
     });
@@ -249,7 +263,7 @@ export default function NewsletterPopupModal({
                       </div>
                       <div>
                         <label className="text-[10px] uppercase tracking-wider text-gray-400 block mb-1">
-                          WhatsApp Number or Email
+                          WhatsApp Number or Email <span className="text-rose-400">*</span>
                         </label>
                         <div className="relative">
                           <FiPhone className="absolute left-3 top-3 text-gray-400" size={13} />
@@ -257,10 +271,15 @@ export default function NewsletterPopupModal({
                             type="text"
                             placeholder="+91 98XXX XXXXX or Email"
                             value={contact}
-                            onChange={(e) => setContact(e.target.value)}
-                            className="w-full pl-8 pr-3 py-2.5 bg-white/5 border border-white/15 rounded-sm text-xs text-white placeholder-gray-500 focus:outline-none focus:border-luxury-gold"
+                            onChange={(e) => { setContact(e.target.value); if (contactError) setContactError(''); }}
+                            className={`w-full pl-8 pr-3 py-2.5 bg-white/5 border rounded-sm text-xs text-white placeholder-gray-500 focus:outline-none transition-colors ${contactError ? 'border-rose-500 focus:border-rose-400' : 'border-white/15 focus:border-luxury-gold'}`}
                           />
                         </div>
+                        {contactError && (
+                          <p className="mt-1 text-[10px] text-rose-400 flex items-center gap-1">
+                            <span>⚠</span> {contactError}
+                          </p>
+                        )}
                       </div>
                     </div>
 

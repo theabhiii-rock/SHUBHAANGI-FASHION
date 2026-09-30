@@ -1,10 +1,10 @@
 import React from 'react';
 import { 
   FiGrid, FiRepeat, FiShoppingBag, FiTag, 
-  FiEye, FiLogOut, FiPercent
+  FiEye, FiLogOut, FiPercent, FiBell
 } from 'react-icons/fi';
 
-export default function AdminSidebar({ activeTab, onSelectTab, onBackToStore, onLogout, pendingReturnsCount }) {
+export default function AdminSidebar({ activeTab, onSelectTab, onBackToStore, onLogout, pendingReturnsCount, subscriberCount }) {
   const menuItems = [
     { id: 'OVERVIEW', label: 'Executive Overview', icon: FiGrid },
     { 
@@ -16,6 +16,13 @@ export default function AdminSidebar({ activeTab, onSelectTab, onBackToStore, on
     { id: 'ORDERS', label: 'Client Bookings CRM', icon: FiShoppingBag },
     { id: 'INVENTORY', label: 'Inventory & Prices', icon: FiTag },
     { id: 'COUPONS', label: 'Offers & Discounts', icon: FiPercent },
+    {
+      id: 'NEWSLETTER',
+      label: 'Newsletter Users',
+      icon: FiBell,
+      badge: subscriberCount > 0 ? subscriberCount : null,
+      badgeColor: 'bg-luxury-gold text-black'
+    },
   ];
 
   return (
@@ -61,7 +68,7 @@ export default function AdminSidebar({ activeTab, onSelectTab, onBackToStore, on
                   <span className="truncate">{item.label}</span>
                 </div>
                 {item.badge && (
-                  <span className="bg-rose-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shrink-0 ml-1">
+                  <span className={`${item.badgeColor || 'bg-rose-600 text-white'} text-[10px] px-2 py-0.5 rounded-full font-bold shrink-0 ml-1`}>
                     {item.badge}
                   </span>
                 )}
