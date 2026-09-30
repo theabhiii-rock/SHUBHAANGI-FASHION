@@ -3742,104 +3742,66 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
           const inactiveCount = studioServices.length - activeCount;
 
           return (
-            <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-              {/* Studio Services Overview Banner */}
-              <div className="bg-gradient-to-r from-zinc-950 via-[#181818] to-zinc-950 text-white p-5 rounded-xl border border-luxury-gold/40 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div className="flex items-center gap-3.5">
-                  <div className="p-3 bg-luxury-gold/20 text-luxury-gold rounded-xl border border-luxury-gold/40 text-2xl shrink-0">
-                    <FiCamera size={26} />
-                  </div>
+            <div className="p-4 sm:p-6 lg:p-8 space-y-5">
+              {/* Clean Single-Row Studio Header & Category Filter */}
+              <div className="bg-white p-4 sm:p-5 rounded-xl border border-gray-200 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-luxury-gold block">
-                        Studio Menu & Subtopics Manager
-                      </span>
-                      <span className="text-[9px] bg-luxury-gold/20 text-luxury-gold px-2 py-0.5 rounded font-bold">
-                        दुकान का मेनू और सब-टॉपिक्स
+                      <h2 className="text-lg sm:text-xl font-serif font-bold text-gray-900">
+                        Studio Packages & Menus
+                      </h2>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">
+                        {activeCount} Live
                       </span>
                     </div>
-                    <h2 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight mt-0.5">
-                      Studio Shoots, Events & Bridal Packages
-                    </h2>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      Create unlimited subtopics and packages under each category. All updates sync live to the client drawer and booking system.
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Select any category below to view or add packages using 1-click ready templates.
                     </p>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={() => setIsAddTopicOpen(true)}
-                    className="px-3.5 py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider rounded-lg border border-white/20 transition-all flex items-center gap-2 cursor-pointer"
-                  >
-                    <FiPlus size={15} />
-                    <span>+ Add Main Topic</span>
-                  </button>
-                  <button
-                    onClick={() => handleOpenAddService(serviceCategoryFilter === 'ALL' ? (studioTopics[0]?.id || 'PREWEDDING') : serviceCategoryFilter)}
-                    className="px-4 py-2.5 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-md flex items-center gap-2 cursor-pointer"
-                  >
-                    <FiPlus size={16} />
-                    <span>+ Add Subtopic / Package</span>
-                  </button>
-                </div>
-              </div>
+                  {/* Clean Search + Primary Actions */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="relative w-full sm:w-56">
+                      <FiSearch className="absolute left-3 top-2 text-gray-400" size={14} />
+                      <input
+                        type="text"
+                        placeholder="Search package..."
+                        value={serviceSearch}
+                        onChange={(e) => setServiceSearch(e.target.value)}
+                        className="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:border-black outline-none bg-gray-50 focus:bg-white"
+                      />
+                    </div>
 
-              {/* Stat Counters */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
-                  <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Total Subtopic Packages</p>
-                  <h3 className="text-2xl font-serif font-bold text-gray-900 mt-1">{studioServices.length}</h3>
-                  <p className="text-[10px] text-gray-400 mt-1">Under {studioTopics.length} main categories</p>
-                </div>
-                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
-                  <p className="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold">Active On Website</p>
-                  <h3 className="text-2xl font-serif font-bold text-emerald-700 mt-1">{activeCount}</h3>
-                  <p className="text-[10px] text-emerald-600 mt-1">Visible to brides & clients</p>
-                </div>
-                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
-                  <p className="text-[11px] uppercase tracking-wider text-amber-700 font-semibold">Hidden / Draft</p>
-                  <h3 className="text-2xl font-serif font-bold text-amber-700 mt-1">{inactiveCount}</h3>
-                  <p className="text-[10px] text-gray-400 mt-1">Temporarily offline</p>
-                </div>
-                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs">
-                  <p className="text-[11px] uppercase tracking-wider text-indigo-700 font-semibold">Main Topics</p>
-                  <h3 className="text-2xl font-serif font-bold text-indigo-700 mt-1">{studioTopics.length}</h3>
-                  <p className="text-[10px] text-gray-400 mt-1">Categories in drawer menu</p>
-                </div>
-              </div>
+                    <button
+                      onClick={() => setIsAddTopicOpen(true)}
+                      className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <FiPlus size={14} />
+                      <span>Category</span>
+                    </button>
 
-              {/* Category Filter Tabs & Search Bar */}
-              <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-xs space-y-3">
-                <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3">
-                  {/* Search input */}
-                  <div className="relative flex-1 max-w-md">
-                    <FiSearch className="absolute left-3 top-2.5 text-gray-400" size={15} />
-                    <input
-                      type="text"
-                      placeholder="Search title, price, location or features..."
-                      value={serviceSearch}
-                      onChange={(e) => setServiceSearch(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 text-xs border border-gray-300 rounded-md focus:border-black outline-none bg-gray-50 focus:bg-white"
-                    />
+                    <button
+                      onClick={() => handleOpenAddService(serviceCategoryFilter === 'ALL' ? (studioTopics[0]?.id || 'PREWEDDING') : serviceCategoryFilter)}
+                      className="px-4 py-1.5 bg-black hover:bg-luxury-gold hover:text-black text-white text-xs font-bold rounded-lg transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <FiPlus size={15} />
+                      <span>Add Package</span>
+                    </button>
                   </div>
-
-                  <span className="text-xs text-gray-500 font-medium">
-                    Showing <strong className="text-gray-900">{filteredServices.length}</strong> of {studioServices.length} subtopics
-                  </span>
                 </div>
 
-                {/* Dynamic Category Pills */}
-                <div className="flex gap-1.5 overflow-x-auto no-scrollbar pt-1 items-center">
+                {/* Clean Horizontal Category Tabs */}
+                <div className="flex gap-1.5 overflow-x-auto no-scrollbar pt-3 border-t border-gray-100 items-center">
                   <button
                     onClick={() => setServiceCategoryFilter('ALL')}
-                    className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                       serviceCategoryFilter === 'ALL'
-                        ? 'bg-black text-white shadow-xs font-bold'
+                        ? 'bg-black text-white shadow-2xs'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
-                    🌟 All Subtopics ({studioServices.length})
+                    All ({studioServices.length})
                   </button>
                   {studioTopics.map((topic) => {
                     const count = studioServices.filter(s => s.type === topic.id).length;
@@ -3848,212 +3810,62 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                       <button
                         key={topic.id}
                         onClick={() => setServiceCategoryFilter(topic.id)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                           isSelected
-                            ? 'bg-luxury-gold text-black shadow-xs font-bold'
+                            ? 'bg-luxury-gold text-black font-bold shadow-2xs'
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                       >
                         <span>{topic.icon || '✨'}</span>
-                        <span>{topic.label || topic.name} ({count})</span>
+                        <span>{topic.label || topic.name}</span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-black/15 text-black' : 'bg-gray-200 text-gray-600'}`}>
+                          {count}
+                        </span>
                       </button>
                     );
                   })}
-
-                  <button
-                    onClick={() => setIsAddTopicOpen(true)}
-                    className="px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 bg-gray-900 text-white hover:bg-black border border-gray-700 shadow-xs shrink-0"
-                  >
-                    <FiPlus size={13} />
-                    <span>+ Add Topic</span>
-                  </button>
                 </div>
-              </div>
 
-              {/* Active Selected Category Focus Header */}
-              {(() => {
-                const activeTopic = studioTopics.find(t => t.id === serviceCategoryFilter);
-                if (activeTopic) {
+                {/* Compact Quick-Add Template Strip (Only when a specific category is selected) */}
+                {(() => {
+                  const activeTopic = studioTopics.find(t => t.id === serviceCategoryFilter);
+                  if (!activeTopic) return null;
                   const config = getCategoryConfig(activeTopic.id);
                   return (
-                    <div className="bg-gradient-to-br from-zinc-950 via-[#141414] to-stone-900 border border-luxury-gold/50 p-5 sm:p-6 rounded-2xl shadow-xl text-white space-y-5 relative overflow-hidden">
-                      {/* Subtle gold decorative glow */}
-                      <div className="absolute -top-16 -right-16 w-56 h-56 bg-luxury-gold/10 rounded-full blur-3xl pointer-events-none" />
-
-                      {/* Header Row */}
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
-                        <div className="flex items-start sm:items-center gap-3.5">
-                          <span className="text-3xl sm:text-4xl p-3 bg-white/10 rounded-xl backdrop-blur-sm border border-luxury-gold/40 shadow-md shrink-0">
-                            {activeTopic.icon || config.icon || '✨'}
-                          </span>
-                          <div>
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-luxury-gold bg-luxury-gold/15 px-2.5 py-0.5 rounded-full border border-luxury-gold/30">
-                                Atelier Category Focus
-                              </span>
-                              {activeTopic.badge && (
-                                <span className="text-[9px] uppercase font-bold bg-luxury-gold text-black px-2 py-0.5 rounded-md shadow-xs">
-                                  {activeTopic.badge}
-                                </span>
-                              )}
-                              <span className="text-[10px] text-gray-400">
-                                • {filteredServices.length} Published Subtopics
-                              </span>
-                            </div>
-                            <h3 className="text-lg sm:text-2xl font-serif font-bold text-white tracking-tight mt-1">
-                              {activeTopic.label || activeTopic.name}
-                            </h3>
-                            <p className="text-xs text-luxury-gold/90 font-medium italic mt-0.5">
-                              "{config.tagline || activeTopic.desc}"
-                            </p>
-                            <p className="text-xs text-gray-300 mt-1 max-w-2xl leading-relaxed">
-                              {config.description || activeTopic.desc}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                    <div className="pt-3 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-amber-50/60 -mx-4 sm:-mx-5 -mb-4 sm:-mb-5 px-4 sm:px-5 py-3 rounded-b-xl">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[11px] font-bold text-amber-900 flex items-center gap-1">
+                          <span>⚡ Quick Templates ({activeTopic.label || activeTopic.name}):</span>
+                        </span>
+                        {config.presets && config.presets.map((preset, idx) => (
                           <button
-                            onClick={() => handleOpenAddService(activeTopic.id)}
-                            className="px-4 py-2.5 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-md flex items-center gap-2 cursor-pointer active:scale-95"
+                            key={idx}
+                            type="button"
+                            onClick={() => handleOpenAddService(activeTopic.id, preset)}
+                            className="px-2.5 py-1 bg-white hover:bg-black hover:text-white text-gray-800 rounded-md border border-amber-200/80 text-[11px] font-medium flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer group"
                           >
-                            <FiPlus size={16} />
-                            <span>Create Subtopic Package</span>
+                            <span>+ {preset.title}</span>
+                            <span className="font-mono font-bold text-amber-700 group-hover:text-luxury-gold text-[10px]">{preset.price}</span>
                           </button>
-                          {studioTopics.length > 1 && (
-                            <button
-                              onClick={() => handleDeleteTopic(activeTopic.id)}
-                              className="p-2.5 text-gray-400 hover:text-rose-400 hover:bg-rose-950/40 border border-white/10 rounded-lg transition-colors cursor-pointer"
-                              title={`Delete topic "${activeTopic.label}"`}
-                            >
-                              <FiTrash2 size={16} />
-                            </button>
-                          )}
-                        </div>
+                        ))}
                       </div>
 
-                      {/* ⚡ One-Click Starter Packages Grid */}
-                      {config.presets && config.presets.length > 0 && (
-                        <div className="pt-3 border-t border-white/10 relative z-10 space-y-2.5">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold uppercase tracking-wider text-luxury-gold flex items-center gap-1.5">
-                              <span>⚡ One-Click Starter Packages (Vogue Luxury Presets)</span>
-                              <span className="text-[10px] text-gray-400 normal-case font-normal hidden sm:inline">— Click to instantly populate details & edit</span>
-                            </span>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {config.presets.map((preset, pIdx) => (
-                              <div
-                                key={pIdx}
-                                className="bg-white/5 hover:bg-white/10 border border-luxury-gold/30 hover:border-luxury-gold rounded-xl p-3.5 transition-all flex flex-col justify-between group shadow-sm"
-                              >
-                                <div className="space-y-2">
-                                  <div className="flex items-start justify-between gap-2">
-                                    <h4 className="font-serif font-bold text-white text-sm group-hover:text-luxury-gold transition-colors leading-snug">
-                                      {preset.title}
-                                    </h4>
-                                    <span className="text-xs font-mono font-bold text-luxury-gold bg-black/60 px-2 py-0.5 rounded border border-luxury-gold/30 shrink-0">
-                                      {preset.price}
-                                    </span>
-                                  </div>
-                                  <p className="text-[11px] text-gray-300 line-clamp-1">
-                                    {preset.subtitle}
-                                  </p>
-
-                                  <div className="flex flex-wrap gap-1 text-[10px] text-gray-400">
-                                    {preset.duration && (
-                                      <span className="bg-white/10 px-2 py-0.5 rounded text-amber-200">
-                                        ⏱️ {preset.duration}
-                                      </span>
-                                    )}
-                                    {preset.badge && (
-                                      <span className="bg-luxury-gold/20 text-luxury-gold px-1.5 py-0.5 rounded">
-                                        ★ {preset.badge}
-                                      </span>
-                                    )}
-                                  </div>
-
-                                  {/* Inclusions sample */}
-                                  <div className="space-y-0.5 pt-1 text-[11px] text-gray-300">
-                                    {(preset.features || []).slice(0, 3).map((feat, fIdx) => (
-                                      <div key={fIdx} className="flex items-center gap-1.5 truncate">
-                                        <span className="text-luxury-gold text-[10px]">✓</span>
-                                        <span className="truncate">{feat}</span>
-                                      </div>
-                                    ))}
-                                    {(preset.features || []).length > 3 && (
-                                      <span className="text-[10px] text-gray-400 block pt-0.5">
-                                        + {(preset.features || []).length - 3} more luxury inclusions...
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenAddService(activeTopic.id, preset)}
-                                  className="mt-3 w-full py-2 bg-luxury-gold/20 hover:bg-luxury-gold text-luxury-gold hover:text-black font-bold text-xs uppercase tracking-wider rounded-lg border border-luxury-gold/50 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
-                                >
-                                  <span>⚡ Use This Package</span>
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* ✨ Recommended Inclusions Chip Cloud */}
-                      {config.suggestedFeatures && config.suggestedFeatures.length > 0 && (
-                        <div className="pt-2 border-t border-white/10 relative z-10 flex flex-col sm:flex-row sm:items-center gap-2">
-                          <span className="text-[11px] uppercase tracking-wider font-bold text-gray-300 shrink-0 flex items-center gap-1">
-                            <span>✨ Suggested Inclusions:</span>
-                          </span>
-                          <div className="flex flex-wrap gap-1.5">
-                            {config.suggestedFeatures.map((feat, fIdx) => (
-                              <button
-                                key={fIdx}
-                                type="button"
-                                onClick={() => {
-                                  handleOpenAddService(activeTopic.id);
-                                  handleAddSuggestedFeature(feat);
-                                }}
-                                className="px-2.5 py-1 bg-white/10 hover:bg-luxury-gold hover:text-black text-gray-200 text-[10px] rounded-full border border-white/15 transition-all flex items-center gap-1 cursor-pointer"
-                                title="Click to create subtopic with this feature"
-                              >
-                                <span>+</span>
-                                <span>{feat}</span>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2 shrink-0">
+                        {studioTopics.length > 1 && (
+                          <button
+                            onClick={() => handleDeleteTopic(activeTopic.id)}
+                            className="text-[11px] text-gray-400 hover:text-rose-600 px-2 py-1 rounded transition-colors cursor-pointer flex items-center gap-1"
+                            title={`Delete "${activeTopic.label}" category`}
+                          >
+                            <FiTrash2 size={13} />
+                            <span>Delete Category</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   );
-                }
-                return (
-                  <div className="bg-gradient-to-r from-stone-900 via-zinc-900 to-stone-900 text-white p-5 rounded-2xl border border-luxury-gold/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
-                    <div>
-                      <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-luxury-gold block">
-                        All Studio Categories
-                      </span>
-                      <h3 className="text-base sm:text-xl font-serif font-bold text-white mt-1">
-                        Showing All {studioServices.length} Subtopics across {studioTopics.length} Main Topics
-                      </h3>
-                      <p className="text-xs text-gray-300 mt-1 max-w-xl">
-                        Click any category pill above to see curated Vogue presets, suggested inclusions, and add tailored packages for that shoot or bridal service.
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handleOpenAddService(studioTopics[0]?.id || 'PREWEDDING')}
-                      className="px-4 py-2.5 bg-luxury-gold hover:bg-[#dfb956] text-black text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-md flex items-center gap-2 shrink-0 cursor-pointer active:scale-95"
-                    >
-                      <FiPlus size={16} />
-                      <span>Create New Subtopic</span>
-                    </button>
-                  </div>
-                );
-              })()}
+                })()}
+              </div>
 
               {/* Service Cards Grid */}
               {filteredServices.length === 0 ? (
@@ -4244,70 +4056,36 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
         {isAddServiceOpen && (() => {
           const activeConfig = getCategoryConfig(serviceForm.type);
           return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-              <div className="bg-white max-w-2xl w-full p-5 sm:p-7 rounded-2xl shadow-2xl relative border border-luxury-gold/40 my-auto max-h-[92vh] overflow-y-auto">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-xs overflow-y-auto">
+              <div className="bg-white max-w-lg w-full p-5 sm:p-6 rounded-2xl shadow-2xl relative border border-gray-200 my-auto max-h-[92vh] overflow-y-auto">
                 <button
                   onClick={() => setIsAddServiceOpen(false)}
-                  className="absolute top-4 right-4 text-gray-400 hover:text-black p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer z-10"
+                  className="absolute top-4 right-4 text-gray-400 hover:text-black p-1.5 rounded-full hover:bg-gray-100 transition-colors cursor-pointer z-10"
                   aria-label="Close"
                 >
                   <FiX size={20} />
                 </button>
 
-                {/* Modal Header */}
-                <div className="flex items-start gap-3.5 mb-4 pr-10">
-                  <span className="p-3 bg-luxury-gold/20 text-luxury-gold rounded-xl border border-luxury-gold/40 text-2xl shrink-0 shadow-xs">
+                {/* Clean Header */}
+                <div className="flex items-center gap-3 mb-4 pr-8">
+                  <span className="p-2.5 bg-amber-50 text-amber-800 rounded-xl border border-amber-200 text-xl shrink-0">
                     {activeConfig.icon || '✨'}
                   </span>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] uppercase font-bold tracking-widest text-amber-900 bg-amber-100 px-2 py-0.5 rounded">
-                        {activeConfig.categoryTitle}
-                      </span>
-                      <span className="text-[10px] text-gray-400 font-medium">
-                        Atelier Studio Catalog
-                      </span>
-                    </div>
-                    <h3 className="text-lg sm:text-xl font-serif font-bold text-gray-900 leading-tight mt-0.5">
-                      {editingService ? `Edit Package: ${serviceForm.title || 'Subtopic'}` : `Create New ${activeConfig.categoryTitle} Package`}
+                    <h3 className="text-base sm:text-lg font-serif font-bold text-gray-900 leading-tight">
+                      {editingService ? 'Edit Package' : `Add ${activeConfig.categoryTitle} Package`}
                     </h3>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {activeConfig.tagline}
+                    <p className="text-xs text-gray-500">
+                      Pick a 1-click template below or fill in the package details
                     </p>
                   </div>
                 </div>
 
-                {/* ⚡ One-Click Preset Chips inside Modal */}
-                {activeConfig.presets && activeConfig.presets.length > 0 && !editingService && (
-                  <div className="mb-4 p-3 bg-amber-50/70 border border-luxury-gold/40 rounded-xl space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
-                        <span>⚡ 1-Click Quick Fill Presets:</span>
-                      </span>
-                      <span className="text-[10px] text-amber-800 italic">Click any preset to pre-fill all fields</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {activeConfig.presets.map((preset, pIdx) => (
-                        <button
-                          key={pIdx}
-                          type="button"
-                          onClick={() => handleApplyPreset(preset)}
-                          className="px-2.5 py-1.5 bg-white hover:bg-luxury-gold hover:text-black text-gray-800 rounded-lg border border-amber-200 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer group"
-                        >
-                          <span className="text-amber-600 group-hover:text-black">⚡</span>
-                          <span>{preset.title}</span>
-                          <span className="font-mono text-black font-bold text-[11px]">({preset.price})</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <form onSubmit={handleSaveService} className="space-y-4 text-xs">
-                  {/* Category Type Selector */}
+                <form onSubmit={handleSaveService} className="space-y-3.5 text-xs">
+                  {/* Category Selector */}
                   <div>
-                    <label className="font-semibold block mb-1 text-gray-800">
-                      Parent Category / Studio Pillar *
+                    <label className="font-semibold block mb-1 text-gray-700">
+                      Select Category
                     </label>
                     <select
                       value={serviceForm.type}
@@ -4318,10 +4096,10 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                           ...serviceForm,
                           type: e.target.value,
                           categoryLabel: selected ? (selected.label || selected.name) : e.target.value,
-                          location: newConfig.locationPlaceholder?.replace(/^e\.g\.\s*/, '') || serviceForm.location
+                          features: (newConfig.suggestedFeatures?.slice(0, 4) || []).join('\n')
                         });
                       }}
-                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white font-semibold text-xs shadow-2xs"
+                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-gray-50 font-semibold text-xs cursor-pointer"
                     >
                       {studioTopics.map(topic => (
                         <option key={topic.id} value={topic.id}>
@@ -4331,15 +4109,37 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                     </select>
                   </div>
 
-                  {/* Title and Subtitle */}
+                  {/* ⚡ 1-Click Ready Templates */}
+                  {activeConfig.presets && activeConfig.presets.length > 0 && !editingService && (
+                    <div className="p-2.5 bg-amber-50/70 border border-amber-200/80 rounded-xl space-y-1.5">
+                      <span className="text-[11px] font-bold text-amber-900 block">
+                        ⚡ 1-Click Auto-Fill Templates (Click to fill form):
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {activeConfig.presets.map((preset, pIdx) => (
+                          <button
+                            key={pIdx}
+                            type="button"
+                            onClick={() => handleApplyPreset(preset)}
+                            className="px-2.5 py-1.5 bg-white hover:bg-black hover:text-white text-gray-800 rounded-lg border border-amber-200 text-xs font-medium flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                          >
+                            <span>⚡ {preset.title}</span>
+                            <span className="font-mono font-bold text-amber-700 text-[11px]">({preset.price})</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 4 Essential Fields in a Clean 2x2 Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="font-semibold block mb-1 text-gray-800">
-                        Package Title / Service Name *
+                      <label className="font-semibold block mb-1 text-gray-700">
+                        Package Name *
                       </label>
                       <input
                         type="text"
-                        placeholder={`e.g. ${activeConfig.presets?.[0]?.title || 'Signature Luxury Experience'}`}
+                        placeholder={`e.g. ${activeConfig.presets?.[0]?.title || 'Royal Bridal Package'}`}
                         value={serviceForm.title}
                         onChange={(e) => setServiceForm({ ...serviceForm, title: e.target.value })}
                         required
@@ -4347,249 +4147,149 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                       />
                     </div>
                     <div>
-                      <label className="font-semibold block mb-1 text-gray-800">
-                        Editorial Subtitle / Tagline
+                      <label className="font-semibold block mb-1 text-gray-700">
+                        Short Highlight / Subtitle
                       </label>
                       <input
                         type="text"
-                        placeholder={`e.g. ${activeConfig.presets?.[0]?.subtitle || 'Exclusive Studio Session'}`}
+                        placeholder={`e.g. ${activeConfig.presets?.[0]?.subtitle || 'Complete Studio Session'}`}
                         value={serviceForm.subtitle}
                         onChange={(e) => setServiceForm({ ...serviceForm, subtitle: e.target.value })}
                         className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white"
                       />
                     </div>
-                  </div>
-
-                  {/* Price, Tailored Duration, Badge */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="font-semibold block mb-1 text-gray-800">
-                        Price / Investment
+                      <label className="font-semibold block mb-1 text-gray-700">
+                        Price / Rate
                       </label>
                       <input
                         type="text"
-                        placeholder={activeConfig.pricePlaceholder || 'e.g. ₹25,000 or Upon Request'}
+                        placeholder={activeConfig.pricePlaceholder || 'e.g. ₹25,000'}
                         value={serviceForm.price}
                         onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
                         className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white font-mono"
                       />
                     </div>
                     <div>
-                      <label className="font-semibold block mb-1 text-gray-800">
-                        {activeConfig.durationLabel || 'Duration / Schedule'}
+                      <label className="font-semibold block mb-1 text-gray-700">
+                        {activeConfig.durationLabel || 'Duration / Date'}
                       </label>
                       <input
                         type="text"
-                        placeholder={activeConfig.durationPlaceholder || 'e.g. 1 Full Day / By Appointment'}
+                        placeholder={activeConfig.durationPlaceholder || 'e.g. 1 Full Day'}
                         value={serviceForm.duration || serviceForm.date || ''}
                         onChange={(e) => setServiceForm({ ...serviceForm, duration: e.target.value, date: e.target.value })}
                         className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white"
                       />
                     </div>
-                    <div>
-                      <label className="font-semibold block mb-1 text-gray-800">
-                        Badge Highlight Tag
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Bestseller / Popular / Limited"
-                        value={serviceForm.badge}
-                        onChange={(e) => setServiceForm({ ...serviceForm, badge: e.target.value })}
-                        className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white"
-                      />
-                    </div>
                   </div>
 
-                  {/* Special Tailored Detail (Category-specific!) */}
+                  {/* Clickable Features & Inclusions */}
                   <div>
-                    <label className="font-semibold block mb-1 text-gray-800 flex items-center justify-between">
-                      <span>{activeConfig.specialDetailLabel || 'Special Inclusions & Highlights'}</span>
-                      <span className="text-[10px] text-gray-400 font-normal">Category Specific Feature</span>
+                    <label className="font-semibold block mb-1 text-gray-700">
+                      What's Included (Click tags below to add or type your own)
                     </label>
-                    <input
-                      type="text"
-                      placeholder={activeConfig.specialDetailPlaceholder || 'e.g. Vault Wardrobe Included'}
-                      value={serviceForm.specialDetail || ''}
-                      onChange={(e) => setServiceForm({ ...serviceForm, specialDetail: e.target.value })}
-                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white"
-                    />
-                  </div>
 
-                  {/* Location */}
-                  <div>
-                    <label className="font-semibold block mb-1 text-gray-800">
-                      Studio / Shoot Location
-                    </label>
-                    <input
-                      type="text"
-                      placeholder={activeConfig.locationPlaceholder || 'Delhi Flagship Atelier • Laxmi Nagar'}
-                      value={serviceForm.location}
-                      onChange={(e) => setServiceForm({ ...serviceForm, location: e.target.value })}
-                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white"
-                    />
-                  </div>
-
-                  {/* Photo Upload: File or URL */}
-                  <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-200 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="font-semibold text-gray-800">Cover Photo / Showcase Visual</label>
-                      <div className="flex gap-1 bg-white p-0.5 rounded-md border border-gray-200 shadow-2xs">
-                        <button
-                          type="button"
-                          onClick={() => setServicePhotoTab('FILE')}
-                          className={`px-2.5 py-1 text-[10px] font-bold rounded uppercase transition-colors cursor-pointer ${
-                            servicePhotoTab === 'FILE' ? 'bg-black text-white' : 'text-gray-500 hover:text-black'
-                          }`}
-                        >
-                          Upload File
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setServicePhotoTab('URL')}
-                          className={`px-2.5 py-1 text-[10px] font-bold rounded uppercase transition-colors cursor-pointer ${
-                            servicePhotoTab === 'URL' ? 'bg-black text-white' : 'text-gray-500 hover:text-black'
-                          }`}
-                        >
-                          Image URL
-                        </button>
-                      </div>
-                    </div>
-
-                    {servicePhotoTab === 'FILE' ? (
-                      <div>
-                        <label className="border-2 border-dashed border-gray-300 hover:border-black rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer bg-white transition-colors">
-                          {isUploadingServicePhoto ? (
-                            <div className="flex items-center gap-2 text-gray-500">
-                              <FiLoader className="animate-spin text-luxury-gold" size={18} />
-                              <span>Optimizing & compressing photo...</span>
-                            </div>
-                          ) : (
-                            <>
-                              <FiUploadCloud size={24} className="text-gray-400 mb-1" />
-                              <span className="font-semibold text-gray-700">Click to choose image file</span>
-                              <span className="text-[10px] text-gray-400 mt-0.5">JPG, PNG, WEBP automatically compressed</span>
-                            </>
-                          )}
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            disabled={isUploadingServicePhoto}
-                            onChange={handleServicePhotoFileChange}
-                          />
-                        </label>
-                      </div>
-                    ) : (
-                      <div>
-                        <input
-                          type="url"
-                          placeholder="https://images.unsplash.com/... or paste image link"
-                          value={serviceForm.image}
-                          onChange={(e) => setServiceForm({ ...serviceForm, image: e.target.value })}
-                          className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white font-mono text-xs"
-                        />
-                      </div>
-                    )}
-
-                    {/* Photo Preview */}
-                    {serviceForm.image && (
-                      <div className="flex items-center gap-3 pt-2">
-                        <img
-                          src={serviceForm.image}
-                          alt="Preview"
-                          className="w-16 h-16 object-cover rounded-lg border border-gray-300 shadow-xs"
-                        />
-                        <div className="flex-1 min-w-0 text-[11px] text-gray-500">
-                          <span className="text-emerald-700 font-semibold block">✓ Image ready</span>
-                          <span className="truncate block font-mono text-[10px]">{serviceForm.image.slice(0, 50)}...</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Description */}
-                  <div>
-                    <label className="font-semibold block mb-1 text-gray-800">
-                      Editorial Description & Details
-                    </label>
-                    <textarea
-                      rows={2}
-                      placeholder={activeConfig.presets?.[0]?.description || 'Details about this shoot package, event schedule, or service experience...'}
-                      value={serviceForm.description}
-                      onChange={(e) => setServiceForm({ ...serviceForm, description: e.target.value })}
-                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white text-xs leading-relaxed"
-                    />
-                  </div>
-
-                  {/* Clickable Suggested Features & Inclusions */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="font-semibold text-gray-800">
-                        Inclusions & Deliverables (One per line)
-                      </label>
-                      <span className="text-[10px] text-gray-500">
-                        {serviceForm.features ? `${serviceForm.features.split('\n').filter(Boolean).length} items added` : 'None added'}
-                      </span>
-                    </div>
-
-                    {/* Clickable Feature Suggestions Cloud */}
                     {activeConfig.suggestedFeatures && activeConfig.suggestedFeatures.length > 0 && (
-                      <div className="mb-2 p-2.5 bg-gray-50 border border-gray-200 rounded-lg">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-600 block mb-1.5">
-                          💡 Click to add suggested features for {activeConfig.categoryTitle}:
-                        </span>
-                        <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto">
-                          {activeConfig.suggestedFeatures.map((feat, fIdx) => (
-                            <button
-                              key={fIdx}
-                              type="button"
-                              onClick={() => handleAddSuggestedFeature(feat)}
-                              className="px-2.5 py-1 bg-white hover:bg-luxury-gold hover:text-black text-gray-700 rounded-full border border-gray-300 text-[11px] font-medium transition-all shadow-2xs flex items-center gap-1 cursor-pointer active:scale-95"
-                            >
-                              <span className="text-luxury-gold group-hover:text-black font-bold">+</span>
-                              <span>{feat}</span>
-                            </button>
-                          ))}
-                        </div>
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {activeConfig.suggestedFeatures.map((feat, fIdx) => (
+                          <button
+                            key={fIdx}
+                            type="button"
+                            onClick={() => handleAddSuggestedFeature(feat)}
+                            className="px-2 py-1 bg-gray-100 hover:bg-luxury-gold hover:text-black text-gray-700 rounded-md text-[11px] font-medium transition-colors flex items-center gap-1 cursor-pointer"
+                          >
+                            <span className="font-bold">+</span>
+                            <span>{feat}</span>
+                          </button>
+                        ))}
                       </div>
                     )}
 
                     <textarea
                       rows={3}
-                      placeholder={activeConfig.suggestedFeatures?.slice(0, 4).join('\n') || 'Enter package inclusions here...'}
+                      placeholder={activeConfig.suggestedFeatures?.slice(0, 3).join('\n') || 'One feature per line...'}
                       value={serviceForm.features}
                       onChange={(e) => setServiceForm({ ...serviceForm, features: e.target.value })}
-                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white text-xs font-mono"
+                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:border-black outline-none bg-white text-xs"
                     />
                   </div>
 
-                  {/* Active Switch */}
-                  <div className="flex items-center gap-2 pt-1">
-                    <input
-                      type="checkbox"
-                      id="isActiveCheckbox"
-                      checked={serviceForm.isActive}
-                      onChange={(e) => setServiceForm({ ...serviceForm, isActive: e.target.checked })}
-                      className="w-4 h-4 accent-luxury-gold cursor-pointer"
-                    />
-                    <label htmlFor="isActiveCheckbox" className="font-semibold text-gray-800 cursor-pointer text-xs">
-                      Active & visible on client website menu drawer
-                    </label>
+                  {/* Compact Photo Upload / Link */}
+                  <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="font-semibold text-gray-700">Package Cover Photo</label>
+                      <div className="flex gap-1 bg-white p-0.5 rounded border border-gray-200">
+                        <button
+                          type="button"
+                          onClick={() => setServicePhotoTab('FILE')}
+                          className={`px-2 py-0.5 text-[10px] font-bold rounded transition-colors cursor-pointer ${
+                            servicePhotoTab === 'FILE' ? 'bg-black text-white' : 'text-gray-500 hover:text-black'
+                          }`}
+                        >
+                          Upload Photo
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setServicePhotoTab('URL')}
+                          className={`px-2 py-0.5 text-[10px] font-bold rounded transition-colors cursor-pointer ${
+                            servicePhotoTab === 'URL' ? 'bg-black text-white' : 'text-gray-500 hover:text-black'
+                          }`}
+                        >
+                          Paste Link
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      {serviceForm.image && (
+                        <img
+                          src={serviceForm.image}
+                          alt="Preview"
+                          className="w-12 h-12 object-cover rounded-lg border border-gray-300 shrink-0"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        {servicePhotoTab === 'FILE' ? (
+                          <label className="border border-dashed border-gray-300 hover:border-black rounded-lg p-2.5 flex items-center justify-center gap-2 cursor-pointer bg-white transition-colors">
+                            <FiUploadCloud size={16} className="text-gray-500" />
+                            <span className="font-medium text-gray-700">
+                              {isUploadingServicePhoto ? 'Uploading...' : 'Choose image from device'}
+                            </span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              disabled={isUploadingServicePhoto}
+                              onChange={handleServicePhotoFileChange}
+                            />
+                          </label>
+                        ) : (
+                          <input
+                            type="url"
+                            placeholder="https://images.unsplash.com/..."
+                            value={serviceForm.image}
+                            onChange={(e) => setServiceForm({ ...serviceForm, image: e.target.value })}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:border-black outline-none bg-white text-xs"
+                          />
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Submit Buttons */}
-                  <div className="pt-3 flex flex-col sm:flex-row gap-2.5 border-t border-gray-200">
+                  <div className="pt-2 flex gap-2">
                     <button
                       type="submit"
-                      className="flex-1 py-3 bg-black hover:bg-luxury-gold hover:text-black text-white font-bold uppercase tracking-wider rounded-lg transition-colors shadow-md cursor-pointer text-xs flex items-center justify-center gap-2"
+                      className="flex-1 py-2.5 bg-black hover:bg-luxury-gold hover:text-black text-white font-bold uppercase tracking-wider rounded-lg transition-colors shadow-xs cursor-pointer text-xs flex items-center justify-center gap-1.5"
                     >
-                      <FiCheck size={16} />
-                      <span>{editingService ? 'Save Changes' : 'Publish Package to Studio'}</span>
+                      <FiCheck size={15} />
+                      <span>{editingService ? 'Save Changes' : 'Save Package'}</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsAddServiceOpen(false)}
-                      className="px-5 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium cursor-pointer text-xs"
+                      className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium cursor-pointer text-xs"
                     >
                       Cancel
                     </button>
