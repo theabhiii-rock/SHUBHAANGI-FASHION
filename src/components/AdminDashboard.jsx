@@ -594,9 +594,9 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                           </td>
                           <td className="px-4 py-3.5 font-bold text-gray-900 whitespace-nowrap">
                             <div>₹{order.amount.toLocaleString('en-IN')}</div>
-                            {order.razorpayPaymentId && (
+                            {(order.transactionId || order.razorpayPaymentId) && (
                               <span className="text-[9px] font-mono font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded inline-block mt-0.5">
-                                RZP: {order.razorpayPaymentId}
+                                TXN: {order.transactionId || order.razorpayPaymentId}
                               </span>
                             )}
                           </td>
@@ -714,9 +714,9 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
                         </td>
                         <td className="px-4 py-3.5 font-bold text-gray-900 whitespace-nowrap">
                           <div>₹{o.amount.toLocaleString('en-IN')}</div>
-                          {o.razorpayPaymentId && (
+                          {(o.transactionId || o.razorpayPaymentId) && (
                             <span className="text-[9px] font-mono font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded inline-block mt-0.5">
-                              RZP: {o.razorpayPaymentId}
+                              TXN: {o.transactionId || o.razorpayPaymentId}
                             </span>
                           )}
                         </td>

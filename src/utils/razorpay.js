@@ -1,9 +1,9 @@
 /**
- * Razorpay Standard Web Checkout Helper
+ * Online Payment Checkout Helper
  * Implements:
  * 1. Dynamic SDK script verification (https://checkout.razorpay.com/v1/checkout.js)
  * 2. Backend Order Creation (POST /api/create-order)
- * 3. Razorpay Modal Launch & Event Handling (modal.ondismiss, payment.failed)
+ * 3. Payment Modal Launch & Event Handling (modal.ondismiss, payment.failed)
  * 4. Backend HMAC-SHA256 Signature Verification (POST /api/verify-payment)
  * 5. Graceful fallback for static hosts (e.g., GitHub Pages) when /api/* returns 404/405
  */
@@ -24,7 +24,7 @@ export function loadRazorpayScript() {
 }
 
 /**
- * Initiates Razorpay Standard Checkout flow
+ * Initiates Online Payment Checkout flow
  */
 export async function initiateRazorpayPayment({
   amountInRupees,
@@ -39,17 +39,17 @@ export async function initiateRazorpayPayment({
   try {
     const keyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
     if (!keyId) {
-      throw new Error('Razorpay Key ID (VITE_RAZORPAY_KEY_ID) is not configured in environment variables.');
+      throw new Error('Online payment gateway is not configured. Please contact studio support.');
     }
 
     const amountInPaise = Math.round(Number(amountInRupees) * 100);
     if (!amountInPaise || amountInPaise < 100) {
-      throw new Error('Minimum payable amount must be at least ₹1.00 (100 paise).');
+      throw new Error('Minimum payable amount must be at least ₹1.00.');
     }
 
     const isScriptLoaded = await loadRazorpayScript();
     if (!isScriptLoaded || !window.Razorpay) {
-      throw new Error('Failed to load Razorpay Checkout SDK. Please check your internet connection.');
+      throw new Error('Failed to load secure payment gateway. Please check your internet connection.');
     }
 
     // STEP 1: Call Backend to Create Order (POST /api/create-order)
@@ -71,16 +71,15 @@ export async function initiateRazorpayPayment({
       if (contentType.includes('application/json')) {
         orderData = await orderRes.json();
         if (!orderRes.ok) {
-          throw new Error(orderData?.error || `Failed to create order (Status ${orderRes.status}).`);
+          throw new Error(orderData?.error || `Failed to initialize order (Status ${orderRes.status}).`);
         }
         if (orderData?.order_id) {
           useBackendOrder = true;
         }
       } else if (orderRes.status !== 404 && orderRes.status !== 405) {
-        throw new Error(`Unexpected response from /api/create-order (Status ${orderRes.status}).`);
+        throw new Error(`Unable to initialize payment order (Status ${orderRes.status}).`);
       }
     } catch (fetchErr) {
-      // Re-throw explicit API validation/auth errors (400/401/500)
       if (
         fetchErr.message &&
         !fetchErr.message.includes('Failed to fetch') &&
@@ -90,7 +89,7 @@ export async function initiateRazorpayPayment({
       }
     }
 
-    // STEP 2: Configure & Open Razorpay Standard Checkout Modal
+    // STEP 2: Configure & Open Payment Modal
     const options = {
       key: keyId,
       amount: useBackendOrder ? orderData.amount : amountInPaise,
@@ -109,7 +108,7 @@ export async function initiateRazorpayPayment({
       modal: {
         ondismiss: () => {
           if (onDismiss) {
-            onDismiss('Payment cancelled by user. You can complete your payment anytime.');
+            onDismiss('Payment was cancelled. Your outfits are still saved in your bag — you can retry anytime.');
           }
         }
       },
@@ -137,7 +136,7 @@ export async function initiateRazorpayPayment({
 
             if (!verifyRes.ok || !verifyData.verified) {
               if (onError) {
-                onError(verifyData?.error || 'Payment signature verification failed. Order not marked as paid.');
+                onError(verifyData?.error || 'Payment verification failed. Order not marked as paid.');
               }
               return;
             }
@@ -146,13 +145,13 @@ export async function initiateRazorpayPayment({
           if (onSuccess) {
             onSuccess({
               paymentId: razorpay_payment_id,
-              orderId: razorpay_order_id || receipt || `SHB_DIRECT_${Date.now()}`,
+              orderId: razorpay_order_id || receipt || `SHB_ONLINE_${Date.now()}`,
               signature: razorpay_signature || null
             });
           }
         } catch (verifyErr) {
           if (onError) {
-            onError(verifyErr.message || 'Error verifying payment signature with server.');
+            onError(verifyErr.message || 'Error verifying payment status.');
           }
         }
       }
@@ -165,7 +164,7 @@ export async function initiateRazorpayPayment({
       const errDesc =
         failureResponse?.error?.description ||
         failureResponse?.error?.reason ||
-        'Payment failed. Please try again with another payment method.';
+        'Payment could not be completed. Please try again with UPI, Card, or NetBanking.';
       if (onError) {
         onError(errDesc);
       }
@@ -174,7 +173,7 @@ export async function initiateRazorpayPayment({
     rzp.open();
   } catch (err) {
     if (onError) {
-      onError(err.message || 'Unable to initiate Razorpay checkout.');
+      onError(err.message || 'Unable to start online payment.');
     }
   }
 }
