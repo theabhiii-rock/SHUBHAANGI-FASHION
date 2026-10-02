@@ -6,20 +6,24 @@
  * - Automatically extracts a cover frame thumbnail and duration from uploaded videos
  */
 
-const IDB_NAME = 'shubhaangi_media_vault_v1';
+const IDB_NAME = 'shubhaangi_media_vault_v2';
 const IDB_STORE = 'videos';
+const IDB_VAULT_STORE = 'app_vault';
 
-function openVideoDB() {
+export function openShubhaangiDB() {
   return new Promise((resolve, reject) => {
     if (typeof indexedDB === 'undefined') {
       reject(new Error('IndexedDB not supported'));
       return;
     }
-    const req = indexedDB.open(IDB_NAME, 1);
+    const req = indexedDB.open(IDB_NAME, 2);
     req.onupgradeneeded = (e) => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains(IDB_STORE)) {
         db.createObjectStore(IDB_STORE);
+      }
+      if (!db.objectStoreNames.contains(IDB_VAULT_STORE)) {
+        db.createObjectStore(IDB_VAULT_STORE);
       }
     };
     req.onsuccess = () => resolve(req.result);
@@ -27,13 +31,55 @@ function openVideoDB() {
   });
 }
 
-export function compressImageFile(file, maxWidthOrOpts = 1200, qualityArg = 0.84) {
+function openVideoDB() {
+  return openShubhaangiDB();
+}
+
+/**
+ * Saves arbitrary serializable data (products, services) to IndexedDB
+ */
+export async function saveToVault(key, value) {
+  try {
+    const db = await openShubhaangiDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_VAULT_STORE, 'readwrite');
+      const store = tx.objectStore(IDB_VAULT_STORE);
+      store.put(value, key);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (err) {
+    console.warn('IDB Vault write error:', err);
+    return false;
+  }
+}
+
+/**
+ * Reads arbitrary serializable data from IndexedDB
+ */
+export async function getFromVault(key) {
+  try {
+    const db = await openShubhaangiDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(IDB_VAULT_STORE, 'readonly');
+      const store = tx.objectStore(IDB_VAULT_STORE);
+      const req = store.get(key);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => resolve(null);
+    });
+  } catch (err) {
+    console.warn('IDB Vault read error:', err);
+    return null;
+  }
+}
+
+export function compressImageFile(file, maxWidthOrOpts = 900, qualityArg = 0.76) {
   const maxWidth = typeof maxWidthOrOpts === 'object' && maxWidthOrOpts !== null
-    ? (maxWidthOrOpts.maxWidth || 1200)
-    : (Number(maxWidthOrOpts) || 1200);
+    ? (maxWidthOrOpts.maxWidth || 900)
+    : (Number(maxWidthOrOpts) || 900);
   const quality = typeof maxWidthOrOpts === 'object' && maxWidthOrOpts !== null
-    ? (maxWidthOrOpts.quality || 0.84)
-    : (Number(qualityArg) || 0.84);
+    ? (maxWidthOrOpts.quality || 0.76)
+    : (Number(qualityArg) || 0.76);
 
   return new Promise((resolve, reject) => {
     if (!file) {

@@ -543,9 +543,18 @@ function SmartVideoPlayer({ videoUrl, poster, className = 'w-full h-full object-
   );
 }
 
-export default function AdminDashboard({ onBackToStore, onLogout }) {
+export default function AdminDashboard({ 
+  onBackToStore, 
+  onLogout,
+  products: propProducts,
+  setProducts: propSetProducts,
+  studioServices: propStudioServices,
+  setStudioServices: propSetStudioServices,
+  studioTopics: propStudioTopics,
+  setStudioTopics: propSetStudioTopics
+}) {
   const [orders, setOrders] = useState(() => getStoredOrders());
-  const [products, setProducts] = useState(() => getStoredProducts());
+  const [products, setProducts] = useState(() => (Array.isArray(propProducts) && propProducts.length > 0) ? propProducts : getStoredProducts());
   const [visitors] = useState(() => getVisitorCount());
   const [activeTab, setActiveTab] = useState('OVERVIEW'); // 'OVERVIEW' | 'OFFLINE_ORDERS' | 'STUDIO_SERVICES' | 'RENTALS' | 'ORDERS' | 'INVENTORY' | 'COUPONS' | 'NEWSLETTER'
   const [editingProduct, setEditingProduct] = useState(null);
@@ -557,8 +566,51 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Shoots, Events & Studio Experiences State
-  const [studioTopics, setStudioTopics] = useState(() => getStoredStudioTopics());
-  const [studioServices, setStudioServices] = useState(() => getStoredStudioServices());
+  const [studioTopics, setStudioTopics] = useState(() => (Array.isArray(propStudioTopics) && propStudioTopics.length > 0) ? propStudioTopics : getStoredStudioTopics());
+  const [studioServices, setStudioServices] = useState(() => (Array.isArray(propStudioServices) && propStudioServices.length > 0) ? propStudioServices : getStoredStudioServices());
+
+  // Real-time synchronization with parent App state
+  useEffect(() => {
+    if (propProducts && Array.isArray(propProducts)) {
+      setProducts(propProducts);
+    }
+  }, [propProducts]);
+
+  useEffect(() => {
+    if (propStudioServices && Array.isArray(propStudioServices)) {
+      setStudioServices(propStudioServices);
+    }
+  }, [propStudioServices]);
+
+  useEffect(() => {
+    if (propStudioTopics && Array.isArray(propStudioTopics)) {
+      setStudioTopics(propStudioTopics);
+    }
+  }, [propStudioTopics]);
+
+  const updateProducts = (updated) => {
+    setProducts(updated);
+    if (typeof propSetProducts === 'function') {
+      propSetProducts(updated);
+    }
+    saveProducts(updated);
+  };
+
+  const updateStudioServices = (updated) => {
+    setStudioServices(updated);
+    if (typeof propSetStudioServices === 'function') {
+      propSetStudioServices(updated);
+    }
+    saveStudioServices(updated);
+  };
+
+  const updateStudioTopics = (updated) => {
+    setStudioTopics(updated);
+    if (typeof propSetStudioTopics === 'function') {
+      propSetStudioTopics(updated);
+    }
+    saveStudioTopics(updated);
+  };
   const [isAddServiceOpen, setIsAddServiceOpen] = useState(false);
   const [isAddTopicOpen, setIsAddTopicOpen] = useState(false);
   const [newTopicForm, setNewTopicForm] = useState({ id: '', label: '', icon: '📸', desc: '', badge: '' });
@@ -790,8 +842,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       }
       return s;
     });
-    setStudioServices(updated);
-    saveStudioServices(updated);
+    updateStudioServices(updated);
     const item = updated.find(s => s.id === serviceId);
     showToast(`${item.isActive ? '👁️ Activated' : '🔒 Hidden'}: "${item.title}"`);
   };
@@ -800,8 +851,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
     const item = studioServices.find(s => s.id === serviceId);
     if (!window.confirm(`Are you sure you want to delete "${item?.title || 'this entry'}"? This cannot be undone.`)) return;
     const updated = studioServices.filter(s => s.id !== serviceId);
-    setStudioServices(updated);
-    saveStudioServices(updated);
+    updateStudioServices(updated);
     showToast(`🗑️ Deleted: "${item?.title || 'Service entry'}"`);
   };
 
@@ -971,8 +1021,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
         }
         return s;
       });
-      setStudioServices(updated);
-      saveStudioServices(updated);
+      updateStudioServices(updated);
       showToast(`✨ Updated: "${serviceForm.title}"`);
     } else {
       const newEntry = {
@@ -988,8 +1037,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
         features: featureList
       };
       const updated = [newEntry, ...studioServices];
-      setStudioServices(updated);
-      saveStudioServices(updated);
+      updateStudioServices(updated);
       showToast(`🎉 Published to ${categoryLabel}: "${serviceForm.title}"`);
     }
 
@@ -1022,8 +1070,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
     };
 
     const updated = [...studioTopics, newTopic];
-    setStudioTopics(updated);
-    saveStudioTopics(updated);
+    updateStudioTopics(updated);
     setIsAddTopicOpen(false);
     setNewTopicForm({ id: '', label: '', icon: '📸', desc: '', badge: '' });
     setServiceCategoryFilter(newTopic.id);
@@ -1040,8 +1087,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       return;
     }
     const updated = studioTopics.filter(t => t.id !== topicId);
-    setStudioTopics(updated);
-    saveStudioTopics(updated);
+    updateStudioTopics(updated);
     if (serviceCategoryFilter === topicId) {
       setServiceCategoryFilter('ALL');
     }
@@ -1199,8 +1245,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       }
       return p;
     });
-    setProducts(updated);
-    saveProducts(updated);
+    updateProducts(updated);
     setEditingProduct(null);
     showToast(`✅ Pricing updated and synchronized live with storefront!`);
   };
@@ -1210,7 +1255,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
     if (!file) return;
     try {
       setIsUploadingCover(true);
-      const compressedDataUrl = await compressImageFile(file, 1200, 0.84);
+      const compressedDataUrl = await compressImageFile(file, 900, 0.76);
       setNewProd(prev => ({ ...prev, img: compressedDataUrl }));
       showToast('✅ Cover photo loaded from your device!');
     } catch (err) {
@@ -1227,7 +1272,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
     try {
       setIsUploadingGallery(true);
       const compressedList = await Promise.all(
-        files.map(f => compressImageFile(f, 1200, 0.84))
+        files.map(f => compressImageFile(f, 900, 0.76))
       );
       setExtraPhotosList(prev => [...prev, ...compressedList]);
       showToast(`✅ Added ${compressedList.length} angle photo(s) from your device!`);
@@ -1248,7 +1293,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
     if (!file || !photoManagerProduct) return;
     try {
       setIsUploadingManagerPhoto(true);
-      const compressedDataUrl = await compressImageFile(file, 1200, 0.84);
+      const compressedDataUrl = await compressImageFile(file, 900, 0.76);
       handleAddPhotoToProduct(photoManagerProduct.id, compressedDataUrl);
       showToast('✅ New photo uploaded to gallery!');
     } catch (err) {
@@ -1276,26 +1321,37 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
     const primaryImg = newProd.img.trim() || allExtra[0] || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=1000';
     const allImages = [primaryImg, ...allExtra.filter(url => url !== primaryImg)];
 
+    const rawCategory = (newProd.category || 'DRESS').toUpperCase();
+    const category = (rawCategory === 'JEWELLERY' || rawCategory === 'MAKEUP') ? rawCategory : 'DRESS';
+    const subCategory = category === 'JEWELLERY'
+      ? 'Royal Jewellery'
+      : (category === 'MAKEUP' ? 'Bridal Makeup' : 'Bridal Lehenga / Saree');
+
     const created = {
       id: Date.now(),
       name: newProd.name.trim(),
-      category: newProd.category,
+      category,
+      subCategory,
       buyPrice: Number(newProd.buyPrice),
       rentPrice3Days: newProd.rentPrice3Days ? Number(newProd.rentPrice3Days) : null,
       rentPrice7Days: newProd.rentPrice7Days ? Number(newProd.rentPrice7Days) : null,
       deposit: newProd.deposit ? Number(newProd.deposit) : 0,
-      isRentalAvailable: newProd.isRentalAvailable,
-      description: 'Handcrafted luxury bridal ensemble designed exclusively for the modern Indian bride.',
-      fabric: 'Pure Raw Silk & Fine Organza',
+      isRentalAvailable: Boolean(newProd.isRentalAvailable),
+      description: newProd.description?.trim() || 'Handcrafted luxury bridal ensemble designed exclusively for the modern Indian bride.',
+      fabric: newProd.fabric?.trim() || 'Pure Raw Silk & Fine Organza',
+      color: newProd.color?.trim() || 'Bridal Couture',
       img: primaryImg,
       images: allImages,
       availableSizes: ['FREE SIZE'],
-      isFeatured: true
+      isFeatured: true,
+      rating: 5.0,
+      reviewCount: 1,
+      reviewsCount: 1,
+      isNewlyAdded: true
     };
 
     const updated = [created, ...products];
-    setProducts(updated);
-    saveProducts(updated);
+    updateProducts(updated);
     setIsAddProductOpen(false);
     setNewProd({
       name: '',
@@ -1312,7 +1368,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
     setCoverPhotoTab('FILE');
     broadcastNewDressAlert(created);
     const subCount = getStoredSubscribers().length;
-    showToast(`🔔 Added "${created.name}" & sent instant Push Notification to ${subCount} VIP Subscribers!`);
+    showToast(`🔔 Published "${created.name}" live to Storefront!`, () => onBackToStore && onBackToStore(category));
   };
 
   const handleAddPhotoToProduct = (productId, photoUrl) => {
@@ -1330,8 +1386,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       }
       return p;
     });
-    setProducts(updated);
-    saveProducts(updated);
+    updateProducts(updated);
     const updatedProd = updated.find(p => p.id === productId);
     setPhotoManagerProduct(updatedProd);
     setNewPhotoUrlInput('');
@@ -1361,8 +1416,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       }
       return p;
     });
-    setProducts(updated);
-    saveProducts(updated);
+    updateProducts(updated);
     const updatedProd = updated.find(p => p.id === productId);
     setPhotoManagerProduct(updatedProd);
     showToast(`🗑️ Photo removed from gallery.`);
@@ -1381,8 +1435,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       }
       return p;
     });
-    setProducts(updated);
-    saveProducts(updated);
+    updateProducts(updated);
     const updatedProd = updated.find(p => p.id === productId);
     setPhotoManagerProduct(updatedProd);
     showToast(`⭐ Primary cover photo updated!`);
@@ -1395,8 +1448,7 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
       }
       return p;
     });
-    setProducts(updated);
-    saveProducts(updated);
+    updateProducts(updated);
     showToast(`✅ Rental availability updated.`);
   };
 
@@ -1522,13 +1574,25 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
             <span className="text-[9px] text-luxury-gold uppercase tracking-widest block font-medium">Studio OS</span>
           </div>
         </div>
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 text-gray-300 hover:text-white rounded-md hover:bg-white/10 transition-colors"
-          aria-label="Toggle navigation menu"
-        >
-          {mobileMenuOpen ? <FiX size={22} /> : <FiMenu size={22} />}
-        </button>
+        <div className="flex items-center gap-2">
+          {onBackToStore && (
+            <button
+              onClick={() => onBackToStore()}
+              className="px-2.5 py-1 bg-luxury-gold text-black rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm"
+              title="Go to Live Storefront"
+            >
+              <FiEye size={12} />
+              <span>Store</span>
+            </button>
+          )}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 text-gray-300 hover:text-white rounded-md hover:bg-white/10 transition-colors"
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+          </button>
+        </div>
       </div>
 
       {/* Desktop & Mobile Sidebar Drawer */}
@@ -1577,7 +1641,18 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            <span className="text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full flex items-center gap-1.5 font-medium shadow-xs">
+            {onBackToStore && (
+              <button
+                onClick={() => onBackToStore()}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-black hover:bg-zinc-800 text-white border border-luxury-gold/70 hover:border-luxury-gold rounded-md text-xs font-bold tracking-wider uppercase transition-all shadow-md cursor-pointer hover:scale-[1.02]"
+                title="Go to Live Storefront where clients view and order pieces"
+              >
+                <FiEye className="text-luxury-gold" size={15} />
+                <span>View Storefront</span>
+              </button>
+            )}
+
+            <span className="hidden sm:inline-flex text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full items-center gap-1.5 font-medium shadow-xs">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               Live Storefront Connected
             </span>
@@ -1586,9 +1661,19 @@ export default function AdminDashboard({ onBackToStore, onLogout }) {
 
         {/* Toast Notification */}
         {notification && (
-          <div className="mx-4 sm:mx-6 lg:mx-8 mt-4 p-3 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-md text-xs font-medium flex items-center gap-2 shadow-sm animate-fade-in">
-            <FiCheck className="text-emerald-600 shrink-0" size={16} />
-            <span className="flex-1">{notification}</span>
+          <div className="mx-4 sm:mx-6 lg:mx-8 mt-4 p-3 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-md text-xs font-medium flex items-center justify-between gap-3 shadow-sm animate-fade-in">
+            <div className="flex items-center gap-2 min-w-0">
+              <FiCheck className="text-emerald-600 shrink-0" size={16} />
+              <span className="truncate">{notification}</span>
+            </div>
+            {onBackToStore && (
+              <button
+                onClick={() => onBackToStore()}
+                className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-[10px] font-bold uppercase tracking-wider shrink-0 transition-colors cursor-pointer shadow-xs"
+              >
+                View on Storefront →
+              </button>
+            )}
           </div>
         )}
 

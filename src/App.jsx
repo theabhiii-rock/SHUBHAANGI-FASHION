@@ -10,7 +10,8 @@ import Lenis from '@studio-freight/lenis';
 import { 
   getStoredProducts, getVisitorCount, 
   getStoredWishlist, saveWishlist, getStoredOrders,
-  getStoredOfferBanner, getStoredStudioServices, getStoredStudioTopics
+  getStoredOfferBanner, getStoredStudioServices, getStoredStudioTopics,
+  hydrateProductsFromVault
 } from './data/store';
 import { openProductWhatsAppChat } from './utils/whatsapp';
 import ProductDetailModal from './components/ProductDetailModal';
@@ -115,6 +116,10 @@ export default function App() {
         }
       } else {
         setCurrentView('store');
+        // Refresh products and studio data whenever returning to store
+        setProducts(getStoredProducts());
+        setStudioServices(getStoredStudioServices());
+        setStudioTopics(getStoredStudioTopics());
       }
     };
 
@@ -135,6 +140,79 @@ export default function App() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isAuthenticated]);
+
+  // Real-time synchronization (IndexedDB vault hydration + window events + cross-tab BroadcastChannel)
+  useEffect(() => {
+    // 1. Hydrate from IndexedDB vault in background
+    hydrateProductsFromVault((vaultProducts) => {
+      if (Array.isArray(vaultProducts) && vaultProducts.length > 0) {
+        setProducts(vaultProducts);
+      }
+    });
+
+    // 2. Real-time window & cross-tab events
+    const handleProductsUpdated = (e) => {
+      if (e?.detail && Array.isArray(e.detail)) {
+        setProducts(e.detail);
+      } else {
+        setProducts(getStoredProducts());
+      }
+    };
+    const handleServicesUpdated = (e) => {
+      if (e?.detail && Array.isArray(e.detail)) {
+        setStudioServices(e.detail);
+      } else {
+        setStudioServices(getStoredStudioServices());
+      }
+    };
+    const handleTopicsUpdated = (e) => {
+      if (e?.detail && Array.isArray(e.detail)) {
+        setStudioTopics(e.detail);
+      } else {
+        setStudioTopics(getStoredStudioTopics());
+      }
+    };
+    const handleStorage = (e) => {
+      if (e.key === 'shubhaangi_products_v4') {
+        setProducts(getStoredProducts());
+      }
+      if (e.key === 'shubhaangi_studio_services_v1') {
+        setStudioServices(getStoredStudioServices());
+      }
+      if (e.key === 'shubhaangi_studio_topics_v1') {
+        setStudioTopics(getStoredStudioTopics());
+      }
+    };
+
+    window.addEventListener('shubhaangi_products_updated', handleProductsUpdated);
+    window.addEventListener('shubhaangi_services_updated', handleServicesUpdated);
+    window.addEventListener('shubhaangi_topics_updated', handleTopicsUpdated);
+    window.addEventListener('storage', handleStorage);
+
+    let bc;
+    try {
+      bc = new BroadcastChannel('shubhaangi_sync');
+      bc.onmessage = (msg) => {
+        if (msg.data?.type === 'PRODUCTS_UPDATED') {
+          setProducts(msg.data.products);
+        }
+        if (msg.data?.type === 'SERVICES_UPDATED') {
+          setStudioServices(msg.data.services);
+        }
+        if (msg.data?.type === 'TOPICS_UPDATED') {
+          setStudioTopics(msg.data.topics);
+        }
+      };
+    } catch {}
+
+    return () => {
+      window.removeEventListener('shubhaangi_products_updated', handleProductsUpdated);
+      window.removeEventListener('shubhaangi_services_updated', handleServicesUpdated);
+      window.removeEventListener('shubhaangi_topics_updated', handleTopicsUpdated);
+      window.removeEventListener('storage', handleStorage);
+      if (bc) bc.close();
+    };
+  }, []);
 
   // Track visitors once on mount
   useEffect(() => {
@@ -258,13 +336,28 @@ export default function App() {
   if (currentView === 'admin' && isAuthenticated) {
     return (
       <AdminDashboard 
-        onBackToStore={() => {
+        products={products}
+        setProducts={setProducts}
+        studioServices={studioServices}
+        setStudioServices={setStudioServices}
+        studioTopics={studioTopics}
+        setStudioTopics={setStudioTopics}
+        onBackToStore={(targetCategory) => {
+          if (targetCategory) {
+            setActiveTab(targetCategory);
+          } else {
+            setActiveTab('ALL'); // Default to ALL so newly added products are guaranteed visible
+          }
           setProducts(getStoredProducts());
           setOfferBanner(getStoredOfferBanner());
           setStudioServices(getStoredStudioServices());
           setStudioTopics(getStoredStudioTopics());
           setCurrentView('store');
           window.location.hash = '';
+          setTimeout(() => {
+            const el = document.getElementById('catalog');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }, 150);
         }}
         onLogout={() => {
           setIsAuthenticated(false);
@@ -712,13 +805,13 @@ export default function App() {
         <OccasionFilter
           activeTab={activeTab}
           onSelectTab={setActiveTab}
-          totalCount={products.filter(p => activeTab === 'ALL' || p.category === activeTab).length}
+          totalCount={products.filter(p => activeTab === 'ALL' || (p.category || '').toUpperCase() === activeTab).length}
           sortBy={sortBy}
           onSortChange={setSortBy}
           categoryCounts={{
-            DRESS: products.filter(p => p.category === 'DRESS').length,
-            JEWELLERY: products.filter(p => p.category === 'JEWELLERY').length,
-            MAKEUP: products.filter(p => p.category === 'MAKEUP').length,
+            DRESS: products.filter(p => (p.category || '').toUpperCase() === 'DRESS').length,
+            JEWELLERY: products.filter(p => (p.category || '').toUpperCase() === 'JEWELLERY').length,
+            MAKEUP: products.filter(p => (p.category || '').toUpperCase() === 'MAKEUP').length,
             ALL: products.length,
           }}
         />
@@ -732,7 +825,7 @@ export default function App() {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-14 mb-28"
         >
           {products
-            .filter(p => activeTab === 'ALL' || p.category === activeTab)
+            .filter(p => activeTab === 'ALL' || (p.category || '').toUpperCase() === activeTab)
             .sort((a, b) => {
               if (sortBy === 'PRICE_LOW') {
                 const priceA = a.rentPrice3Days || a.buyPrice;
@@ -770,6 +863,11 @@ export default function App() {
                     
                     {/* Rental Available Badge & Photos Badge */}
                     <div className="absolute top-3 left-3 flex flex-col gap-1.5 pointer-events-none">
+                      {(product.isNewlyAdded || (typeof product.id === 'number' && Date.now() - product.id < 172800000)) && (
+                        <span className="bg-amber-400 text-black text-[9px] tracking-widest uppercase px-2.5 py-0.5 font-extrabold shadow-md animate-pulse">
+                          ✦ New Arrival
+                        </span>
+                      )}
                       {isRental ? (
                         <span className="bg-black/90 backdrop-blur text-luxury-gold text-[9px] tracking-widest uppercase px-2.5 py-1 font-semibold shadow-md">
                           Rent & Buy

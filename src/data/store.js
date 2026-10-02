@@ -1,3 +1,5 @@
+import { saveToVault, getFromVault } from '../utils/imageUpload.js';
+
 // Initial catalog with Buy and Rent pricing
 export const INITIAL_PRODUCTS = [
   {
@@ -507,11 +509,15 @@ export const getStoredProducts = () => {
     const data = localStorage.getItem('shubhaangi_products_v4');
     if (data) {
       const parsed = JSON.parse(data);
-      // Ensure all items have valid images array
+      // Ensure all items have valid fields and images array
       return parsed.map(p => {
         const init = INITIAL_PRODUCTS.find(ip => ip.id === p.id);
+        const category = (p.category || 'DRESS').toUpperCase();
         return {
           ...p,
+          category,
+          subCategory: p.subCategory || (category === 'JEWELLERY' ? 'Royal Jewellery' : (category === 'MAKEUP' ? 'Bridal Makeup' : 'Bridal Lehenga / Saree')),
+          isRentalAvailable: p.isRentalAvailable ?? true,
           images: (p.images && p.images.length > 0) ? p.images : (init?.images || [p.img].filter(Boolean))
         };
       });
@@ -523,27 +529,97 @@ export const getStoredProducts = () => {
       const parsed = JSON.parse(oldData);
       const migrated = parsed.map(p => {
         const init = INITIAL_PRODUCTS.find(ip => ip.id === p.id);
+        const category = (p.category || 'DRESS').toUpperCase();
         return {
           ...p,
+          category,
+          subCategory: p.subCategory || (category === 'JEWELLERY' ? 'Royal Jewellery' : (category === 'MAKEUP' ? 'Bridal Makeup' : 'Bridal Lehenga / Saree')),
+          isRentalAvailable: p.isRentalAvailable ?? true,
           images: (p.images && p.images.length > 0) ? p.images : (init?.images || [p.img].filter(Boolean))
         };
       });
-      localStorage.setItem('shubhaangi_products_v4', JSON.stringify(migrated));
+      try {
+        localStorage.setItem('shubhaangi_products_v4', JSON.stringify(migrated));
+        localStorage.removeItem('shubhaangi_products_v3');
+      } catch {}
       return migrated;
     }
 
     return INITIAL_PRODUCTS;
   } catch (e) {
-    console.warn(e);
+    console.warn('Error reading stored products:', e);
     return INITIAL_PRODUCTS;
   }
 };
 
-export const saveProducts = (products) => {
+/**
+ * Hydrates products from high-capacity IndexedDB vault in background
+ */
+export async function hydrateProductsFromVault(onHydrated) {
   try {
-    localStorage.setItem('shubhaangi_products_v4', JSON.stringify(products));
+    const vaultProducts = await getFromVault('products');
+    if (Array.isArray(vaultProducts) && vaultProducts.length > 0) {
+      const current = getStoredProducts();
+      // If vault has more products or newer products, sync and notify
+      if (vaultProducts.length >= current.length) {
+        try {
+          localStorage.setItem('shubhaangi_products_v4', JSON.stringify(vaultProducts));
+        } catch {}
+        if (typeof onHydrated === 'function') {
+          onHydrated(vaultProducts);
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Vault hydration skipped:', err);
+  }
+}
+
+export const saveProducts = (products) => {
+  if (!Array.isArray(products)) return;
+  try {
+    // 1. Clean legacy keys to free browser storage
+    try {
+      localStorage.removeItem('shubhaangi_products_v3');
+      localStorage.removeItem('shubhaangi_products_v2');
+      localStorage.removeItem('shubhaangi_products');
+    } catch {}
+
+    // 2. Save to localStorage with graceful quota fallback
+    try {
+      localStorage.setItem('shubhaangi_products_v4', JSON.stringify(products));
+    } catch (quotaErr) {
+      console.warn('LocalStorage quota limit reached, saving optimized version...', quotaErr);
+      // If quota exceeded, create an optimized version for localStorage
+      const optimized = products.map(p => {
+        const isBigImg = typeof p.img === 'string' && p.img.length > 200000;
+        return {
+          ...p,
+          img: isBigImg ? p.img.slice(0, 80000) : p.img,
+          images: (p.images || []).map(img => (typeof img === 'string' && img.length > 200000 ? img.slice(0, 80000) : img))
+        };
+      });
+      try {
+        localStorage.setItem('shubhaangi_products_v4', JSON.stringify(optimized));
+      } catch (innerErr) {
+        console.warn('Emergency storage compression applied:', innerErr);
+      }
+    }
+
+    // 3. Save full uncompromised catalog to IndexedDB vault
+    saveToVault('products', products).catch(err => console.warn('IDB products vault save skipped:', err));
+
+    // 4. Dispatch real-time window & broadcast events for instant zero-refresh UI sync
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('shubhaangi_products_updated', { detail: products }));
+      try {
+        const bc = new BroadcastChannel('shubhaangi_sync');
+        bc.postMessage({ type: 'PRODUCTS_UPDATED', products });
+        bc.close();
+      } catch {}
+    }
   } catch (e) {
-    console.error(e);
+    console.error('Failed to save products:', e);
   }
 };
 
@@ -965,8 +1041,18 @@ export const getStoredStudioTopics = () => {
 };
 
 export const saveStudioTopics = (topics) => {
+  if (!Array.isArray(topics)) return;
   try {
     localStorage.setItem('shubhaangi_studio_topics_v1', JSON.stringify(topics));
+    saveToVault('studio_topics', topics).catch(err => console.warn('IDB topics vault save skipped:', err));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('shubhaangi_topics_updated', { detail: topics }));
+      try {
+        const bc = new BroadcastChannel('shubhaangi_sync');
+        bc.postMessage({ type: 'TOPICS_UPDATED', topics });
+        bc.close();
+      } catch {}
+    }
   } catch (e) {
     console.error(e);
   }
@@ -999,8 +1085,22 @@ export const getStoredStudioServices = () => {
 };
 
 export const saveStudioServices = (services) => {
+  if (!Array.isArray(services)) return;
   try {
-    localStorage.setItem('shubhaangi_studio_services_v1', JSON.stringify(services));
+    try {
+      localStorage.setItem('shubhaangi_studio_services_v1', JSON.stringify(services));
+    } catch (quotaErr) {
+      console.warn('LocalStorage quota in services, using compact storage:', quotaErr);
+    }
+    saveToVault('studio_services', services).catch(err => console.warn('IDB services vault save skipped:', err));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('shubhaangi_services_updated', { detail: services }));
+      try {
+        const bc = new BroadcastChannel('shubhaangi_sync');
+        bc.postMessage({ type: 'SERVICES_UPDATED', services });
+        bc.close();
+      } catch {}
+    }
   } catch (e) {
     console.error(e);
   }
