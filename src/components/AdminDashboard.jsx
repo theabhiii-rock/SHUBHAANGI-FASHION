@@ -551,7 +551,9 @@ export default function AdminDashboard({
   studioServices: propStudioServices,
   setStudioServices: propSetStudioServices,
   studioTopics: propStudioTopics,
-  setStudioTopics: propSetStudioTopics
+  setStudioTopics: propSetStudioTopics,
+  offerBanner: propOfferBanner,
+  setOfferBanner: propSetOfferBanner
 }) {
   const [orders, setOrders] = useState(() => getStoredOrders());
   const [products, setProducts] = useState(() => (Array.isArray(propProducts) && propProducts.length > 0) ? propProducts : getStoredProducts());
@@ -676,7 +678,17 @@ export default function AdminDashboard({
 
   // Offers & Promo Vouchers state
   const [coupons, setCoupons] = useState(() => getStoredCoupons());
-  const [offerBanner, setOfferBanner] = useState(() => getStoredOfferBanner());
+  const [offerBanner, setOfferBanner] = useState(() => propOfferBanner || getStoredOfferBanner());
+
+  // Real-time sync for storefront top running announcement banner
+  const handleUpdateOfferBanner = (updated) => {
+    setOfferBanner(updated);
+    saveOfferBanner(updated);
+    if (propSetOfferBanner) {
+      propSetOfferBanner(updated);
+    }
+  };
+
   const [isAddCouponOpen, setIsAddCouponOpen] = useState(false);
   const [couponFilter, setCouponFilter] = useState('ALL'); // 'ALL' | 'ACTIVE' | 'PAUSED' | 'PERCENTAGE' | 'FLAT'
   const [copiedCode, setCopiedCode] = useState(null);
@@ -690,7 +702,8 @@ export default function AdminDashboard({
     description: '',
     validUntil: '31 Dec 2026',
     badge: 'Seasonal Offer',
-    isActive: true
+    isActive: true,
+    showInTopBanner: false
   });
 
   // New product form state
@@ -1494,6 +1507,16 @@ export default function AdminDashboard({
     const updated = [created, ...coupons];
     setCoupons(updated);
     saveCoupons(updated);
+    if (newCoupon.showInTopBanner) {
+      const bannerUpdated = {
+        enabled: true,
+        badge: created.badge || 'PROMO',
+        text: created.description,
+        couponCode: created.code
+      };
+      handleUpdateOfferBanner(bannerUpdated);
+    }
+
     setIsAddCouponOpen(false);
     setNewCoupon({
       code: '',
@@ -1503,7 +1526,8 @@ export default function AdminDashboard({
       description: '',
       validUntil: '31 Dec 2026',
       badge: 'Seasonal Offer',
-      isActive: true
+      isActive: true,
+      showInTopBanner: false
     });
     broadcastOfferAlert({
       title: `🎉 New Bridal Offer: ${created.badge}`,
@@ -1515,7 +1539,7 @@ export default function AdminDashboard({
 
   const handleSaveOfferBanner = (e) => {
     e.preventDefault();
-    saveOfferBanner(offerBanner);
+    handleUpdateOfferBanner(offerBanner);
     if (offerBanner?.enabled) {
       broadcastOfferAlert({
         title: `✨ ${offerBanner.badge || 'LIMITED OFFER'} — SHUBHAANGI Studio`,
@@ -1523,7 +1547,7 @@ export default function AdminDashboard({
         couponCode: offerBanner.couponCode
       });
     }
-    showToast('🔔 Storefront Offer Banner updated & push alert sent to VIP subscribers!');
+    showToast('🔔 Storefront Offer Banner updated & settings saved!');
   };
 
   const handleQuickAddPreset = (preset) => {
@@ -2261,21 +2285,33 @@ export default function AdminDashboard({
                 <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
                   <div>
                     <span className="text-[11px] uppercase tracking-wider text-gray-400 font-semibold block">
-                      Storefront Banner
+                      Top Running Animation Text
                     </span>
-                    <span className={`text-xs font-semibold mt-1 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full ${
-                      offerBanner.enabled ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600'
+                    <span className={`text-xs font-bold mt-1 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full ${
+                      offerBanner.enabled ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-50 text-rose-700 border border-rose-200'
                     }`}>
-                      <span className={`w-2 h-2 rounded-full ${offerBanner.enabled ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`}></span>
-                      {offerBanner.enabled ? 'LIVE ON SITE' : 'PAUSED'}
+                      <span className={`w-2 h-2 rounded-full ${offerBanner.enabled ? 'bg-emerald-500 animate-pulse' : 'bg-rose-400'}`}></span>
+                      {offerBanner.enabled ? '🟢 ON (RUNNING)' : '⏸️ OFF (DISABLED)'}
                     </span>
                     <span className="text-[10px] text-gray-500 block mt-1">
                       Top Marquee Promo Bar
                     </span>
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold shrink-0">
-                    <FiVolume2 size={18} />
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = { ...offerBanner, enabled: !offerBanner.enabled };
+                      handleUpdateOfferBanner(updated);
+                      showToast(updated.enabled ? '🟢 Top Animation Text is now ON (Visible on site)!' : '⏸️ Top Animation Text is now OFF (Hidden from site)!');
+                    }}
+                    className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer ${
+                      offerBanner.enabled 
+                        ? 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100' 
+                        : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                    }`}
+                  >
+                    {offerBanner.enabled ? 'Turn OFF' : 'Turn ON'}
+                  </button>
                 </div>
 
                 <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200 shadow-xs flex flex-col justify-center">
@@ -2293,59 +2329,100 @@ export default function AdminDashboard({
               </div>
 
               {/* 1. STOREFRONT PROMOTIONAL ANNOUNCEMENT BANNER CONTROLLER */}
-              <div className="bg-white rounded-lg border border-amber-200 shadow-xs p-4 sm:p-6 bg-gradient-to-br from-white via-amber-50/15 to-amber-100/10">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-gray-200">
+              <div className={`rounded-lg border shadow-xs p-4 sm:p-6 transition-all ${
+                offerBanner.enabled 
+                  ? 'bg-white border-amber-300 bg-gradient-to-br from-white via-amber-50/20 to-amber-100/10' 
+                  : 'bg-gray-50 border-gray-200'
+              }`}>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-gray-200">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="p-1.5 bg-black text-luxury-gold rounded-md shrink-0">
+                      <span className={`p-1.5 rounded-md shrink-0 ${offerBanner.enabled ? 'bg-black text-luxury-gold' : 'bg-gray-200 text-gray-600'}`}>
                         <FiVolume2 size={16} />
                       </span>
                       <h3 className="text-base font-serif font-bold text-gray-900">
-                        Top Storefront Promotional Banner Settings
+                        Top Running Animation Text (Marquee Ticker)
                       </h3>
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-amber-100 text-amber-900 rounded shrink-0">
-                        Live Bar
+                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded shrink-0 ${
+                        offerBanner.enabled ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-700'
+                      }`}>
+                        {offerBanner.enabled ? '🟢 RUNNING (ON)' : '⏸️ PAUSED (OFF)'}
                       </span>
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
-                      Display promotional announcement, active voucher code, and atelier perks across the very top of the website.
+                      Website ke sabse top par chalne wala moving animated text banner. Jab chahe tab ise ON ya OFF toggle kar sakte hain.
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
-                    <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-gray-800">
-                      <span>Enable on Storefront:</span>
-                      <input
-                        type="checkbox"
-                        checked={Boolean(offerBanner.enabled)}
-                        onChange={(e) => {
-                          const updated = { ...offerBanner, enabled: e.target.checked };
-                          setOfferBanner(updated);
-                          saveOfferBanner(updated);
-                          showToast(`Storefront banner ${e.target.checked ? 'ENABLED' : 'DISABLED'}!`);
-                        }}
-                        className="w-4 h-4 text-black accent-black cursor-pointer rounded"
+                  {/* Big Clear ON/OFF Toggle Switch */}
+                  <div className="flex items-center gap-3 shrink-0 bg-white p-2.5 rounded-xl border border-gray-200 shadow-2xs">
+                    <span className="text-xs font-bold text-gray-800">
+                      Animation Status:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = { ...offerBanner, enabled: !offerBanner.enabled };
+                        handleUpdateOfferBanner(updated);
+                        showToast(updated.enabled ? '🟢 Top Animation Banner ON ho gaya (Website par dikhega)!' : '⏸️ Top Animation Banner OFF ho gaya (Website se hide ho gaya)!');
+                      }}
+                      className={`relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                        offerBanner.enabled ? 'bg-emerald-600' : 'bg-gray-300'
+                      }`}
+                      aria-label="Toggle banner animation"
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                          offerBanner.enabled ? 'translate-x-7' : 'translate-x-0'
+                        }`}
                       />
-                    </label>
+                    </button>
+                    <span className={`text-xs font-extrabold px-2.5 py-1 rounded-md ${
+                      offerBanner.enabled ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-gray-100 text-gray-600 border border-gray-300'
+                    }`}>
+                      {offerBanner.enabled ? 'ON' : 'OFF'}
+                    </span>
                   </div>
                 </div>
 
                 {/* Banner Live Preview */}
-                <div className="my-4 p-3 bg-[#111] text-luxury-gold rounded-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs shadow-inner">
-                  <div className="flex items-center gap-2 overflow-hidden min-w-0">
-                    <span className="px-2 py-0.5 bg-luxury-gold/20 text-luxury-gold text-[10px] font-bold rounded uppercase shrink-0">
-                      {offerBanner.badge || 'PROMO'}
-                    </span>
-                    <span className="truncate text-gray-200 text-xs">
-                      {offerBanner.text}
-                    </span>
+                {offerBanner.enabled ? (
+                  <div className="my-4 p-3 bg-[#111] text-luxury-gold rounded-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs shadow-inner border border-luxury-gold/30">
+                    <div className="flex items-center gap-2 overflow-hidden min-w-0">
+                      <span className="px-2 py-0.5 bg-luxury-gold/20 text-luxury-gold text-[10px] font-bold rounded uppercase shrink-0">
+                        {offerBanner.badge || 'PROMO'}
+                      </span>
+                      <span className="truncate text-gray-200 text-xs">
+                        {offerBanner.text}
+                      </span>
+                    </div>
+                    {offerBanner.couponCode && (
+                      <span className="font-mono font-bold text-luxury-gold border-b border-luxury-gold text-xs shrink-0 self-end sm:self-auto">
+                        Code: {offerBanner.couponCode}
+                      </span>
+                    )}
                   </div>
-                  {offerBanner.couponCode && (
-                    <span className="font-mono font-bold text-luxury-gold border-b border-luxury-gold text-xs shrink-0 self-end sm:self-auto">
-                      Code: {offerBanner.couponCode}
-                    </span>
-                  )}
-                </div>
+                ) : (
+                  <div className="my-4 p-3 bg-gray-100 text-gray-600 rounded-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs border border-dashed border-gray-300">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">⏸️</span>
+                      <span className="font-medium">
+                        Top Running Animation Banner is currently <strong>TURNED OFF</strong>. Storefront par koi running text banner nahi chalega.
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = { ...offerBanner, enabled: true };
+                        handleUpdateOfferBanner(updated);
+                        showToast('🟢 Top Animation Banner ON ho gaya!');
+                      }}
+                      className="px-3.5 py-1.5 bg-black text-white hover:bg-luxury-gold rounded text-[11px] font-semibold shrink-0 cursor-pointer"
+                    >
+                      Turn ON Now
+                    </button>
+                  </div>
+                )}
 
                 {/* Form to edit banner */}
                 <form onSubmit={handleSaveOfferBanner} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs pt-1">
@@ -3216,6 +3293,32 @@ export default function AdminDashboard({
                       <span>Make Active Immediately</span>
                     </label>
                   </div>
+                </div>
+
+                {/* Option to also run on the top moving animated text ticker */}
+                <div className="p-3.5 rounded-lg border border-luxury-gold/50 bg-amber-50/60 space-y-2 mt-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-luxury-gold animate-pulse shrink-0"></span>
+                      <span className="font-bold text-gray-900 text-xs">
+                        Top Running Animation Text (Marquee Ticker)
+                      </span>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(newCoupon.showInTopBanner)}
+                        onChange={(e) => setNewCoupon({ ...newCoupon, showInTopBanner: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                    </label>
+                  </div>
+                  <p className="text-[11px] text-gray-600 leading-relaxed">
+                    {newCoupon.showInTopBanner
+                      ? '🟢 ON: Yeh naya promo website ke sabse uper moving animated text banner me turant chalne lagega.'
+                      : '⏸️ OFF: Yeh voucher sirf checkout/orders par accept hoga, uper running animation ticker me nahi chalega.'}
+                  </p>
                 </div>
 
                 <div className="pt-3 flex flex-col sm:flex-row gap-2.5">

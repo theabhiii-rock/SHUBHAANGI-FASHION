@@ -339,6 +339,8 @@ export default function App() {
         setStudioServices={setStudioServices}
         studioTopics={studioTopics}
         setStudioTopics={setStudioTopics}
+        offerBanner={offerBanner}
+        setOfferBanner={setOfferBanner}
         onBackToStore={(targetCategory) => {
           if (targetCategory) {
             setActiveTab(targetCategory);
