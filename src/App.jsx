@@ -713,7 +713,7 @@ export default function App() {
           </motion.div>
 
           <motion.h1 variants={fadeUp} className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl mb-4 font-sans font-medium tracking-[0.06em] uppercase drop-shadow-2xl text-white">
-            Bridal Couture '26
+            Bridal Couture
           </motion.h1>
 
           <motion.p variants={fadeUp} className="text-xs sm:text-sm md:text-base tracking-[0.16em] uppercase mb-10 text-gray-200 font-light max-w-2xl mx-auto leading-relaxed">

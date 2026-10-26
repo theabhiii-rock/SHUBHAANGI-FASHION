@@ -834,7 +834,7 @@ export const INITIAL_STUDIO_SERVICES = [
     id: 'srv-event-1',
     type: 'EVENTS',
     categoryLabel: 'Upcoming Events',
-    title: 'Shubhaangi Bridal Couture 2026 Showcase',
+    title: 'Shubhaangi Bridal Couture Showcase',
     subtitle: 'Delhi Flagship Atelier • Laxmi Nagar (Near V3S Mall)',
     price: 'Free VIP Entry (RSVP)',
     badge: 'Oct 2026',
