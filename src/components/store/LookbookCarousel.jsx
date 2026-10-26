@@ -126,134 +126,103 @@ export default function LookbookCarousel({ fadeUp, products: propsProducts, onSe
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onClick={() => slide.rawProduct && onSelectProduct && onSelectProduct(slide.rawProduct)}
-        className="relative min-h-[580px] md:h-[660px] w-full overflow-hidden rounded-md bg-zinc-950 border border-luxury-gold/30 shadow-2xl group cursor-pointer"
+        className="relative h-[560px] md:h-[720px] w-full overflow-hidden rounded-sm bg-black shadow-xl group cursor-pointer"
       >
         <AnimatePresence mode="wait">
           <motion.div
             key={String(slide.id) + '-' + slide.img}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="absolute inset-0"
+            initial={{ opacity: 0, scale: 1.02 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+            className="absolute inset-0 flex items-center justify-center overflow-hidden"
           >
-            {/* Ambient Blurred Background (Gives the atmosphere & color of the piece without cropping the foreground) */}
+            {/* Ambient Blurred Backdrop (matches exact garment colors across the full banner width) */}
             <img
               src={slide.img}
               alt=""
               aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-25 scale-110 pointer-events-none"
+              className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-110 pointer-events-none"
             />
+
+            {/* Sharp 100% Uncropped Foreground Image (preserves original aspect ratio, head-to-toe) */}
+            <img
+              src={slide.img}
+              alt={slide.title}
+              className="relative z-[2] max-h-full max-w-full h-full w-auto object-contain object-center drop-shadow-[0_15px_35px_rgba(0,0,0,0.85)] group-hover:scale-[1.02] transition-transform duration-[1.8s] ease-out"
+            />
+
             {/* Cinematic Gradient Vignette */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/40 md:bg-gradient-to-r md:from-black/95 md:via-black/75 md:to-black/35" />
-
-            {/* Split Content: Left Editorial Typography & Right Uncropped Original Picture */}
-            <div className="relative z-10 w-full h-full max-w-7xl mx-auto px-6 md:px-12 py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-10 pb-20 md:pb-16">
-              
-              {/* Left Column: Story, Title, Fabric, Price & Action */}
-              <div className="w-full md:w-1/2 flex flex-col justify-center text-left order-2 md:order-1">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-[10px] tracking-[0.3em] uppercase bg-luxury-gold text-black font-bold px-3 py-1 inline-block shadow-xs">
-                    {slide.season}
-                  </span>
-                  <span className="text-[10px] tracking-widest uppercase text-emerald-400 font-mono flex items-center gap-1 bg-black/60 border border-emerald-400/30 px-2.5 py-0.5 rounded-full">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    Atelier Original
-                  </span>
-                </div>
-
-                <h3 className="text-2xl sm:text-3xl md:text-5xl font-serif text-white mb-3 leading-tight group-hover:text-luxury-gold transition-colors drop-shadow-md">
-                  {slide.title}
-                </h3>
-
-                <p className="text-xs sm:text-sm text-gray-300 font-light tracking-wide mb-5 line-clamp-2 md:line-clamp-3">
-                  {slide.artisan}
-                </p>
-
-                <div className="flex items-center gap-4 pt-1">
-                  <button className="px-5 py-2.5 bg-luxury-gold text-black hover:bg-white text-[11px] tracking-[0.2em] uppercase font-bold transition-all shadow-md flex items-center gap-2">
-                    <span>Explore Look</span>
-                    <span>→</span>
-                  </button>
-                  <span className="text-[11px] text-gray-400 tracking-wider hidden sm:inline">
-                    Click to view 360° & details
-                  </span>
-                </div>
-              </div>
-
-              {/* Right Column: Original 100% Uncropped Portrait Picture */}
-              <div className="w-full md:w-1/2 h-[340px] sm:h-[400px] md:h-[500px] flex items-center justify-center order-1 md:order-2">
-                <div className="relative h-full w-auto max-w-full flex items-center justify-center">
-                  <img
-                    src={slide.img}
-                    alt={slide.title}
-                    className="h-full w-auto max-h-full max-w-full object-contain rounded-md shadow-[0_20px_50px_rgba(0,0,0,0.9)] border border-white/15 group-hover:scale-[1.02] transition-transform duration-700"
-                  />
-                  <span className="absolute bottom-2.5 right-2.5 bg-black/80 backdrop-blur-md text-[9px] text-white/90 font-mono tracking-widest uppercase px-2 py-0.5 rounded border border-white/10 shadow-xs">
-                    Original Frame
-                  </span>
-                </div>
-              </div>
-
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/10 z-[3] pointer-events-none" />
           </motion.div>
         </AnimatePresence>
 
-        {/* Navigation Controls Bar at the Bottom */}
-        <div className="absolute bottom-3 left-6 right-6 md:left-12 md:right-12 z-20 flex items-center justify-between border-t border-white/10 pt-2.5">
-          <div className="flex items-center gap-2">
+        {/* Slide Metadata Overlay - Exact Original Editorial Aesthetic */}
+        <div className="absolute bottom-8 left-8 right-8 z-10 flex flex-col md:flex-row md:items-end justify-between gap-6 pointer-events-none">
+          <div className="max-w-2xl pointer-events-auto">
+            <span className="text-[10px] tracking-[0.3em] uppercase bg-luxury-gold text-black font-bold px-3 py-1 mb-3 inline-block shadow-xs">
+              {slide.season}
+            </span>
+            <h3 className="text-3xl md:text-5xl font-serif text-white mb-2 leading-tight group-hover:text-luxury-gold transition-colors drop-shadow-md">
+              {slide.title}
+            </h3>
+            <p className="text-xs md:text-sm text-gray-200 font-light tracking-wider mb-3 drop-shadow-xs">
+              {slide.artisan}
+            </p>
+            <span className="text-[10px] tracking-[0.25em] uppercase text-luxury-gold font-semibold flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
+              Explore This Atelier Piece →
+            </span>
+          </div>
+
+          {/* Navigation Controls */}
+          <div className="flex items-center gap-3 pointer-events-auto">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 reshuffleSlides();
               }}
-              className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md text-white/80 flex items-center justify-center hover:bg-luxury-gold hover:text-black transition-all duration-300 mr-2"
+              className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md text-white/80 flex items-center justify-center hover:bg-luxury-gold hover:text-black transition-all duration-300 mr-2"
               title="Shuffle Editorial Looks"
               aria-label="Shuffle Editorial Looks"
             >
-              <FiRefreshCw size={12} />
+              <FiRefreshCw size={14} />
             </button>
-            <span className="text-[10px] tracking-widest uppercase text-gray-400 font-mono hidden sm:inline">
-              Look {currentIndex + 1} of {slides.length}
-            </span>
-          </div>
 
-          <div className="flex gap-2">
-            {slides.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setCurrentIndex(idx);
-                }}
-                className={`h-1.5 transition-all rounded-full ${
-                  idx === currentIndex ? 'w-8 bg-luxury-gold' : 'w-2 bg-white/30 hover:bg-white/60'
-                }`}
-                aria-label={`Go to slide ${idx + 1}`}
-              />
-            ))}
-          </div>
+            <div className="flex gap-2 mr-3">
+              {slides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentIndex(idx);
+                  }}
+                  className={`h-1.5 transition-all rounded-full ${
+                    idx === currentIndex ? 'w-8 bg-luxury-gold' : 'w-2 bg-white/40 hover:bg-white/70'
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
 
-          <div className="flex items-center gap-2">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 prevSlide();
               }}
-              className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-luxury-gold hover:text-black transition-colors"
+              className="w-12 h-12 rounded-full bg-white/15 backdrop-blur-md text-white flex items-center justify-center hover:bg-luxury-gold hover:text-black transition-colors"
               aria-label="Previous look"
             >
-              <FiChevronLeft size={16} />
+              <FiChevronLeft size={20} />
             </button>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 nextSlide();
               }}
-              className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-luxury-gold hover:text-black transition-colors"
+              className="w-12 h-12 rounded-full bg-white/15 backdrop-blur-md text-white flex items-center justify-center hover:bg-luxury-gold hover:text-black transition-colors"
               aria-label="Next look"
             >
-              <FiChevronRight size={16} />
+              <FiChevronRight size={20} />
             </button>
           </div>
         </div>
