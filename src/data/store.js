@@ -5,7 +5,7 @@ export const INITIAL_PRODUCTS = [
   {
     id: 1,
     name: 'Gulabi Noor — Rani Pink Heritage Zardozi Lehenga',
-    category: 'DRESS',
+    category: 'BRIDAL_COUTURE',
     subCategory: 'Bridal Lehenga',
     buyPrice: 185000,
     rentPrice3Days: 18500,
@@ -31,7 +31,7 @@ export const INITIAL_PRODUCTS = [
   {
     id: 2,
     name: 'Zar-e-Khaas — Antique Gold Tissue Couture Set',
-    category: 'DRESS',
+    category: 'FESTIVE_PARTY',
     subCategory: 'Reception & Sangeet',
     buyPrice: 145000,
     rentPrice3Days: 14500,
@@ -57,7 +57,7 @@ export const INITIAL_PRODUCTS = [
   {
     id: 3,
     name: 'Rose Quartz — Mauve Shimmer Flared Reception Gown',
-    category: 'DRESS',
+    category: 'MODERN_BRIDE',
     subCategory: 'Cocktail & Reception',
     buyPrice: 125000,
     rentPrice3Days: 12500,
@@ -83,7 +83,7 @@ export const INITIAL_PRODUCTS = [
   {
     id: 4,
     name: 'Royal Baingani — Deep Plum Sequin Cape & Flared Set',
-    category: 'DRESS',
+    category: 'FESTIVE_PARTY',
     subCategory: 'Indo-Western & Sangeet',
     buyPrice: 95000,
     rentPrice3Days: 9500,
@@ -109,7 +109,7 @@ export const INITIAL_PRODUCTS = [
   {
     id: 5,
     name: 'Royal Jadau Polki Bridal Set',
-    category: 'JEWELLERY',
+    category: 'JEWELLERY_ACCESSORIES',
     subCategory: 'Polki Masterpiece',
     buyPrice: 125000,
     rentPrice3Days: 12500,
@@ -132,7 +132,7 @@ export const INITIAL_PRODUCTS = [
   {
     id: 6,
     name: 'Champagne Tissue Saree with Zari',
-    category: 'DRESS',
+    category: 'BRIDAL_COUTURE',
     subCategory: 'Reception Drape',
     buyPrice: 65000,
     rentPrice3Days: 7500,
@@ -155,7 +155,7 @@ export const INITIAL_PRODUCTS = [
   {
     id: 7,
     name: 'Maharaja Embroidered Ivory Sherwani',
-    category: 'DRESS',
+    category: 'GROOM_COLLECTION',
     subCategory: 'Groom Couture',
     buyPrice: 95000,
     rentPrice3Days: 11000,
@@ -178,7 +178,7 @@ export const INITIAL_PRODUCTS = [
   {
     id: 8,
     name: 'Destination Reception Glam Session',
-    category: 'MAKEUP',
+    category: 'MAKEUP_BEAUTY',
     subCategory: 'Evening Glam',
     buyPrice: 18000,
     rentPrice3Days: null,
@@ -201,7 +201,7 @@ export const INITIAL_PRODUCTS = [
   {
     id: 9,
     name: 'Royal Emerald Velvet Kalidar',
-    category: 'DRESS',
+    category: 'BRIDAL_COUTURE',
     subCategory: 'Winter Wedding',
     buyPrice: 175000,
     rentPrice3Days: 17500,
@@ -224,7 +224,7 @@ export const INITIAL_PRODUCTS = [
   {
     id: 10,
     name: 'Imperial Matha Patti & Nath Suite',
-    category: 'JEWELLERY',
+    category: 'JEWELLERY_ACCESSORIES',
     subCategory: 'Bridal Headpiece',
     buyPrice: 48000,
     rentPrice3Days: 5500,
@@ -247,7 +247,7 @@ export const INITIAL_PRODUCTS = [
   {
     id: 11,
     name: 'Rose Gold Metallic Drape Saree',
-    category: 'DRESS',
+    category: 'MODERN_BRIDE',
     subCategory: 'Cocktail Edit',
     buyPrice: 72000,
     rentPrice3Days: 8000,
@@ -270,7 +270,7 @@ export const INITIAL_PRODUCTS = [
   {
     id: 12,
     name: 'Nawabi Velvet Bandhgala Suit',
-    category: 'DRESS',
+    category: 'GROOM_COLLECTION',
     subCategory: 'Groom Reception',
     buyPrice: 82000,
     rentPrice3Days: 9500,
@@ -506,43 +506,33 @@ export const CUSTOMER_REVIEWS = [
 // Products persistence
 export const getStoredProducts = () => {
   try {
-    const data = localStorage.getItem('shubhaangi_products_v4');
+    const data = localStorage.getItem('shubhaangi_products_v5');
     if (data) {
       const parsed = JSON.parse(data);
-      // Ensure all items have valid fields and images array
       return parsed.map(p => {
         const init = INITIAL_PRODUCTS.find(ip => ip.id === p.id);
-        const category = (p.category || 'DRESS').toUpperCase();
+        const category = p.category ? p.category.toUpperCase() : (init?.category || 'BRIDAL_COUTURE');
         return {
           ...p,
           category,
-          subCategory: p.subCategory || (category === 'JEWELLERY' ? 'Royal Jewellery' : (category === 'MAKEUP' ? 'Bridal Makeup' : 'Bridal Lehenga / Saree')),
+          subCategory: p.subCategory || init?.subCategory || 'Bridal Couture',
           isRentalAvailable: p.isRentalAvailable ?? true,
           images: (p.images && p.images.length > 0) ? p.images : (init?.images || [p.img].filter(Boolean))
         };
       });
     }
     
-    // Check v3 migration
-    const oldData = localStorage.getItem('shubhaangi_products_v3');
-    if (oldData) {
-      const parsed = JSON.parse(oldData);
-      const migrated = parsed.map(p => {
-        const init = INITIAL_PRODUCTS.find(ip => ip.id === p.id);
-        const category = (p.category || 'DRESS').toUpperCase();
-        return {
-          ...p,
-          category,
-          subCategory: p.subCategory || (category === 'JEWELLERY' ? 'Royal Jewellery' : (category === 'MAKEUP' ? 'Bridal Makeup' : 'Bridal Lehenga / Saree')),
-          isRentalAvailable: p.isRentalAvailable ?? true,
-          images: (p.images && p.images.length > 0) ? p.images : (init?.images || [p.img].filter(Boolean))
-        };
-      });
+    // Check v4 migration (preserve any newly added admin products)
+    const oldV4 = localStorage.getItem('shubhaangi_products_v4');
+    if (oldV4) {
       try {
-        localStorage.setItem('shubhaangi_products_v4', JSON.stringify(migrated));
-        localStorage.removeItem('shubhaangi_products_v3');
+        const parsedV4 = JSON.parse(oldV4);
+        const customAdded = parsedV4.filter(p => !INITIAL_PRODUCTS.some(ip => ip.id === p.id));
+        const migrated = [...customAdded, ...INITIAL_PRODUCTS];
+        localStorage.setItem('shubhaangi_products_v5', JSON.stringify(migrated));
+        localStorage.removeItem('shubhaangi_products_v4');
+        return migrated;
       } catch {}
-      return migrated;
     }
 
     return INITIAL_PRODUCTS;
@@ -563,7 +553,7 @@ export async function hydrateProductsFromVault(onHydrated) {
       // If vault has more products or newer products, sync and notify
       if (vaultProducts.length >= current.length) {
         try {
-          localStorage.setItem('shubhaangi_products_v4', JSON.stringify(vaultProducts));
+          localStorage.setItem('shubhaangi_products_v5', JSON.stringify(vaultProducts));
         } catch {}
         if (typeof onHydrated === 'function') {
           onHydrated(vaultProducts);
@@ -580,6 +570,7 @@ export const saveProducts = (products) => {
   try {
     // 1. Clean legacy keys to free browser storage
     try {
+      localStorage.removeItem('shubhaangi_products_v4');
       localStorage.removeItem('shubhaangi_products_v3');
       localStorage.removeItem('shubhaangi_products_v2');
       localStorage.removeItem('shubhaangi_products');
@@ -587,7 +578,7 @@ export const saveProducts = (products) => {
 
     // 2. Save to localStorage with graceful quota fallback
     try {
-      localStorage.setItem('shubhaangi_products_v4', JSON.stringify(products));
+      localStorage.setItem('shubhaangi_products_v5', JSON.stringify(products));
     } catch (quotaErr) {
       console.warn('LocalStorage quota limit reached, saving optimized version...', quotaErr);
       // If quota exceeded, create an optimized version for localStorage
@@ -600,7 +591,7 @@ export const saveProducts = (products) => {
         };
       });
       try {
-        localStorage.setItem('shubhaangi_products_v4', JSON.stringify(optimized));
+        localStorage.setItem('shubhaangi_products_v5', JSON.stringify(optimized));
       } catch (innerErr) {
         console.warn('Emergency storage compression applied:', innerErr);
       }
