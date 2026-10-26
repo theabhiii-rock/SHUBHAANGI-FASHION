@@ -21,15 +21,25 @@ export default function VideoStorySection({ fadeUp }) {
         
         {/* Left Column: Documentary Video Card */}
         <div className="lg:col-span-7 relative">
-          <div className="relative aspect-video rounded-sm overflow-hidden bg-neutral-900 border border-white/10 shadow-2xl group">
+          <div className="relative aspect-video rounded-sm overflow-hidden bg-[#0d0d0d] border border-white/10 shadow-2xl group flex items-center justify-center">
+            {/* Ambient Blurred Glow Backdrop */}
+            <img
+              src="/videos/shubhaangi-story-poster.jpg"
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-35 scale-110 pointer-events-none"
+            />
+            <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+
+            {/* Uncropped Video in Horizontal Container */}
             <video
               ref={videoRef}
               src="/videos/shubhaangi-story.mp4"
               controls
               playsInline
               preload="metadata"
-              poster="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&q=80&w=1200"
-              className="w-full h-full object-cover"
+              poster="/videos/shubhaangi-story-poster.jpg"
+              className="relative z-10 w-full h-full object-contain"
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
               onEnded={() => setIsPlaying(false)}
@@ -39,18 +49,18 @@ export default function VideoStorySection({ fadeUp }) {
             {!isPlaying && (
               <div
                 onClick={handlePlayClick}
-                className="absolute inset-0 bg-black/40 hover:bg-black/25 flex items-center justify-center cursor-pointer transition-colors group/overlay"
+                className="absolute inset-0 z-20 bg-black/30 hover:bg-black/15 flex items-center justify-center cursor-pointer transition-colors group/overlay"
               >
                 <button
                   type="button"
                   aria-label="Play Shubhaangi Story Film"
-                  className="w-20 h-20 rounded-full bg-luxury-gold text-black flex items-center justify-center hover:scale-110 transition-transform shadow-2xl pl-1"
+                  className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-luxury-gold text-black flex items-center justify-center hover:scale-110 transition-transform shadow-2xl pl-1"
                 >
-                  <FiPlay size={28} />
+                  <FiPlay size={26} />
                 </button>
-                <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm p-3 rounded flex justify-between items-center text-xs pointer-events-none">
+                <div className="absolute bottom-4 left-4 right-4 bg-black/75 backdrop-blur-md p-3 rounded flex justify-between items-center text-xs pointer-events-none border border-white/10">
                   <span className="text-gray-300 font-serif italic">"Every needle pass is an act of devotion."</span>
-                  <span className="text-[10px] tracking-widest text-luxury-gold uppercase font-bold">The Shubhaangi Story • 4K Film</span>
+                  <span className="text-[10px] tracking-widest text-luxury-gold uppercase font-bold">The Shubhaangi Story • Film</span>
                 </div>
               </div>
             )}
