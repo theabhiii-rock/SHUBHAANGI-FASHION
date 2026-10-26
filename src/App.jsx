@@ -21,14 +21,12 @@ import AdminAuthModal from './components/admin/AdminAuthModal';
 import StoreHeader from './components/store/StoreHeader';
 import OccasionFilter from './components/store/OccasionFilter';
 import FeaturedCollections from './components/store/FeaturedCollections';
-import HorizontalScrollSection from './components/store/HorizontalScrollSection';
 import LookbookCarousel from './components/store/LookbookCarousel';
 import BrandStatement from './components/store/BrandStatement';
 import VideoStorySection from './components/store/VideoStorySection';
 import StudioTrialSection from './components/store/StudioTrialSection';
 import NewsletterSection from './components/store/NewsletterSection';
 import StoreFooter from './components/store/StoreFooter';
-import Luxury3DShowcase from './components/Luxury3DShowcase';
 
 // Additional Luxury E-Commerce Modals & Bars
 import SearchModal from './components/store/SearchModal';
@@ -777,9 +775,6 @@ export default function App() {
         }}
       />
 
-      {/* 9. "THE NEW SILHOUETTE" HORIZONTAL SCROLL GALLERY */}
-      <HorizontalScrollSection fadeUp={fadeUp} />
-
       {/* 10. EDITORIAL LOOKBOOK CAROUSEL */}
       <LookbookCarousel fadeUp={fadeUp} />
 
@@ -978,11 +973,6 @@ export default function App() {
               );
             })}
         </motion.div>
-
-        {/* 14. INTERACTIVE 3D LUXURY CRAFTSMANSHIP SHOWCASE */}
-        <div className="mb-28">
-          <Luxury3DShowcase />
-        </div>
 
         {/* 15. ATELIER DOCUMENTARY VIDEO STORY */}
         <VideoStorySection fadeUp={fadeUp} />
