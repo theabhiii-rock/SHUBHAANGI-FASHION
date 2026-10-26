@@ -775,8 +775,12 @@ export default function App() {
         }}
       />
 
-      {/* 10. EDITORIAL LOOKBOOK CAROUSEL */}
-      <LookbookCarousel fadeUp={fadeUp} />
+      {/* 10. EDITORIAL LOOKBOOK CAROUSEL (DYNAMIC CATALOG ROTATION) */}
+      <LookbookCarousel 
+        fadeUp={fadeUp} 
+        products={products}
+        onSelectProduct={(product) => setSelectedProductForModal(product)}
+      />
 
       {/* 11. BRAND STATEMENT (VOGUE TYPOGRAPHY) */}
       <BrandStatement fadeUp={fadeUp} />
