@@ -170,7 +170,7 @@ export default function App() {
       }
     };
     const handleStorage = (e) => {
-      if (e.key === 'shubhaangi_products_v4') {
+      if (e.key === 'shubhaangi_products_v5' || e.key === 'shubhaangi_products_v4') {
         setProducts(getStoredProducts());
       }
       if (e.key === 'shubhaangi_studio_services_v1') {
@@ -178,6 +178,9 @@ export default function App() {
       }
       if (e.key === 'shubhaangi_studio_topics_v1') {
         setStudioTopics(getStoredStudioTopics());
+      }
+      if (e.key === 'shubhaangi_offer_banner_v1') {
+        setOfferBanner(getStoredOfferBanner());
       }
     };
 
@@ -198,6 +201,9 @@ export default function App() {
         }
         if (msg.data?.type === 'TOPICS_UPDATED') {
           setStudioTopics(msg.data.topics);
+        }
+        if (msg.data?.type === 'OFFER_BANNER_UPDATED') {
+          setOfferBanner(msg.data.banner);
         }
       };
     } catch {}

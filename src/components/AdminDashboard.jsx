@@ -687,6 +687,12 @@ export default function AdminDashboard({
     if (propSetOfferBanner) {
       propSetOfferBanner(updated);
     }
+    // Broadcast to all open tabs including storefront
+    try {
+      const bc = new BroadcastChannel('shubhaangi_sync');
+      bc.postMessage({ type: 'OFFER_BANNER_UPDATED', banner: updated });
+      bc.close();
+    } catch {}
   };
 
   const [isAddCouponOpen, setIsAddCouponOpen] = useState(false);
