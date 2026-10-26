@@ -24,7 +24,6 @@ import FeaturedCollections from './components/store/FeaturedCollections';
 import LookbookCarousel from './components/store/LookbookCarousel';
 import BrandStatement from './components/store/BrandStatement';
 import VideoStorySection from './components/store/VideoStorySection';
-import StudioTrialSection from './components/store/StudioTrialSection';
 import NewsletterSection from './components/store/NewsletterSection';
 import StoreFooter from './components/store/StoreFooter';
 
@@ -980,19 +979,6 @@ export default function App() {
 
         {/* 15. ATELIER DOCUMENTARY VIDEO STORY */}
         <VideoStorySection fadeUp={fadeUp} />
-
-        {/* 16. STUDIO PRIVATE TRIAL & GROOM SHOWCASE */}
-        <div className="mt-28">
-          <StudioTrialSection
-            fadeUp={fadeUp}
-            staggerContainer={staggerContainer}
-            onSelectCategory={(cat) => {
-              setActiveTab(cat);
-              const el = document.getElementById('catalog');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }}
-          />
-        </div>
 
         {/* 17. VERIFIED REAL BRIDE EXPERIENCES & REVIEWS */}
         <div className="mt-28">
