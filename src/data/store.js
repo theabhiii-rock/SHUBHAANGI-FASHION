@@ -1106,4 +1106,117 @@ export const saveStudioServices = (services) => {
   }
 };
 
+// ── CATALOG FILTER CATEGORIES & MATCHING LOGIC ──
+export const CATALOG_CATEGORIES = [
+  { id: 'BRIDAL_COUTURE', label: 'Bridal Couture', icon: '✦' },
+  { id: 'GROOM_COLLECTION', label: 'Groom Collection', icon: '👑' },
+  { id: 'MODERN_BRIDE', label: 'The Modern Bride', icon: '✨' },
+  { id: 'FESTIVE_PARTY', label: 'Festive & Party', icon: '🪔' },
+  { id: 'MAKEUP_BEAUTY', label: 'Makeup & Beauty', icon: '💄' },
+  { id: 'JEWELLERY_ACCESSORIES', label: 'Jewellery & Accessories', icon: '💎' },
+  { id: 'ALL', label: 'All Collections', icon: '❖' }
+];
+
+export function matchesCatalogCategory(product, tabId) {
+  if (!tabId || tabId === 'ALL') return true;
+  if (!product) return false;
+
+  const cat = (product.category || '').toUpperCase();
+  const sub = (product.subCategory || '').toLowerCase();
+  const name = (product.name || '').toLowerCase();
+  const coll = (product.collection || '').toLowerCase();
+
+  switch (tabId) {
+    case 'BRIDAL_COUTURE':
+      if (cat === 'JEWELLERY' || cat === 'MAKEUP') return false;
+      if (cat === 'GROOM_COLLECTION' || cat === 'MODERN_BRIDE' || cat === 'FESTIVE_PARTY') return false;
+      if (sub.includes('groom') || name.includes('sherwani') || name.includes('bandhgala')) return false;
+      if (sub.includes('cocktail') || name.includes('gown') || name.includes('metallic drape')) return false;
+      if (sub.includes('sangeet') || sub.includes('indo-western') || name.includes('cape') || name.includes('tissue couture')) return false;
+      return (
+        cat === 'BRIDAL_COUTURE' ||
+        coll.includes('bridal') ||
+        sub.includes('bridal lehenga') ||
+        sub.includes('bridal saree') ||
+        sub.includes('winter wedding') ||
+        sub.includes('reception drape') ||
+        name.includes('lehenga') ||
+        name.includes('kalidar') ||
+        name.includes('saree') ||
+        cat === 'DRESS'
+      );
+
+    case 'GROOM_COLLECTION':
+      if (cat === 'JEWELLERY' || cat === 'MAKEUP') return false;
+      return (
+        cat === 'GROOM_COLLECTION' ||
+        cat === 'SHERWANI' ||
+        cat === 'GROOM' ||
+        coll.includes('groom') ||
+        sub.includes('groom') ||
+        name.includes('sherwani') ||
+        name.includes('bandhgala') ||
+        name.includes('kurta') ||
+        /\b(sherwani|bandhgala|achkan|kurta|groom|suit)\b/i.test(name)
+      );
+
+    case 'MODERN_BRIDE':
+      if (cat === 'JEWELLERY' || cat === 'MAKEUP') return false;
+      return (
+        cat === 'MODERN_BRIDE' ||
+        coll.includes('modern') ||
+        sub.includes('cocktail') ||
+        sub.includes('gown') ||
+        name.includes('gown') ||
+        name.includes('metallic drape') ||
+        name.includes('shimmer')
+      );
+
+    case 'FESTIVE_PARTY':
+      if (cat === 'JEWELLERY' || cat === 'MAKEUP') return false;
+      return (
+        cat === 'FESTIVE_PARTY' ||
+        coll.includes('festive') ||
+        coll.includes('party') ||
+        sub.includes('sangeet') ||
+        sub.includes('indo-western') ||
+        sub.includes('cape') ||
+        name.includes('cape') ||
+        name.includes('tissue couture') ||
+        name.includes('baingani')
+      );
+
+    case 'MAKEUP_BEAUTY':
+      return (
+        cat === 'MAKEUP' ||
+        cat === 'MAKEUP_BEAUTY' ||
+        cat === 'BEAUTY' ||
+        coll.includes('makeup') ||
+        sub.includes('makeup') ||
+        sub.includes('glam') ||
+        name.includes('makeup') ||
+        name.includes('glam')
+      );
+
+    case 'JEWELLERY_ACCESSORIES':
+      return (
+        cat === 'JEWELLERY' ||
+        cat === 'JEWELLERY_ACCESSORIES' ||
+        cat === 'ACCESSORIES' ||
+        coll.includes('jewel') ||
+        sub.includes('jewel') ||
+        sub.includes('polki') ||
+        sub.includes('nath') ||
+        sub.includes('headpiece') ||
+        name.includes('polki') ||
+        name.includes('jewel') ||
+        name.includes('matha patti') ||
+        name.includes('choker')
+      );
+
+    default:
+      return cat === tabId;
+  }
+}
+
 

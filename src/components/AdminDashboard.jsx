@@ -709,7 +709,7 @@ export default function AdminDashboard({
   // New product form state
   const [newProd, setNewProd] = useState({
     name: '',
-    category: 'DRESS',
+    category: 'BRIDAL_COUTURE',
     buyPrice: '',
     rentPrice3Days: '',
     rentPrice7Days: '',
@@ -841,7 +841,21 @@ export default function AdminDashboard({
     const balanceText = order.balanceDue > 0 ? `⚠️ Balance Due upon pickup: ₹${order.balanceDue.toLocaleString('en-IN')}` : `✅ Payment Status: FULLY PAID`;
     const rentalText = order.mode === 'RENT' ? `\n• Security Deposit: ₹${(order.deposit || 0).toLocaleString('en-IN')} (Refundable)\n• Return Date: ${order.returnDate || 'As agreed'}` : '';
 
-    const text = `*SHUBHAANGI — THE ULTIMATE BRIDE*\n_Official Studio Booking Slip_\n\nNamaste ${order.customerName} ji! ✨\nThank you for choosing SHUBHAANGI Bridal Studio (Laxmi Nagar, Delhi).\n\n*Booking Details:*\n• Slip ID: #${order.id}\n• Outfit / Set: ${order.item}\n• Category: ${order.category === 'DRESS' ? 'Bridal Lehenga / Saree' : (order.category === 'JEWELLERY' ? 'Royal Jewellery' : 'Bridal Makeup')}\n• Order Type: ${order.mode === 'RENT' ? 'Bridal Rental' : 'Bespoke Purchase'}\n• Function Date: ${order.eventDate || 'As scheduled'}${rentalText}\n\n*Payment Summary:*\n• Total Agreed: ₹${order.amount.toLocaleString('en-IN')}\n• Advance Received: ₹${order.advancePaid.toLocaleString('en-IN')} (${order.paymentMethod})\n• ${balanceText}\n\n${order.notes ? `*Alteration / Fitting Notes:* ${order.notes}\n\n` : ''}📍 *Studio Address:* B-125, First Floor, Laxmi Nagar, Delhi (Near V3S Mall)\n📞 *Contact:* +91 6397799514\n\n_We look forward to crafting your bridal royalty!_ 👑`;
+    const catMap = {
+      BRIDAL_COUTURE: 'Bridal Couture',
+      GROOM_COLLECTION: 'Groom Collection',
+      MODERN_BRIDE: 'The Modern Bride',
+      FESTIVE_PARTY: 'Festive & Party',
+      MAKEUP_BEAUTY: 'Makeup & Beauty',
+      JEWELLERY_ACCESSORIES: 'Jewellery & Accessories',
+      DRESS: 'Bridal Lehenga / Saree',
+      JEWELLERY: 'Royal Jewellery',
+      MAKEUP: 'Bridal Makeup',
+      SHERWANI: 'Groom Sherwani'
+    };
+    const orderCatLabel = catMap[order.category] || order.category || 'Bridal Couture';
+
+    const text = `*SHUBHAANGI — THE ULTIMATE BRIDE*\n_Official Studio Booking Slip_\n\nNamaste ${order.customerName} ji! ✨\nThank you for choosing SHUBHAANGI Bridal Studio (Laxmi Nagar, Delhi).\n\n*Booking Details:*\n• Slip ID: #${order.id}\n• Outfit / Set: ${order.item}\n• Category: ${orderCatLabel}\n• Order Type: ${order.mode === 'RENT' ? 'Bridal Rental' : 'Bespoke Purchase'}\n• Function Date: ${order.eventDate || 'As scheduled'}${rentalText}\n\n*Payment Summary:*\n• Total Agreed: ₹${order.amount.toLocaleString('en-IN')}\n• Advance Received: ₹${order.advancePaid.toLocaleString('en-IN')} (${order.paymentMethod})\n• ${balanceText}\n\n${order.notes ? `*Alteration / Fitting Notes:* ${order.notes}\n\n` : ''}📍 *Studio Address:* B-125, First Floor, Laxmi Nagar, Delhi (Near V3S Mall)\n📞 *Contact:* +91 6397799514\n\n_We look forward to crafting your bridal royalty!_ 👑`;
 
     const url = `https://wa.me/${cleanPhone || '916397799514'}?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
@@ -1334,11 +1348,15 @@ export default function AdminDashboard({
     const primaryImg = newProd.img.trim() || allExtra[0] || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=1000';
     const allImages = [primaryImg, ...allExtra.filter(url => url !== primaryImg)];
 
-    const rawCategory = (newProd.category || 'DRESS').toUpperCase();
-    const category = (rawCategory === 'JEWELLERY' || rawCategory === 'MAKEUP') ? rawCategory : 'DRESS';
-    const subCategory = category === 'JEWELLERY'
-      ? 'Royal Jewellery'
-      : (category === 'MAKEUP' ? 'Bridal Makeup' : 'Bridal Lehenga / Saree');
+    const rawCategory = (newProd.category || 'BRIDAL_COUTURE').toUpperCase();
+    const category = rawCategory;
+    const subCategory = 
+      category === 'BRIDAL_COUTURE' ? 'Bridal Couture' :
+      category === 'GROOM_COLLECTION' ? 'Groom Collection' :
+      category === 'MODERN_BRIDE' ? 'The Modern Bride' :
+      category === 'FESTIVE_PARTY' ? 'Festive & Party' :
+      (category === 'MAKEUP_BEAUTY' || category === 'MAKEUP') ? 'Makeup & Beauty' :
+      (category === 'JEWELLERY_ACCESSORIES' || category === 'JEWELLERY') ? 'Jewellery & Accessories' : 'Bridal Couture';
 
     const created = {
       id: Date.now(),
@@ -1368,7 +1386,7 @@ export default function AdminDashboard({
     setIsAddProductOpen(false);
     setNewProd({
       name: '',
-      category: 'DRESS',
+      category: 'BRIDAL_COUTURE',
       buyPrice: '',
       rentPrice3Days: '',
       rentPrice7Days: '',
@@ -2132,7 +2150,7 @@ export default function AdminDashboard({
                         <div>
                           <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
                             <span className="text-[10px] uppercase tracking-wider text-amber-800 font-bold bg-amber-50 border border-amber-200/60 px-2 py-0.5 rounded">
-                              {product.category}
+                              {product.subCategory || product.category}
                             </span>
                             <button
                               onClick={() => handleToggleRentalAvailability(product.id)}
@@ -2733,9 +2751,12 @@ export default function AdminDashboard({
                       onChange={(e) => setNewProd({ ...newProd, category: e.target.value })}
                       className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white cursor-pointer"
                     >
-                      <option value="DRESS">Bridal Lehenga / Saree</option>
-                      <option value="JEWELLERY">Bridal Jewellery</option>
-                      <option value="MAKEUP">Bridal Makeup</option>
+                      <option value="BRIDAL_COUTURE">Bridal Couture</option>
+                      <option value="GROOM_COLLECTION">Groom Collection</option>
+                      <option value="MODERN_BRIDE">The Modern Bride</option>
+                      <option value="FESTIVE_PARTY">Festive & Party</option>
+                      <option value="MAKEUP_BEAUTY">Makeup & Beauty</option>
+                      <option value="JEWELLERY_ACCESSORIES">Jewellery & Accessories</option>
                     </select>
                   </div>
                   <div>
@@ -3811,10 +3832,12 @@ export default function AdminDashboard({
                       onChange={(e) => setNewOfflineOrder({ ...newOfflineOrder, category: e.target.value })}
                       className="w-full p-2.5 border border-gray-300 rounded-md focus:border-black outline-none bg-white cursor-pointer"
                     >
-                      <option value="DRESS">Bridal Lehenga / Saree</option>
-                      <option value="JEWELLERY">Bridal Jewellery</option>
-                      <option value="MAKEUP">Bridal Makeup Package</option>
-                      <option value="SHERWANI">Groom Sherwani</option>
+                      <option value="BRIDAL_COUTURE">Bridal Couture</option>
+                      <option value="GROOM_COLLECTION">Groom Collection</option>
+                      <option value="MODERN_BRIDE">The Modern Bride</option>
+                      <option value="FESTIVE_PARTY">Festive & Party</option>
+                      <option value="MAKEUP_BEAUTY">Makeup & Beauty</option>
+                      <option value="JEWELLERY_ACCESSORIES">Jewellery & Accessories</option>
                     </select>
                   </div>
                   <div>

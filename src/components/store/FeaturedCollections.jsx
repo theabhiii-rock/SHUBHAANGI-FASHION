@@ -8,7 +8,7 @@ export default function FeaturedCollections({ onSelectCollection, fadeUp, stagge
       id: 'bridal-couture',
       title: 'Bridal Couture',
       subtitle: 'Haute Couture',
-      category: 'DRESS',
+      category: 'BRIDAL_COUTURE',
       span: 'md:col-span-6 lg:col-span-7',
       height: 'h-[440px] lg:h-[520px]',
       img: '/images/shubhaangi-rani-pink-bridal-lehenga.jpg'
@@ -17,7 +17,7 @@ export default function FeaturedCollections({ onSelectCollection, fadeUp, stagge
       id: 'groom-collection',
       title: 'Groom Collection',
       subtitle: "Men's Luxury",
-      category: 'DRESS',
+      category: 'GROOM_COLLECTION',
       span: 'md:col-span-6 lg:col-span-5',
       height: 'h-[440px] lg:h-[520px]',
       img: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&q=80&w=1000'
@@ -26,7 +26,7 @@ export default function FeaturedCollections({ onSelectCollection, fadeUp, stagge
       id: 'modern-bride',
       title: 'The Modern Bride',
       subtitle: 'Contemporary',
-      category: 'DRESS',
+      category: 'MODERN_BRIDE',
       span: 'md:col-span-6 lg:col-span-3',
       height: 'h-[380px] lg:h-[400px]',
       img: '/images/shubhaangi-mauve-shimmer-gown.jpg'
@@ -35,16 +35,16 @@ export default function FeaturedCollections({ onSelectCollection, fadeUp, stagge
       id: 'festive-party',
       title: 'Festive & Party',
       subtitle: 'Celebration',
-      category: 'DRESS',
+      category: 'FESTIVE_PARTY',
       span: 'md:col-span-6 lg:col-span-3',
       height: 'h-[380px] lg:h-[400px]',
       img: '/images/shubhaangi-royal-plum-cape.jpg'
     },
     {
       id: 'makeup-beauty',
-      title: 'Mekup & Beauty',
+      title: 'Makeup & Beauty',
       subtitle: 'Studio Artistry',
-      category: 'MAKEUP',
+      category: 'MAKEUP_BEAUTY',
       span: 'md:col-span-6 lg:col-span-3',
       height: 'h-[380px] lg:h-[400px]',
       img: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&q=80&w=1000'
@@ -53,7 +53,7 @@ export default function FeaturedCollections({ onSelectCollection, fadeUp, stagge
       id: 'jewellery-accessories',
       title: 'Jewellery & Accessories',
       subtitle: 'Fine Jewels',
-      category: 'JEWELLERY',
+      category: 'JEWELLERY_ACCESSORIES',
       span: 'md:col-span-6 lg:col-span-3',
       height: 'h-[380px] lg:h-[400px]',
       img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=1000'

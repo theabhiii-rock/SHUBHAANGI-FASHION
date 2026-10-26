@@ -1,6 +1,17 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiX, FiClock } from 'react-icons/fi';
+import { matchesCatalogCategory } from '../../data/store';
+
+const SEARCH_TABS = [
+  { id: 'ALL', label: 'All' },
+  { id: 'BRIDAL_COUTURE', label: 'Bridal Couture' },
+  { id: 'GROOM_COLLECTION', label: 'Groom' },
+  { id: 'MODERN_BRIDE', label: 'Modern Bride' },
+  { id: 'FESTIVE_PARTY', label: 'Festive & Party' },
+  { id: 'MAKEUP_BEAUTY', label: 'Makeup & Beauty' },
+  { id: 'JEWELLERY_ACCESSORIES', label: 'Jewellery' },
+];
 
 export default function SearchModal({ isOpen, onClose, products, onSelectProduct }) {
   const [query, setQuery] = useState('');
@@ -8,7 +19,7 @@ export default function SearchModal({ isOpen, onClose, products, onSelectProduct
 
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
-      const matchesCategory = selectedCategory === 'ALL' || p.category === selectedCategory;
+      const matchesCategory = matchesCatalogCategory(p, selectedCategory);
       const q = query.toLowerCase().trim();
       if (!q) return matchesCategory;
       const matchesQuery =
@@ -67,18 +78,18 @@ export default function SearchModal({ isOpen, onClose, products, onSelectProduct
           </div>
 
           {/* Category Tabs */}
-          <div className="px-6 py-3 border-b border-gray-100 flex gap-2 overflow-x-auto text-xs font-medium">
-            {['ALL', 'DRESS', 'JEWELLERY', 'MAKEUP'].map((cat) => (
+          <div className="px-6 py-3 border-b border-gray-100 flex gap-2 overflow-x-auto no-scrollbar text-xs font-medium">
+            {SEARCH_TABS.map((tab) => (
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1 rounded-full uppercase tracking-wider text-[10px] transition-colors ${
-                  selectedCategory === cat
+                key={tab.id}
+                onClick={() => setSelectedCategory(tab.id)}
+                className={`px-3 py-1 rounded-full uppercase tracking-wider text-[10px] whitespace-nowrap transition-colors ${
+                  selectedCategory === tab.id
                     ? 'bg-black text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
-                {cat === 'DRESS' ? 'Outfits' : cat}
+                {tab.label}
               </button>
             ))}
           </div>

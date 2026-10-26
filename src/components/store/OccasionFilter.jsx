@@ -10,9 +10,12 @@ export default function OccasionFilter({
   categoryCounts = {}
 }) {
   const tabs = [
-    { id: 'DRESS', label: 'Bridal Lehengas & Sarees', icon: '✦' },
-    { id: 'JEWELLERY', label: 'Royal Jewellery', icon: '💎' },
-    { id: 'MAKEUP', label: 'Atelier Makeup Packages', icon: '✨' },
+    { id: 'BRIDAL_COUTURE', label: 'Bridal Couture', icon: '✦' },
+    { id: 'GROOM_COLLECTION', label: 'Groom Collection', icon: '👑' },
+    { id: 'MODERN_BRIDE', label: 'The Modern Bride', icon: '✨' },
+    { id: 'FESTIVE_PARTY', label: 'Festive & Party', icon: '🪔' },
+    { id: 'MAKEUP_BEAUTY', label: 'Makeup & Beauty', icon: '💄' },
+    { id: 'JEWELLERY_ACCESSORIES', label: 'Jewellery & Accessories', icon: '💎' },
     { id: 'ALL', label: 'All Collections', icon: '❖' },
   ];
 

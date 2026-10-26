@@ -11,7 +11,7 @@ import {
   getStoredProducts, getVisitorCount, 
   getStoredWishlist, saveWishlist, getStoredOrders,
   getStoredOfferBanner, getStoredStudioServices, getStoredStudioTopics,
-  hydrateProductsFromVault
+  hydrateProductsFromVault, matchesCatalogCategory
 } from './data/store';
 import { openProductWhatsAppChat } from './utils/whatsapp';
 import ProductDetailModal from './components/ProductDetailModal';
@@ -43,7 +43,7 @@ export default function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('DRESS');
+  const [activeTab, setActiveTab] = useState('ALL');
   const [sortBy, setSortBy] = useState('FEATURED');
   const [scrolled, setScrolled] = useState(false);
 
@@ -805,13 +805,16 @@ export default function App() {
         <OccasionFilter
           activeTab={activeTab}
           onSelectTab={setActiveTab}
-          totalCount={products.filter(p => activeTab === 'ALL' || (p.category || '').toUpperCase() === activeTab).length}
+          totalCount={products.filter(p => matchesCatalogCategory(p, activeTab)).length}
           sortBy={sortBy}
           onSortChange={setSortBy}
           categoryCounts={{
-            DRESS: products.filter(p => (p.category || '').toUpperCase() === 'DRESS').length,
-            JEWELLERY: products.filter(p => (p.category || '').toUpperCase() === 'JEWELLERY').length,
-            MAKEUP: products.filter(p => (p.category || '').toUpperCase() === 'MAKEUP').length,
+            BRIDAL_COUTURE: products.filter(p => matchesCatalogCategory(p, 'BRIDAL_COUTURE')).length,
+            GROOM_COLLECTION: products.filter(p => matchesCatalogCategory(p, 'GROOM_COLLECTION')).length,
+            MODERN_BRIDE: products.filter(p => matchesCatalogCategory(p, 'MODERN_BRIDE')).length,
+            FESTIVE_PARTY: products.filter(p => matchesCatalogCategory(p, 'FESTIVE_PARTY')).length,
+            MAKEUP_BEAUTY: products.filter(p => matchesCatalogCategory(p, 'MAKEUP_BEAUTY')).length,
+            JEWELLERY_ACCESSORIES: products.filter(p => matchesCatalogCategory(p, 'JEWELLERY_ACCESSORIES')).length,
             ALL: products.length,
           }}
         />
@@ -824,8 +827,19 @@ export default function App() {
           variants={staggerContainer}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-14 mb-28"
         >
+          {products.filter(p => matchesCatalogCategory(p, activeTab)).length === 0 && (
+            <div className="col-span-full py-16 text-center">
+              <p className="text-gray-400 font-serif text-lg mb-3">No pieces currently listed under this collection.</p>
+              <button
+                onClick={() => setActiveTab('ALL')}
+                className="px-5 py-2 border border-luxury-gold text-xs uppercase tracking-widest font-semibold hover:bg-black hover:text-white transition-colors"
+              >
+                View All Collections
+              </button>
+            </div>
+          )}
           {products
-            .filter(p => activeTab === 'ALL' || (p.category || '').toUpperCase() === activeTab)
+            .filter(p => matchesCatalogCategory(p, activeTab))
             .sort((a, b) => {
               if (sortBy === 'PRICE_LOW') {
                 const priceA = a.rentPrice3Days || a.buyPrice;
@@ -917,7 +931,7 @@ export default function App() {
                   <div className="text-center pt-2">
                     <div className="flex items-center justify-center gap-2 mb-1.5">
                       <span className="text-[9px] tracking-[0.2em] uppercase text-gray-400 font-medium">
-                        {product.category}
+                        {product.subCategory || product.category}
                       </span>
                       {product.rating && (
                         <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-600">
