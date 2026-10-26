@@ -20,9 +20,31 @@
     <!-- Theme & Fonts -->
     <meta name="theme-color" content="#0a0a0a" />
 
+    <script>
+      // Force unregister stale service workers and clear obsolete caches
+      (function() {
+        var APP_VER = '20261026_v6_categories';
+        try {
+          if (localStorage.getItem('shubhaangi_active_ver') !== APP_VER) {
+            localStorage.setItem('shubhaangi_active_ver', APP_VER);
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(regs) {
+                regs.forEach(function(r) { r.unregister(); });
+              });
+            }
+            if ('caches' in window) {
+              caches.keys().then(function(names) {
+                names.forEach(function(n) { caches.delete(n); });
+              });
+            }
+          }
+        } catch(e) {}
+      })();
+    </script>
+
     <!-- Razorpay Standard Web Checkout SDK -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script type="module" crossorigin src="/assets/index-DBGsNVEe.js"></script>
+    <script type="module" crossorigin src="/assets/index-Dg7VfQzw.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-MXkNXnr5.css">
   </head>
   <body>
