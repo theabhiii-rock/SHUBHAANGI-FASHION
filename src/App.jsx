@@ -37,6 +37,44 @@ import MobileBottomBar from './components/store/MobileBottomBar';
 import NewsletterPopupModal from './components/store/NewsletterPopupModal';
 import StudioServiceModal from './components/store/StudioServiceModal';
 
+class StudioErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error('StudioErrorBoundary caught error:', error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-16 h-16 rounded-full overflow-hidden border border-luxury-gold/60 mb-4 shadow-lg">
+            <img src="/images/shubhaangi-official-logo.jpg" alt="Logo" className="w-full h-full object-cover" />
+          </div>
+          <h2 className="text-xl font-serif text-luxury-gold mb-2 uppercase tracking-widest font-bold">SHUBHAANGI Studio</h2>
+          <p className="text-xs text-gray-400 mb-6 max-w-sm font-light">
+            An unexpected error occurred while loading the portal view.
+          </p>
+          <button
+            onClick={() => {
+              window.location.hash = '';
+              window.location.reload();
+            }}
+            className="px-6 py-2.5 bg-luxury-gold text-black font-bold uppercase text-xs rounded tracking-wider cursor-pointer hover:bg-white transition-colors"
+          >
+            Return to Storefront
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
   const [currentView, setCurrentView] = useState('store'); // 'store' | 'admin'
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -347,38 +385,40 @@ export default function App() {
   // If Admin View is active and authenticated, show dedicated Studio OS
   if (currentView === 'admin' && isAuthenticated) {
     return (
-      <AdminDashboard 
-        products={products}
-        setProducts={setProducts}
-        studioServices={studioServices}
-        setStudioServices={setStudioServices}
-        studioTopics={studioTopics}
-        setStudioTopics={setStudioTopics}
-        offerBanner={offerBanner}
-        setOfferBanner={setOfferBanner}
-        onBackToStore={(targetCategory) => {
-          if (targetCategory) {
-            setActiveTab(targetCategory);
-          } else {
-            setActiveTab('ALL'); // Default to ALL so newly added products are guaranteed visible
-          }
-          setProducts(getStoredProducts());
-          setOfferBanner(getStoredOfferBanner());
-          setStudioServices(getStoredStudioServices());
-          setStudioTopics(getStoredStudioTopics());
-          setCurrentView('store');
-          window.location.hash = '';
-          setTimeout(() => {
-            const el = document.getElementById('catalog');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }, 150);
-        }}
-        onLogout={() => {
-          setIsAuthenticated(false);
-          setCurrentView('store');
-          window.location.hash = '';
-        }}
-      />
+      <StudioErrorBoundary>
+        <AdminDashboard 
+          products={products}
+          setProducts={setProducts}
+          studioServices={studioServices}
+          setStudioServices={setStudioServices}
+          studioTopics={studioTopics}
+          setStudioTopics={setStudioTopics}
+          offerBanner={offerBanner}
+          setOfferBanner={setOfferBanner}
+          onBackToStore={(targetCategory) => {
+            if (targetCategory) {
+              setActiveTab(targetCategory);
+            } else {
+              setActiveTab('ALL'); // Default to ALL so newly added products are guaranteed visible
+            }
+            setProducts(getStoredProducts());
+            setOfferBanner(getStoredOfferBanner());
+            setStudioServices(getStoredStudioServices());
+            setStudioTopics(getStoredStudioTopics());
+            setCurrentView('store');
+            window.location.hash = '';
+            setTimeout(() => {
+              const el = document.getElementById('catalog');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 150);
+          }}
+          onLogout={() => {
+            setIsAuthenticated(false);
+            setCurrentView('store');
+            window.location.hash = '';
+          }}
+        />
+      </StudioErrorBoundary>
     );
   }
 

@@ -6,7 +6,7 @@ import {
   FiTag, FiPercent, FiCopy, FiTrash2, FiVolume2,
   FiImage, FiUploadCloud, FiCamera, FiCheckCircle, FiLoader,
   FiBookOpen, FiClipboard, FiCreditCard, FiSend, FiScissors,
-  FiCalendar, FiMapPin, FiStar, FiVideo, FiPlay
+  FiCalendar, FiMapPin, FiStar, FiVideo, FiPlay, FiEye
 } from 'react-icons/fi';
 import { 
   getStoredOrders, saveOrders, getStoredProducts, saveProducts, getVisitorCount, 
