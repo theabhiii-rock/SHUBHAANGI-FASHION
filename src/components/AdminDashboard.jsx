@@ -568,6 +568,7 @@ export default function AdminDashboard({
   const [searchQuery, setSearchQuery] = useState('');
   const [inventoryCategoryFilter, setInventoryCategoryFilter] = useState('ALL');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   // Shoots, Events & Studio Experiences State
   const [studioTopics, setStudioTopics] = useState(() => (Array.isArray(propStudioTopics) && propStudioTopics.length > 0) ? propStudioTopics : getStoredStudioTopics());
@@ -598,6 +599,21 @@ export default function AdminDashboard({
       propSetProducts(updated);
     }
     saveProducts(updated);
+  };
+
+  const confirmDeleteProduct = () => {
+    if (!productToDelete) return;
+    const targetId = productToDelete.id;
+    const targetName = productToDelete.name;
+
+    const updated = products.filter(p => p.id !== targetId);
+    updateProducts(updated);
+    setProductToDelete(null);
+    showToast(`🗑️ "${targetName}" catalog se permanently delete ho gaya!`);
+  };
+
+  const handleDeleteProductClick = (product) => {
+    setProductToDelete(product);
   };
 
   const updateStudioServices = (updated) => {
@@ -2219,16 +2235,27 @@ export default function AdminDashboard({
                             <span className="text-[10px] uppercase tracking-wider text-amber-800 font-bold bg-amber-50 border border-amber-200/60 px-2 py-0.5 rounded">
                               {product.subCategory || product.category}
                             </span>
-                            <button
-                              onClick={() => handleToggleRentalAvailability(product.id)}
-                              className={`text-[10px] px-2.5 py-0.5 rounded font-bold uppercase transition-colors shrink-0 ${
-                                product.isRentalAvailable
-                                  ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                                  : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                              }`}
-                            >
-                              {product.isRentalAvailable ? 'Rental Active' : 'Buy Only'}
-                            </button>
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                onClick={() => handleToggleRentalAvailability(product.id)}
+                                className={`text-[10px] px-2.5 py-0.5 rounded font-bold uppercase transition-colors shrink-0 ${
+                                  product.isRentalAvailable
+                                    ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                                }`}
+                              >
+                                {product.isRentalAvailable ? 'Rental Active' : 'Buy Only'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteProductClick(product)}
+                                title={`Delete "${product.name}"`}
+                                className="p-1 rounded text-gray-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-all cursor-pointer shrink-0"
+                                aria-label="Delete piece"
+                              >
+                                <FiTrash2 size={13} />
+                              </button>
+                            </div>
                           </div>
                           <h4 className="font-serif font-bold text-sm sm:text-base text-gray-900 leading-snug break-words line-clamp-2 mb-2">
                             {product.name}
@@ -2280,6 +2307,13 @@ export default function AdminDashboard({
                               >
                                 Cancel
                               </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteProductClick(product)}
+                                className="px-3 py-1.5 bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 text-xs font-semibold rounded border border-rose-200 transition-colors ml-auto flex items-center gap-1 cursor-pointer"
+                              >
+                                <FiTrash2 size={12} /> Delete Piece
+                              </button>
                             </div>
                           </div>
                         ) : (
@@ -2305,7 +2339,7 @@ export default function AdminDashboard({
                             <div className="flex items-center gap-2 mt-2.5 pt-2 border-t border-gray-100 flex-wrap">
                               <button
                                 onClick={() => setEditingProduct(product.id)}
-                                className="text-xs text-gray-700 hover:text-black font-semibold flex items-center gap-1.5 py-1 px-2.5 rounded bg-white border border-gray-200 hover:bg-gray-100 transition-colors shadow-2xs"
+                                className="text-xs text-gray-700 hover:text-black font-semibold flex items-center gap-1.5 py-1 px-2.5 rounded bg-white border border-gray-200 hover:bg-gray-100 transition-colors shadow-2xs cursor-pointer"
                               >
                                 <FiEdit2 size={12} /> Edit Pricing
                               </button>
@@ -2314,9 +2348,17 @@ export default function AdminDashboard({
                                   setPhotoManagerProduct(product);
                                   setNewPhotoUrlInput('');
                                 }}
-                                className="text-xs text-amber-900 hover:text-black font-semibold flex items-center gap-1.5 py-1 px-2.5 rounded bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-colors"
+                                className="text-xs text-amber-900 hover:text-black font-semibold flex items-center gap-1.5 py-1 px-2.5 rounded bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-colors cursor-pointer"
                               >
                                 <FiImage size={12} /> Manage Photos ({product.images?.length || 1})
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteProductClick(product)}
+                                className="text-xs text-rose-700 hover:text-white font-semibold flex items-center gap-1 py-1 px-2.5 rounded bg-rose-50 hover:bg-rose-600 border border-rose-200 hover:border-rose-600 transition-colors ml-auto cursor-pointer"
+                                title={`Delete "${product.name}"`}
+                              >
+                                <FiTrash2 size={12} /> Delete
                               </button>
                             </div>
                           </div>
@@ -3251,6 +3293,64 @@ export default function AdminDashboard({
                 >
                   Done & Close
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* DELETE CATALOG PIECE CONFIRMATION MODAL */}
+        {productToDelete && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
+            <div className="relative w-full max-w-md bg-white rounded-lg shadow-2xl p-5 sm:p-6 border border-rose-100">
+              <div className="flex items-start gap-3.5">
+                <div className="w-11 h-11 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                  <FiAlertCircle size={22} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base font-serif font-bold text-gray-900">
+                    Delete Piece from Catalog?
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                    Are you sure you want to delete this piece? It will be removed from your live storefront catalog, search, and lookbook.
+                  </p>
+
+                  <div className="mt-3.5 p-3 bg-gray-50 rounded-md border border-gray-200 flex items-center gap-3">
+                    <img
+                      src={productToDelete.img}
+                      alt={productToDelete.name}
+                      className="w-12 h-14 object-cover rounded bg-zinc-900 shrink-0 border border-gray-200"
+                    />
+                    <div className="min-w-0">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 block">
+                        {productToDelete.subCategory || productToDelete.category}
+                      </span>
+                      <h4 className="text-xs font-semibold text-gray-900 truncate mt-0.5">
+                        {productToDelete.name}
+                      </h4>
+                      <span className="text-[11px] font-mono font-bold text-gray-700 block mt-0.5">
+                        ₹{productToDelete.buyPrice?.toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 flex items-center justify-end gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setProductToDelete(null)}
+                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-md transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={confirmDeleteProduct}
+                      className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-md flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
+                    >
+                      <FiTrash2 size={13} />
+                      <span>Yes, Delete Piece</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
