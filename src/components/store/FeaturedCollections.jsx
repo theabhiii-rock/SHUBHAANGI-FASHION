@@ -5,54 +5,58 @@ import { FiArrowUpRight } from 'react-icons/fi';
 export default function FeaturedCollections({ onSelectCollection, fadeUp, staggerContainer }) {
   const collections = [
     {
-      id: 'bridal-2026',
-      title: 'Bridal Couture 2026',
-      subtitle: 'The Headline Suite',
+      id: 'bridal-couture',
+      title: 'Bridal Couture',
+      subtitle: 'Haute Couture',
       category: 'DRESS',
-      span: 'lg:col-span-7',
-      height: 'h-[480px] lg:h-[560px]',
-      img: '/images/shubhaangi-rani-pink-bridal-lehenga.jpg',
-      description: 'Signature Rani Pink raw silk lehenga adorned with handcrafted antique zardozi and emerald choker set.'
+      span: 'md:col-span-6 lg:col-span-7',
+      height: 'h-[440px] lg:h-[520px]',
+      img: '/images/shubhaangi-rani-pink-bridal-lehenga.jpg'
     },
     {
-      id: 'royal-heritage',
-      title: 'Royal Heritage',
-      subtitle: 'Antique Craftsmanship',
+      id: 'groom-collection',
+      title: 'Groom Collection',
+      subtitle: "Men's Luxury",
       category: 'DRESS',
-      span: 'lg:col-span-5',
-      height: 'h-[480px] lg:h-[560px]',
-      img: '/images/shubhaangi-antique-gold-tissue.jpg',
-      description: 'Zar-e-Khaas luminous antique gold tissue silk with chevron cutwork and kundan accents.'
+      span: 'md:col-span-6 lg:col-span-5',
+      height: 'h-[440px] lg:h-[520px]',
+      img: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&q=80&w=1000'
     },
     {
       id: 'modern-bride',
       title: 'The Modern Bride',
-      subtitle: 'Contemporary Elegance',
+      subtitle: 'Contemporary',
       category: 'DRESS',
-      span: 'lg:col-span-4',
-      height: 'h-[420px]',
-      img: '/images/shubhaangi-mauve-shimmer-gown.jpg',
-      description: 'Fairy-tale mauve shimmer gown with thousands of light-catching crystal sequins.'
+      span: 'md:col-span-6 lg:col-span-3',
+      height: 'h-[380px] lg:h-[400px]',
+      img: '/images/shubhaangi-mauve-shimmer-gown.jpg'
     },
     {
-      id: 'festive-edit',
-      title: 'Festive & Sangeet Edit',
-      subtitle: 'Celebration Ensembles',
+      id: 'festive-party',
+      title: 'Festive & Party',
+      subtitle: 'Celebration',
       category: 'DRESS',
-      span: 'lg:col-span-4',
-      height: 'h-[420px]',
-      img: '/images/shubhaangi-royal-plum-cape.jpg',
-      description: 'Royal Baingani deep plum pleated skirt paired with an opulent sequinned jacket cape.'
+      span: 'md:col-span-6 lg:col-span-3',
+      height: 'h-[380px] lg:h-[400px]',
+      img: '/images/shubhaangi-royal-plum-cape.jpg'
     },
     {
-      id: 'royal-jewellery',
-      title: 'Polki & Kundan Suites',
-      subtitle: 'Crown Jewels',
+      id: 'makeup-beauty',
+      title: 'Mekup & Beauty',
+      subtitle: 'Studio Artistry',
+      category: 'MAKEUP',
+      span: 'md:col-span-6 lg:col-span-3',
+      height: 'h-[380px] lg:h-[400px]',
+      img: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&q=80&w=1000'
+    },
+    {
+      id: 'jewellery-accessories',
+      title: 'Jewellery & Accessories',
+      subtitle: 'Fine Jewels',
       category: 'JEWELLERY',
-      span: 'lg:col-span-4',
-      height: 'h-[420px]',
-      img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=800',
-      description: 'Museum-grade bridal chokers and matha pattis encrusted with uncut gems.'
+      span: 'md:col-span-6 lg:col-span-3',
+      height: 'h-[380px] lg:h-[400px]',
+      img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=1000'
     }
   ];
 
@@ -109,12 +113,9 @@ export default function FeaturedCollections({ onSelectCollection, fadeUp, stagge
               </div>
 
               <div>
-                <h3 className="text-2xl md:text-3xl font-serif text-white mb-2 group-hover:text-luxury-gold transition-colors">
+                <h3 className="text-2xl md:text-3xl font-serif text-white mb-3 group-hover:text-luxury-gold transition-colors">
                   {item.title}
                 </h3>
-                <p className="text-xs text-gray-300 line-clamp-2 max-w-md font-light mb-4">
-                  {item.description}
-                </p>
                 <span className="text-[10px] tracking-[0.25em] uppercase text-luxury-gold font-semibold flex items-center gap-1">
                   Discover Collection →
                 </span>
