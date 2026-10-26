@@ -78,7 +78,7 @@ export default function AdminAuthModal({ isOpen, onClose, onSuccess }) {
           </div>
 
           <h3 className="font-serif text-xl tracking-wider uppercase text-white mb-1">
-            Studio Staff Access
+            Studio Portal Access
           </h3>
           <p className="text-[11px] text-gray-400 mb-6 font-light">
             Authorized private portal for Ekta Jain & Deepak Kumar

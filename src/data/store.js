@@ -464,6 +464,9 @@ export const getStoredOfferBanner = () => {
 export const saveOfferBanner = (banner) => {
   try {
     localStorage.setItem('shubhaangi_offer_banner_v1', JSON.stringify(banner));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('shubhaangi_offer_banner_updated', { detail: banner }));
+    }
   } catch (e) {
     console.error(e);
   }
@@ -718,7 +721,7 @@ export const INITIAL_OFFLINE_ORDERS = [
     customerName: 'Megha Singhania',
     customerPhone: '+91 98112 34567',
     item: 'Rani Pink Zardozi Velvet Bridal Lehenga',
-    category: 'DRESS',
+    category: 'BRIDAL_COUTURE',
     mode: 'RENT',
     amount: 18500,
     advancePaid: 8500,
@@ -737,7 +740,7 @@ export const INITIAL_OFFLINE_ORDERS = [
     customerName: 'Ananya Verma',
     customerPhone: '+91 98731 88921',
     item: 'Royal Polki & Emerald Bridal Choker Set',
-    category: 'JEWELLERY',
+    category: 'JEWELLERY_ACCESSORIES',
     mode: 'RENT',
     amount: 8500,
     advancePaid: 8500,
@@ -756,7 +759,7 @@ export const INITIAL_OFFLINE_ORDERS = [
     customerName: 'Ritika Malhotra',
     customerPhone: '+91 96540 12890',
     item: 'Bespoke Antique Gold Tissue Silk Bridal Saree',
-    category: 'DRESS',
+    category: 'FESTIVE_PARTY',
     mode: 'BUY',
     amount: 125000,
     advancePaid: 50000,

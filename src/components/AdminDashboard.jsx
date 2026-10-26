@@ -13,7 +13,8 @@ import {
   getStoredCoupons, saveCoupons, getStoredOfferBanner, saveOfferBanner,
   getStoredOfflineOrders, saveOfflineOrders,
   getStoredStudioServices, saveStudioServices,
-  getStoredStudioTopics, saveStudioTopics
+  getStoredStudioTopics, saveStudioTopics,
+  matchesCatalogCategory
 } from '../data/store';
 import {
   broadcastNewDressAlert,
@@ -565,6 +566,7 @@ export default function AdminDashboard({
   const [newPhotoUrlInput, setNewPhotoUrlInput] = useState('');
   const [notification, setNotification] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [inventoryCategoryFilter, setInventoryCategoryFilter] = useState('ALL');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Shoots, Events & Studio Experiences State
@@ -651,7 +653,7 @@ export default function AdminDashboard({
     customerName: '',
     customerPhone: '',
     item: '',
-    category: 'DRESS',
+    category: 'BRIDAL_COUTURE',
     mode: 'RENT',
     amount: '',
     advancePaid: '',
@@ -794,7 +796,7 @@ export default function AdminDashboard({
       customerName: '',
       customerPhone: '',
       item: '',
-      category: 'DRESS',
+      category: 'BRIDAL_COUTURE',
       mode: 'RENT',
       amount: '',
       advancePaid: '',
@@ -1954,12 +1956,12 @@ export default function AdminDashboard({
                                   : 'bg-emerald-100 text-emerald-800'
                               }`}
                             >
-                              {order.status.replace('_', ' ')}
+                              {(order.status || '').replace(/_/g, ' ')}
                             </span>
                           </td>
                           <td className="px-4 py-3.5 text-right whitespace-nowrap">
                             <a
-                              href={`https://wa.me/${order.phone.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(order.customerName)},%20SHUBHAANGI%20Studio%20calling%20regarding%20your%20order.`}
+                              href={`https://wa.me/${(order.phone || '916397799514').replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(order.customerName || 'Client')},%20SHUBHAANGI%20Studio%20calling%20regarding%20your%20order.`}
                               target="_blank"
                               rel="noreferrer"
                               className="inline-flex items-center gap-1.5 text-xs bg-[#25D366] text-white px-3 py-1.5 rounded-md hover:bg-[#1eb855] transition-colors shadow-2xs font-medium"
@@ -2101,7 +2103,7 @@ export default function AdminDashboard({
           {/* TAB 4: INVENTORY & PRICING EDITOR */}
           {activeTab === 'INVENTORY' && (
             <div className="bg-white rounded-lg border border-gray-200 shadow-xs p-4 sm:p-6">
-              <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mb-6">
+              <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mb-5">
                 <div>
                   <h3 className="text-base sm:text-lg font-serif font-bold text-gray-900">
                     Catalog, Pricing & Rental Availability Manager
@@ -2115,7 +2117,7 @@ export default function AdminDashboard({
                     <FiSearch className="absolute left-3 top-2.5 text-gray-400" size={15} />
                     <input
                       type="text"
-                      placeholder="Search dresses/jewellery..."
+                      placeholder="Search pieces..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full sm:w-56 pl-9 pr-3 py-2 border border-gray-300 rounded-md text-xs focus:border-black outline-none bg-white"
@@ -2123,16 +2125,51 @@ export default function AdminDashboard({
                   </div>
                   <button
                     onClick={() => setIsAddProductOpen(true)}
-                    className="px-4 py-2 bg-black text-white hover:bg-luxury-gold text-xs font-semibold rounded-md flex items-center justify-center gap-1.5 transition-colors shadow-xs shrink-0"
+                    className="px-4 py-2 bg-black text-white hover:bg-luxury-gold hover:text-black text-xs font-semibold rounded-md flex items-center justify-center gap-1.5 transition-colors shadow-xs shrink-0 cursor-pointer"
                   >
                     <FiPlus size={14} />
-                    <span>Add New Dress</span>
+                    <span>Add New Piece</span>
                   </button>
                 </div>
               </div>
 
+              {/* Category Filter Tabs */}
+              <div className="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-4 border-b border-gray-100">
+                {[
+                  { id: 'ALL', label: 'All Pieces' },
+                  { id: 'BRIDAL_COUTURE', label: 'Bridal Couture' },
+                  { id: 'GROOM_COLLECTION', label: 'Groom' },
+                  { id: 'MODERN_BRIDE', label: 'Modern Bride' },
+                  { id: 'FESTIVE_PARTY', label: 'Festive & Party' },
+                  { id: 'MAKEUP_BEAUTY', label: 'Makeup & Beauty' },
+                  { id: 'JEWELLERY_ACCESSORIES', label: 'Jewellery' }
+                ].map((cat) => {
+                  const count = products.filter(p => matchesCatalogCategory(p, cat.id)).length;
+                  const isActive = inventoryCategoryFilter === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => setInventoryCategoryFilter(cat.id)}
+                      className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
+                        isActive
+                          ? 'bg-black text-white shadow-xs'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      <span>{cat.label}</span>
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                        isActive ? 'bg-luxury-gold text-black font-bold' : 'bg-gray-200 text-gray-600'
+                      }`}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {products
+                  .filter(p => matchesCatalogCategory(p, inventoryCategoryFilter))
                   .filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
                   .map((product) => (
                     <div
@@ -2312,10 +2349,10 @@ export default function AdminDashboard({
                       Top Running Animation Text
                     </span>
                     <span className={`text-xs font-bold mt-1 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full ${
-                      offerBanner.enabled ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-50 text-rose-700 border border-rose-200'
+                      offerBanner?.enabled ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-50 text-rose-700 border border-rose-200'
                     }`}>
-                      <span className={`w-2 h-2 rounded-full ${offerBanner.enabled ? 'bg-emerald-500 animate-pulse' : 'bg-rose-400'}`}></span>
-                      {offerBanner.enabled ? '🟢 ON (RUNNING)' : '⏸️ OFF (DISABLED)'}
+                      <span className={`w-2 h-2 rounded-full ${offerBanner?.enabled ? 'bg-emerald-500 animate-pulse' : 'bg-rose-400'}`}></span>
+                      {offerBanner?.enabled ? '🟢 ON (RUNNING)' : '⏸️ OFF (DISABLED)'}
                     </span>
                     <span className="text-[10px] text-gray-500 block mt-1">
                       Top Marquee Promo Bar
@@ -2324,17 +2361,17 @@ export default function AdminDashboard({
                   <button
                     type="button"
                     onClick={() => {
-                      const updated = { ...offerBanner, enabled: !offerBanner.enabled };
+                      const updated = { ...offerBanner, enabled: !offerBanner?.enabled };
                       handleUpdateOfferBanner(updated);
                       showToast(updated.enabled ? '🟢 Top Animation Text is now ON (Visible on site)!' : '⏸️ Top Animation Text is now OFF (Hidden from site)!');
                     }}
                     className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer ${
-                      offerBanner.enabled 
+                      offerBanner?.enabled 
                         ? 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100' 
                         : 'bg-emerald-600 text-white hover:bg-emerald-700'
                     }`}
                   >
-                    {offerBanner.enabled ? 'Turn OFF' : 'Turn ON'}
+                    {offerBanner?.enabled ? 'Turn OFF' : 'Turn ON'}
                   </button>
                 </div>
 
@@ -2354,23 +2391,23 @@ export default function AdminDashboard({
 
               {/* 1. STOREFRONT PROMOTIONAL ANNOUNCEMENT BANNER CONTROLLER */}
               <div className={`rounded-lg border shadow-xs p-4 sm:p-6 transition-all ${
-                offerBanner.enabled 
+                offerBanner?.enabled 
                   ? 'bg-white border-amber-300 bg-gradient-to-br from-white via-amber-50/20 to-amber-100/10' 
                   : 'bg-gray-50 border-gray-200'
               }`}>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-gray-200">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className={`p-1.5 rounded-md shrink-0 ${offerBanner.enabled ? 'bg-black text-luxury-gold' : 'bg-gray-200 text-gray-600'}`}>
+                      <span className={`p-1.5 rounded-md shrink-0 ${offerBanner?.enabled ? 'bg-black text-luxury-gold' : 'bg-gray-200 text-gray-600'}`}>
                         <FiVolume2 size={16} />
                       </span>
                       <h3 className="text-base font-serif font-bold text-gray-900">
                         Top Running Animation Text (Marquee Ticker)
                       </h3>
                       <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded shrink-0 ${
-                        offerBanner.enabled ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-700'
+                        offerBanner?.enabled ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-700'
                       }`}>
-                        {offerBanner.enabled ? '🟢 RUNNING (ON)' : '⏸️ PAUSED (OFF)'}
+                        {offerBanner?.enabled ? '🟢 RUNNING (ON)' : '⏸️ PAUSED (OFF)'}
                       </span>
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
@@ -2386,31 +2423,31 @@ export default function AdminDashboard({
                     <button
                       type="button"
                       onClick={() => {
-                        const updated = { ...offerBanner, enabled: !offerBanner.enabled };
+                        const updated = { ...offerBanner, enabled: !offerBanner?.enabled };
                         handleUpdateOfferBanner(updated);
                         showToast(updated.enabled ? '🟢 Top Animation Banner ON ho gaya (Website par dikhega)!' : '⏸️ Top Animation Banner OFF ho gaya (Website se hide ho gaya)!');
                       }}
                       className={`relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                        offerBanner.enabled ? 'bg-emerald-600' : 'bg-gray-300'
+                        offerBanner?.enabled ? 'bg-emerald-600' : 'bg-gray-300'
                       }`}
                       aria-label="Toggle banner animation"
                     >
                       <span
                         className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                          offerBanner.enabled ? 'translate-x-7' : 'translate-x-0'
+                          offerBanner?.enabled ? 'translate-x-7' : 'translate-x-0'
                         }`}
                       />
                     </button>
                     <span className={`text-xs font-extrabold px-2.5 py-1 rounded-md ${
-                      offerBanner.enabled ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-gray-100 text-gray-600 border border-gray-300'
+                      offerBanner?.enabled ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-gray-100 text-gray-600 border border-gray-300'
                     }`}>
-                      {offerBanner.enabled ? 'ON' : 'OFF'}
+                      {offerBanner?.enabled ? 'ON' : 'OFF'}
                     </span>
                   </div>
                 </div>
 
                 {/* Banner Live Preview */}
-                {offerBanner.enabled ? (
+                {offerBanner?.enabled ? (
                   <div className="my-4 p-3 bg-[#111] text-luxury-gold rounded-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs shadow-inner border border-luxury-gold/30">
                     <div className="flex items-center gap-2 overflow-hidden min-w-0">
                       <span className="px-2 py-0.5 bg-luxury-gold/20 text-luxury-gold text-[10px] font-bold rounded uppercase shrink-0">

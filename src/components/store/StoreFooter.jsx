@@ -1,7 +1,26 @@
-import React from 'react';
-import { FiInstagram, FiMessageCircle, FiPhoneCall, FiLock } from 'react-icons/fi';
+import React, { useState, useRef } from 'react';
+import { FiInstagram, FiMessageCircle, FiPhoneCall } from 'react-icons/fi';
 
 export default function StoreFooter({ onOpenAuthModal }) {
+  const [tapCount, setTapCount] = useState(0);
+  const lastTapRef = useRef(0);
+
+  const handleStudioClick = (e) => {
+    e.preventDefault();
+    const now = Date.now();
+    // Count consecutive taps within 2.5 seconds
+    const nextCount = (now - lastTapRef.current < 2500) ? tapCount + 1 : 1;
+    lastTapRef.current = now;
+    setTapCount(nextCount);
+
+    if (nextCount >= 5) {
+      setTapCount(0);
+      lastTapRef.current = 0;
+      if (typeof onOpenAuthModal === 'function') {
+        onOpenAuthModal();
+      }
+    }
+  };
   return (
     <footer className="bg-[#0a0a0a] text-white py-24 px-6 relative overflow-hidden border-t border-white/5">
       <div className="absolute top-0 right-0 w-96 h-96 bg-luxury-gold/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
@@ -119,13 +138,14 @@ export default function StoreFooter({ onOpenAuthModal }) {
           <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
           <a href="#" className="hover:text-white transition-colors">Rental Terms</a>
           
-          {/* Subtle Discreet Staff Login (Only accessible to studio owners) */}
+          {/* Secret Studio Access - Opens PIN modal after 5 consecutive taps */}
           <button
-            onClick={onOpenAuthModal}
-            className="text-gray-600 hover:text-luxury-gold transition-colors flex items-center gap-1 font-mono tracking-wider ml-2"
-            title="Studio Owner & Staff Login"
+            type="button"
+            onClick={handleStudioClick}
+            className="text-gray-600 hover:text-gray-400 transition-colors tracking-widest cursor-pointer select-none ml-2"
+            title="STUDIO"
           >
-            <FiLock size={10} /> Staff Access
+            STUDIO
           </button>
         </div>
       </div>

@@ -169,6 +169,13 @@ export default function App() {
         setStudioTopics(getStoredStudioTopics());
       }
     };
+    const handleBannerUpdated = (e) => {
+      if (e?.detail) {
+        setOfferBanner(e.detail);
+      } else {
+        setOfferBanner(getStoredOfferBanner());
+      }
+    };
     const handleStorage = (e) => {
       if (e.key === 'shubhaangi_products_v5' || e.key === 'shubhaangi_products_v4') {
         setProducts(getStoredProducts());
@@ -187,6 +194,7 @@ export default function App() {
     window.addEventListener('shubhaangi_products_updated', handleProductsUpdated);
     window.addEventListener('shubhaangi_services_updated', handleServicesUpdated);
     window.addEventListener('shubhaangi_topics_updated', handleTopicsUpdated);
+    window.addEventListener('shubhaangi_offer_banner_updated', handleBannerUpdated);
     window.addEventListener('storage', handleStorage);
 
     let bc;
@@ -212,6 +220,7 @@ export default function App() {
       window.removeEventListener('shubhaangi_products_updated', handleProductsUpdated);
       window.removeEventListener('shubhaangi_services_updated', handleServicesUpdated);
       window.removeEventListener('shubhaangi_topics_updated', handleTopicsUpdated);
+      window.removeEventListener('shubhaangi_offer_banner_updated', handleBannerUpdated);
       window.removeEventListener('storage', handleStorage);
       if (bc) bc.close();
     };
