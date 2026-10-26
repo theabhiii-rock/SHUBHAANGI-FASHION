@@ -1917,7 +1917,18 @@ export default function AdminDashboard({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                      {orders.slice(0, 5).map((order) => (
+                      {orders.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="px-4 py-10 text-center text-gray-400 text-xs font-light">
+                            <div className="flex flex-col items-center justify-center gap-1.5 py-4">
+                              <FiClipboard size={24} className="text-gray-300 mb-1" />
+                              <p className="font-semibold text-gray-700">No client orders received yet</p>
+                              <p className="text-[11px] text-gray-400">Live orders placed by brides on the storefront will appear here automatically.</p>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : (
+                        orders.slice(0, 5).map((order) => (
                         <tr key={order.id} className="hover:bg-gray-50/70 transition-colors">
                           <td className="px-4 py-3.5 font-mono text-xs font-bold text-gray-700 whitespace-nowrap">{order.id}</td>
                           <td className="px-4 py-3.5 whitespace-nowrap">
@@ -1970,7 +1981,7 @@ export default function AdminDashboard({
                             </a>
                           </td>
                         </tr>
-                      ))}
+                      )))}
                     </tbody>
                   </table>
                 </div>
@@ -2037,7 +2048,20 @@ export default function AdminDashboard({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {orders.map((o) => (
+                    {orders.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-12 text-center text-gray-400 text-xs font-light">
+                          <div className="flex flex-col items-center justify-center gap-2 py-6">
+                            <FiClipboard size={28} className="text-gray-300 mb-1" />
+                            <p className="font-semibold text-gray-700 text-sm">No Orders in System</p>
+                            <p className="text-xs text-gray-400 max-w-sm">
+                              Your online bridal store is live and ready. As soon as a client checks out, their rental or purchase will show up here.
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : (
+                      orders.map((o) => (
                       <tr key={o.id} className="hover:bg-gray-50/70 transition-colors">
                         <td className="px-4 py-3.5 font-mono text-xs font-bold text-gray-700 whitespace-nowrap">{o.id}</td>
                         <td className="px-4 py-3.5 whitespace-nowrap">
@@ -2093,7 +2117,7 @@ export default function AdminDashboard({
                           </a>
                         </td>
                       </tr>
-                    ))}
+                    )))}
                   </tbody>
                 </table>
               </div>

@@ -292,84 +292,8 @@ export const INITIAL_PRODUCTS = [
   }
 ];
 
-// Initial mock orders & rental tracking records
-export const INITIAL_ORDERS = [
-  {
-    id: 'SHB-8091',
-    customerName: 'Pooja Sharma',
-    phone: '+91 98112 34567',
-    date: '17 Sep 2026',
-    item: 'Regal Ivory Zardozi Lehenga',
-    mode: 'RENT',
-    duration: '3 Days',
-    rentalDueDate: '20 Sep 2026',
-    amount: 14500,
-    deposit: 15000,
-    status: 'ACTIVE_RENTAL', // PLACED | FITTING_SCHEDULED | DISPATCHED | ACTIVE_RENTAL | RETURN_PENDING | RETURNED | COMPLETED
-    deliveryType: 'Studio Trial & Pick-up',
-    paymentStatus: 'PAID'
-  },
-  {
-    id: 'SHB-8092',
-    customerName: 'Ananya Verma',
-    phone: '+91 99580 88210',
-    date: '16 Sep 2026',
-    item: 'Heritage Kundan Choker Set',
-    mode: 'RENT',
-    duration: '7 Days',
-    rentalDueDate: '23 Sep 2026',
-    amount: 13000,
-    deposit: 10000,
-    status: 'ACTIVE_RENTAL',
-    deliveryType: 'Insured Pan-India Courier',
-    paymentStatus: 'PAID'
-  },
-  {
-    id: 'SHB-8093',
-    customerName: 'Megha Singhal',
-    phone: '+91 98104 55421',
-    date: '15 Sep 2026',
-    item: 'Crimson Scarlet Heritage Lehenga',
-    mode: 'RENT',
-    duration: '3 Days',
-    rentalDueDate: '18 Sep 2026',
-    amount: 18000,
-    deposit: 20000,
-    status: 'RETURN_PENDING',
-    deliveryType: 'Studio Trial & Pick-up',
-    paymentStatus: 'PAID'
-  },
-  {
-    id: 'SHB-8094',
-    customerName: 'Rohan Malhotra',
-    phone: '+91 98711 00293',
-    date: '14 Sep 2026',
-    item: 'Maharaja Embroidered Ivory Sherwani',
-    mode: 'BUY',
-    duration: 'Permanent',
-    rentalDueDate: null,
-    amount: 95000,
-    deposit: 0,
-    status: 'COMPLETED',
-    deliveryType: 'Insured Pan-India Courier',
-    paymentStatus: 'PAID'
-  },
-  {
-    id: 'SHB-8095',
-    customerName: 'Simran Kaur',
-    phone: '+91 99100 44321',
-    date: '12 Sep 2026',
-    item: 'Champagne Tissue Saree with Zari',
-    mode: 'RENT',
-    duration: '3 Days',
-    rentalDueDate: '15 Sep 2026',
-    amount: 7500,
-    deposit: 8000,
-    status: 'RETURNED',
-    deliveryType: 'Studio Trial & Pick-up',
-    paymentStatus: 'DEPOSIT_REFUNDED'
-  }
-];
+// Initial orders & rental tracking records (Starts completely fresh & empty for studio handover)
+export const INITIAL_ORDERS = [];
 
 // Valid Promotional Coupons & Discount Offers
 export const INITIAL_COUPONS = [
@@ -382,7 +306,7 @@ export const INITIAL_COUPONS = [
     minSubtotal: 5000,
     isActive: true,
     validUntil: '31 Dec 2026',
-    timesUsed: 42,
+    timesUsed: 0,
     badge: 'Trending'
   },
   {
@@ -394,7 +318,7 @@ export const INITIAL_COUPONS = [
     minSubtotal: 8000,
     isActive: true,
     validUntil: '30 Nov 2026',
-    timesUsed: 28,
+    timesUsed: 0,
     badge: 'Delhi Special'
   },
   {
@@ -406,7 +330,7 @@ export const INITIAL_COUPONS = [
     minSubtotal: 20000,
     isActive: true,
     validUntil: '31 Dec 2026',
-    timesUsed: 65,
+    timesUsed: 0,
     badge: 'VIP Bridal'
   },
   {
@@ -418,7 +342,7 @@ export const INITIAL_COUPONS = [
     minSubtotal: 15000,
     isActive: true,
     validUntil: '15 Nov 2026',
-    timesUsed: 19,
+    timesUsed: 0,
     badge: 'Festive Special'
   }
 ];
@@ -426,7 +350,7 @@ export const INITIAL_COUPONS = [
 export const PROMO_COUPONS = INITIAL_COUPONS;
 
 export const INITIAL_OFFER_BANNER = {
-  enabled: true,
+  enabled: false,
   headline: '✨ FESTIVE BRIDAL EXCLUSIVE',
   text: 'Use code ROYAL10 for 10% Off on all bridal commissions | Complimentary Bespoke Fitting by Designer Deepak Kumar',
   badge: 'Limited Period',
@@ -436,7 +360,14 @@ export const INITIAL_OFFER_BANNER = {
 export const getStoredCoupons = () => {
   try {
     const data = localStorage.getItem('shubhaangi_coupons_v1');
-    return data ? JSON.parse(data) : INITIAL_COUPONS;
+    if (!data) return INITIAL_COUPONS;
+    const parsed = JSON.parse(data);
+    if (!Array.isArray(parsed)) return INITIAL_COUPONS;
+    // Reset test/demo usage counts for fresh studio handover
+    return parsed.map(c => ({
+      ...c,
+      timesUsed: [42, 28, 65, 19].includes(c.timesUsed) ? 0 : (c.timesUsed || 0)
+    }));
   } catch (e) {
     console.warn(e);
     return INITIAL_COUPONS;
@@ -621,7 +552,15 @@ export const saveProducts = (products) => {
 export const getStoredOrders = () => {
   try {
     const data = localStorage.getItem('shubhaangi_orders');
-    return data ? JSON.parse(data) : INITIAL_ORDERS;
+    if (!data) return INITIAL_ORDERS;
+    const parsed = JSON.parse(data);
+    if (!Array.isArray(parsed)) return INITIAL_ORDERS;
+    // Filter out legacy development mock orders
+    const filtered = parsed.filter(o => !['SHB-8091', 'SHB-8092', 'SHB-8093', 'SHB-8094', 'SHB-8095'].includes(o.id));
+    if (filtered.length !== parsed.length) {
+      localStorage.setItem('shubhaangi_orders', JSON.stringify(filtered));
+    }
+    return filtered;
   } catch (e) {
     console.warn(e);
     return INITIAL_ORDERS;
@@ -655,20 +594,20 @@ export const saveWishlist = (wishlistIds) => {
   }
 };
 
-// Visitors count
+// Visitors count (Starts fresh for real site traffic)
 export const getVisitorCount = () => {
   try {
     const current = localStorage.getItem('shubhaangi_visitors');
-    if (!current) {
-      localStorage.setItem('shubhaangi_visitors', '3428');
-      return 3428;
+    if (!current || current === '3428' || current === '3429' || parseInt(current, 10) >= 3420) {
+      localStorage.setItem('shubhaangi_visitors', '1');
+      return 1;
     }
     const newCount = parseInt(current, 10) + 1;
     localStorage.setItem('shubhaangi_visitors', newCount.toString());
     return newCount;
   } catch (e) {
     console.warn(e);
-    return 3429;
+    return 1;
   }
 };
 
@@ -715,70 +654,21 @@ export const validateCouponCode = (code, subtotal) => {
 };
 
 // ── OFFLINE STUDIO ORDERS PERSISTENCE (WALK-IN POS & BOOKINGS) ──
-export const INITIAL_OFFLINE_ORDERS = [
-  {
-    id: 'OFF-101',
-    customerName: 'Megha Singhania',
-    customerPhone: '+91 98112 34567',
-    item: 'Rani Pink Zardozi Velvet Bridal Lehenga',
-    category: 'BRIDAL_COUTURE',
-    mode: 'RENT',
-    amount: 18500,
-    advancePaid: 8500,
-    balanceDue: 10000,
-    deposit: 15000,
-    paymentMethod: 'UPI_QR',
-    paymentStatus: 'PARTIAL_ADVANCE',
-    bookingDate: '28 Sep 2026',
-    eventDate: '12 Nov 2026',
-    returnDate: '15 Nov 2026',
-    notes: 'Blouse alteration: chest 34, waist 28. Extra latkans requested.',
-    status: 'IN_ALTERATION'
-  },
-  {
-    id: 'OFF-102',
-    customerName: 'Ananya Verma',
-    customerPhone: '+91 98731 88921',
-    item: 'Royal Polki & Emerald Bridal Choker Set',
-    category: 'JEWELLERY_ACCESSORIES',
-    mode: 'RENT',
-    amount: 8500,
-    advancePaid: 8500,
-    balanceDue: 0,
-    deposit: 8000,
-    paymentMethod: 'CASH',
-    paymentStatus: 'PAID',
-    bookingDate: '29 Sep 2026',
-    eventDate: '05 Oct 2026',
-    returnDate: '08 Oct 2026',
-    notes: 'Matching earrings & maang tikka packed in studio velvet box.',
-    status: 'READY_FOR_PICKUP'
-  },
-  {
-    id: 'OFF-103',
-    customerName: 'Ritika Malhotra',
-    customerPhone: '+91 96540 12890',
-    item: 'Bespoke Antique Gold Tissue Silk Bridal Saree',
-    category: 'FESTIVE_PARTY',
-    mode: 'BUY',
-    amount: 125000,
-    advancePaid: 50000,
-    balanceDue: 75000,
-    deposit: 0,
-    paymentMethod: 'CARD',
-    paymentStatus: 'PARTIAL_ADVANCE',
-    bookingDate: '25 Sep 2026',
-    eventDate: '20 Dec 2026',
-    returnDate: null,
-    notes: 'Custom hand embroidery on pallu with bride & groom initials.',
-    status: 'CONFIRMED'
-  }
-];
+// Starts completely fresh & empty for studio handover
+export const INITIAL_OFFLINE_ORDERS = [];
 
 export const getStoredOfflineOrders = () => {
   try {
     const data = localStorage.getItem('shubhaangi_offline_orders');
-    return data ? JSON.parse(data) : INITIAL_OFFLINE_ORDERS;
+    if (!data) return INITIAL_OFFLINE_ORDERS;
+    const parsed = JSON.parse(data);
+    if (!Array.isArray(parsed)) return INITIAL_OFFLINE_ORDERS;
+    // Filter out legacy development mock orders
+    const filtered = parsed.filter(o => !['OFF-101', 'OFF-102', 'OFF-103'].includes(o.id));
+    if (filtered.length !== parsed.length) {
+      localStorage.setItem('shubhaangi_offline_orders', JSON.stringify(filtered));
+    }
+    return filtered;
   } catch (e) {
     console.warn(e);
     return INITIAL_OFFLINE_ORDERS;
@@ -938,7 +828,7 @@ export const INITIAL_STUDIO_SERVICES = [
     badge: 'Craft Story',
     description: 'Watch our master karigars in Old Delhi and Laxmi Nagar hand-embroider real dabka, sequins and golden threads onto pure raw silk fabrics.',
     image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&q=80&w=1000',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    videoUrl: 'https://www.instagram.com/shubhaangi.official/',
     features: ['Raw Karigar Craftsmanship', 'Close-up Thread & Pearl Work'],
     isActive: true
   },
@@ -952,7 +842,7 @@ export const INITIAL_STUDIO_SERVICES = [
     badge: 'Reel',
     description: 'Step inside our Laxmi Nagar trial suite and experience how a bride finds her dream lehenga with lead designer Deepak Kumar.',
     image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=1000',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    videoUrl: 'https://www.instagram.com/shubhaangi.official/',
     features: ['Real Bride Experience', 'Final Look Reveal Reaction'],
     isActive: true
   },
@@ -1061,7 +951,7 @@ export const getStoredStudioServices = () => {
       if (item.type === 'BTS_VIDEOS' && !item.videoUrl) {
         return {
           ...item,
-          videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
+          videoUrl: 'https://www.instagram.com/shubhaangi.official/'
         };
       }
       if ((item.type === 'PHOTOSHOOT' || item.type === 'PORTFOLIO') && (!item.gallery || item.gallery.length === 0)) {
@@ -1210,6 +1100,61 @@ export function matchesCatalogCategory(product, tabId) {
 
     default:
       return cat === tabId;
+  }
+}
+
+// Self-executing one-time purge of legacy development/test mock data for fresh handover
+if (typeof window !== 'undefined') {
+  try {
+    const isCleaned = localStorage.getItem('shubhaangi_fresh_v2');
+    if (!isCleaned) {
+      // 1. Remove mock online orders
+      const orders = localStorage.getItem('shubhaangi_orders');
+      if (orders) {
+        try {
+          const parsed = JSON.parse(orders);
+          if (Array.isArray(parsed)) {
+            const filtered = parsed.filter(o => !['SHB-8091', 'SHB-8092', 'SHB-8093', 'SHB-8094', 'SHB-8095'].includes(o.id));
+            localStorage.setItem('shubhaangi_orders', JSON.stringify(filtered));
+          }
+        } catch {}
+      } else {
+        localStorage.setItem('shubhaangi_orders', JSON.stringify([]));
+      }
+
+      // 2. Remove mock offline orders
+      const offline = localStorage.getItem('shubhaangi_offline_orders');
+      if (offline) {
+        try {
+          const parsed = JSON.parse(offline);
+          if (Array.isArray(parsed)) {
+            const filtered = parsed.filter(o => !['OFF-101', 'OFF-102', 'OFF-103'].includes(o.id));
+            localStorage.setItem('shubhaangi_offline_orders', JSON.stringify(filtered));
+          }
+        } catch {}
+      } else {
+        localStorage.setItem('shubhaangi_offline_orders', JSON.stringify([]));
+      }
+
+      // 3. Clear demo test cart
+      try {
+        localStorage.removeItem('shubhaangi_cart');
+      } catch {}
+      
+      // 4. Reset visitor counter from fake 3428 to 1
+      try {
+        localStorage.setItem('shubhaangi_visitors', '1');
+      } catch {}
+
+      // 5. Default top banner to OFF for fresh handover
+      try {
+        localStorage.setItem('shubhaangi_offer_banner_v1', JSON.stringify(INITIAL_OFFER_BANNER));
+      } catch {}
+
+      localStorage.setItem('shubhaangi_fresh_v2', 'true');
+    }
+  } catch (e) {
+    console.warn('Fresh store handover purge:', e);
   }
 }
 

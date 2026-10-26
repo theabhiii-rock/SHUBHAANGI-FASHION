@@ -70,7 +70,7 @@ export default function OrderTrackerModal({ isOpen, onClose, orders }) {
             </div>
             <h3 className="text-2xl font-serif text-gray-900 mb-2">Track Your Bridal Commission</h3>
             <p className="text-xs text-gray-500 font-light mb-6">
-              Enter your Order Reference Number (e.g. <strong>#SHB-8091</strong>) or phone number to view real-time atelier status.
+              Enter your Order Reference Number (e.g. <strong>#SHB-1001</strong>) or phone number to view real-time atelier status.
             </p>
 
             {/* Search Input */}
@@ -79,7 +79,7 @@ export default function OrderTrackerModal({ isOpen, onClose, orders }) {
                 <FiSearch className="absolute left-3.5 top-3 text-gray-400" size={16} />
                 <input
                   type="text"
-                  placeholder="e.g. SHB-8091"
+                  placeholder="e.g. SHB-1001 or Phone Number"
                   value={searchId}
                   onChange={(e) => setSearchId(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded text-xs focus:border-black outline-none font-mono"
