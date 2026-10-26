@@ -2,19 +2,22 @@ import React, { useState, useRef } from 'react';
 import { FiInstagram, FiMessageCircle, FiPhoneCall } from 'react-icons/fi';
 
 export default function StoreFooter({ onOpenAuthModal }) {
-  const [tapCount, setTapCount] = useState(0);
+  const tapCountRef = useRef(0);
   const lastTapRef = useRef(0);
 
   const handleStudioClick = (e) => {
     e.preventDefault();
     const now = Date.now();
-    // Count consecutive taps within 2.5 seconds
-    const nextCount = (now - lastTapRef.current < 2500) ? tapCount + 1 : 1;
+    // Count consecutive taps within 3 seconds
+    if (now - lastTapRef.current < 3000) {
+      tapCountRef.current += 1;
+    } else {
+      tapCountRef.current = 1;
+    }
     lastTapRef.current = now;
-    setTapCount(nextCount);
 
-    if (nextCount >= 5) {
-      setTapCount(0);
+    if (tapCountRef.current >= 5) {
+      tapCountRef.current = 0;
       lastTapRef.current = 0;
       if (typeof onOpenAuthModal === 'function') {
         onOpenAuthModal();
