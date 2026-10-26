@@ -1,8 +1,20 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiPlay, FiAward, FiScissors, FiHeart, FiInstagram } from 'react-icons/fi';
+import { FiPlay, FiAward, FiScissors, FiHeart } from 'react-icons/fi';
 
 export default function VideoStorySection({ fadeUp }) {
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const handlePlayClick = () => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {
+        // Fallback for strict browser autoplay policies
+      });
+      setIsPlaying(true);
+    }
+  };
+
   return (
     <section className="py-24 px-6 bg-[#0a0a0a] text-white border-y border-white/10 relative overflow-hidden">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -10,34 +22,38 @@ export default function VideoStorySection({ fadeUp }) {
         {/* Left Column: Documentary Video Card */}
         <div className="lg:col-span-7 relative">
           <div className="relative aspect-video rounded-sm overflow-hidden bg-neutral-900 border border-white/10 shadow-2xl group">
-            <img
-              src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&q=80&w=1200"
-              alt="Atelier Craftsmanship"
-              className="w-full h-full object-cover opacity-75 group-hover:scale-105 transition-transform duration-700"
+            <video
+              ref={videoRef}
+              src="/videos/shubhaangi-story.mp4"
+              controls
+              playsInline
+              preload="metadata"
+              poster="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&q=80&w=1200"
+              className="w-full h-full object-cover"
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              onEnded={() => setIsPlaying(false)}
             />
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-              <a
-                href="https://instagram.com/shubhaangi.official"
-                target="_blank"
-                rel="noreferrer"
-                className="w-20 h-20 rounded-full bg-luxury-gold text-black flex items-center justify-center hover:scale-110 transition-transform shadow-2xl pl-1 group/btn"
-                aria-label="Watch atelier films on official Instagram"
+
+            {/* Custom Gold Play Button Overlay before video is started */}
+            {!isPlaying && (
+              <div
+                onClick={handlePlayClick}
+                className="absolute inset-0 bg-black/40 hover:bg-black/25 flex items-center justify-center cursor-pointer transition-colors group/overlay"
               >
-                <FiPlay size={28} className="group-hover/btn:scale-105 transition-transform text-black" />
-              </a>
-            </div>
-            <div className="absolute bottom-4 left-4 right-4 bg-black/75 backdrop-blur-md p-3 rounded flex justify-between items-center text-xs border border-white/10">
-              <span className="text-gray-300 font-serif italic">"Every needle pass is an act of devotion."</span>
-              <a
-                href="https://instagram.com/shubhaangi.official"
-                target="_blank"
-                rel="noreferrer"
-                className="text-[10px] tracking-widest text-luxury-gold hover:text-white uppercase font-bold transition-colors flex items-center gap-1.5"
-              >
-                <FiInstagram size={12} />
-                <span>Watch Reel →</span>
-              </a>
-            </div>
+                <button
+                  type="button"
+                  aria-label="Play Shubhaangi Story Film"
+                  className="w-20 h-20 rounded-full bg-luxury-gold text-black flex items-center justify-center hover:scale-110 transition-transform shadow-2xl pl-1"
+                >
+                  <FiPlay size={28} />
+                </button>
+                <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm p-3 rounded flex justify-between items-center text-xs pointer-events-none">
+                  <span className="text-gray-300 font-serif italic">"Every needle pass is an act of devotion."</span>
+                  <span className="text-[10px] tracking-widest text-luxury-gold uppercase font-bold">The Shubhaangi Story • 4K Film</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

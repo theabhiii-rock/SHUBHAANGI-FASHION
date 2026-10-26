@@ -823,12 +823,12 @@ export const INITIAL_STUDIO_SERVICES = [
     type: 'BTS_VIDEOS',
     categoryLabel: 'BTS Videos',
     title: 'The Art of Zardozi — Behind the Loom',
-    subtitle: '400 Hours of Pure Hand Embroidery Documentary',
-    duration: '0:45s • 4K Reel',
+    subtitle: 'The Shubhaangi Story Documentary',
+    duration: '4K Film',
     badge: 'Craft Story',
     description: 'Watch our master karigars in Old Delhi and Laxmi Nagar hand-embroider real dabka, sequins and golden threads onto pure raw silk fabrics.',
     image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&q=80&w=1000',
-    videoUrl: 'https://www.instagram.com/shubhaangi.official/',
+    videoUrl: '/videos/shubhaangi-story.mp4',
     features: ['Raw Karigar Craftsmanship', 'Close-up Thread & Pearl Work'],
     isActive: true
   },
@@ -836,13 +836,13 @@ export const INITIAL_STUDIO_SERVICES = [
     id: 'srv-bts-2',
     type: 'BTS_VIDEOS',
     categoryLabel: 'BTS Videos',
-    title: 'Bridal Transformation & Trial Suite BTS',
-    subtitle: 'Bride Simran’s Complete Fitting Journey',
-    duration: '0:30s • Studio Reel',
-    badge: 'Reel',
+    title: 'The Shubhaangi Story — Heritage & Vision',
+    subtitle: 'Founder Ekta Jain & Designer Deepak Kumar',
+    duration: 'Studio Film',
+    badge: 'Brand Film',
     description: 'Step inside our Laxmi Nagar trial suite and experience how a bride finds her dream lehenga with lead designer Deepak Kumar.',
     image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=1000',
-    videoUrl: 'https://www.instagram.com/shubhaangi.official/',
+    videoUrl: '/videos/shubhaangi-story.mp4',
     features: ['Real Bride Experience', 'Final Look Reveal Reaction'],
     isActive: true
   },
@@ -951,7 +951,7 @@ export const getStoredStudioServices = () => {
       if (item.type === 'BTS_VIDEOS' && !item.videoUrl) {
         return {
           ...item,
-          videoUrl: 'https://www.instagram.com/shubhaangi.official/'
+          videoUrl: '/videos/shubhaangi-story.mp4'
         };
       }
       if ((item.type === 'PHOTOSHOOT' || item.type === 'PORTFOLIO') && (!item.gallery || item.gallery.length === 0)) {
